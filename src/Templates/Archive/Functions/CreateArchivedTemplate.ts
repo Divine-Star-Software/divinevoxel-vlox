@@ -176,14 +176,20 @@ export default function CreateArchivedTemplate(
   const palettes: ArchivedVoxelTemplateData["palettes"] = {
     ...voxelPalette.toJSON(),
   };
-  if (!(levelPalette.size == 1 && levelPalette._palette[0] === 0)) {
+  if (
+    levelPalette.size > 0 &&
+    !(levelPalette.size == 1 && levelPalette._palette[0] === 0)
+  ) {
     palettes.level = BinaryBuffer.Create({
       format: BinaryBufferFormat.Uint8,
       byteLength: levelPalette._palette.length,
       buffer: Uint8Array.from(levelPalette._palette).buffer,
     });
   }
-  if (!(secondaryPalette.size == 1 && secondaryPalette._palette[0] === 0)) {
+  if (
+    secondaryPalette.size > 0 &&
+    !(secondaryPalette.size == 1 && secondaryPalette._palette[0] === 0)
+  ) {
     palettes.secondary = BinaryBuffer.Create({
       format: BinaryBufferFormat.Uint16,
       byteLength: secondaryPalette._palette.length,
