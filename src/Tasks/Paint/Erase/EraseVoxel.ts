@@ -24,7 +24,7 @@ export function EraseVoxel(
   voxel.secondary[voxel._index] = 0;
   voxel.light[voxel._index] = 0;
   voxel.updateVoxel(1);
-  updateArea(tasks, x, y, z, x, y, z);
+  updateArea(tasks, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
 
   voxel = tasks.sDataCursor.getVoxel(x, y, z)!;
 

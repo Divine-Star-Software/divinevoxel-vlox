@@ -24,7 +24,7 @@ export function PaintVoxel(
   voxel.setRaw(raw);
   voxel.updateVoxel(0);
 
-  updateArea(tasks, x, y, z, x, y, z);
+  updateArea(tasks, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
 
   if (ES.doPower) {
     if (
