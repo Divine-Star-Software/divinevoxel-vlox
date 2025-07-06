@@ -9,7 +9,8 @@ export class TemplateCursor implements DataCursorInterface {
   private voxel = new TemplateVoxelCursor(this);
 
   inBounds(x: number, y: number, z: number): boolean {
-    return true;
+    if(!this._proxy) return false;
+    return this._proxy.inBounds(x,y,z);
   }
   setTemplate(template: IVoxelTemplate) {
     this._proxy = new TemplateProxy(template);

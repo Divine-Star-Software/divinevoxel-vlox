@@ -99,32 +99,32 @@ const topAndDown: Record<string, Vec3Array[]> = {
   west: [[-1, 0, 0]],
 };
 const eastAndWest: Record<string, Vec3Array[]> = {
-  top: [
+  north: [
     [0, 1, 0],
     [0, 1, 1],
     [0, 1, -1],
   ],
-  bottom: [
+  south: [
     [0, -1, 0],
     [0, -1, 1],
     [0, -1, -1],
   ],
-  right: [[0, 0, 1]],
-  left: [[0, 0, -1]],
+  east: [[0, 0, 1]],
+  west: [[0, 0, -1]],
 };
 const northAndSouth: Record<string, Vec3Array[]> = {
-  top: [
+  north: [
     [0, 1, 0],
     [1, 1, 0],
     [-1, 1, 0],
   ],
-  bottom: [
+  south: [
     [0, -1, 0],
     [1, -1, 0],
     [-1, -1, 0],
   ],
-  right: [[1, 0, 0]],
-  left: [[-1, 0, 0]],
+  east: [[1, 0, 0]],
+  west: [[-1, 0, 0]],
 };
 const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
   [VoxelFaces.Up]: topAndDown,

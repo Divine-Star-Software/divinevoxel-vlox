@@ -31,7 +31,8 @@ export function MeshVoxel(
       `Could not find constructor for voxel [id:${voxel.getStringId()} name:${voxel.getName()}] `
     );
   }
-
+  constructor.schema.dataCursor = templateCursor;
+  constructor.schema.voxel = voxel;
   const builder = constructor.builder;
   if (!builder) {
     console.error(builder, constructor.id, constructor);
