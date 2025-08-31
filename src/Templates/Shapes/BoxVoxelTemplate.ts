@@ -79,10 +79,19 @@ export class BoxVoxelTemplate extends BasicVoxelShapeTemplate<
     this._width = data.width;
     this._height = data.height;
     this._depth = data.depth;
+    this.bounds.size.x = data.width;
+    this.bounds.size.y = data.height;
+    this.bounds.size.z = data.depth;
+    this._updateBounds();
   }
 
   isIncluded(index: number) {
     return true;
+  }
+
+  clone() {
+    const newTemplate = new BoxVoxelTemplate(structuredClone(this.toJSON()));
+    return newTemplate;
   }
 
   toJSON(): BoxVoxelTemplateData {

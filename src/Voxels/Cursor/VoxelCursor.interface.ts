@@ -243,6 +243,7 @@ export abstract class VoxelCursorInterface {
     return this;
   }
 
+  /**Get the voxels palette id. The id is the combination of the true id, state, and mod. */
   getId() {
     if (this.__readingSecondaryVoxel) {
       return this.secondaryId;
@@ -257,6 +258,7 @@ export abstract class VoxelCursorInterface {
     this.ids[this._index] = id;
     return this;
   }
+  /**Get the true voxel id. Meaning the numeric id for the string id of the voxel */
   getVoxelId() {
     return this.getIndexData()[0];
   }

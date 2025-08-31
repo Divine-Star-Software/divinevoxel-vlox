@@ -82,6 +82,11 @@ export class ConeVoxelTemplate extends BasicVoxelShapeTemplate<
     return true;
   }
 
+  clone() {
+    const newTemplate = new ConeVoxelTemplate(structuredClone(this.toJSON()));
+    return newTemplate;
+  }
+
   toJSON(): ConeVoxelTemplateData {
     return {
       width: this.width,

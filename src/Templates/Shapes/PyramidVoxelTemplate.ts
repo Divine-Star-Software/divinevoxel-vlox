@@ -107,6 +107,10 @@ export class PyramidVoxelTemplate extends BasicVoxelShapeTemplate<
     this._width = data.width;
     this._height = data.height;
     this._depth = data.depth;
+    this.bounds.size.x = this._width;
+    this.bounds.size.y = this._height;
+    this.bounds.size.z = this._depth;
+    this._updateBounds();
   }
 
   isIncluded(index: number): boolean {
@@ -158,6 +162,13 @@ export class PyramidVoxelTemplate extends BasicVoxelShapeTemplate<
       default:
         return false;
     }
+  }
+
+  clone() {
+    const newTemplate = new PyramidVoxelTemplate(
+      structuredClone(this.toJSON())
+    );
+    return newTemplate;
   }
 
   toJSON(): PyramidVoxelTemplateData {

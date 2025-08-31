@@ -3,6 +3,7 @@ import { IVoxelSelection } from "./VoxelSelecton";
 import { BoxVoxelTemplate } from "../Shapes/BoxVoxelTemplate";
 import { IVoxelshapeTemplateBaseData } from "../Shapes/VoxelShapeTemplate.types";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 const getMinMax = (...points: Vec3Array[]): [Vec3Array, Vec3Array] => {
   if (points.length === 0) {
     throw new Error("At least one point is required to calculate min/max.");
@@ -33,6 +34,7 @@ export class VoxelBoxSelection implements IVoxelSelection {
   origin = Vector3Like.Create();
   end = Vector3Like.Create();
   size = Vector3Like.Create();
+  bounds = new BoundingBox();
 
   isSelected(x: number, y: number, z: number): boolean {
     if (x < this.origin.x || x >= this.end.x) return false;
@@ -112,6 +114,16 @@ export class VoxelBoxSelection implements IVoxelSelection {
       this.size.y = finalSize[1];
       this.size.z = finalSize[2];
     }
+    this.bounds.setMinMax(this.origin, this.end);
+  }
+
+  clone() {
+    const newSelection = new VoxelBoxSelection();
+    Vector3Like.Copy(newSelection.origin, this.origin);
+    Vector3Like.Copy(newSelection.size, this.size);
+    Vector3Like.Copy(newSelection.end, this.end);
+    newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
+    return newSelection;
   }
 
   toTemplate(data?: Partial<IVoxelshapeTemplateBaseData>) {

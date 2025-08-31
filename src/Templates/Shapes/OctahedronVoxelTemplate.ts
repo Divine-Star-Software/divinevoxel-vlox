@@ -82,6 +82,13 @@ export class OctahedronVoxelTemplate extends BasicVoxelShapeTemplate<
     return true;
   }
 
+  clone() {
+    const newTemplate = new OctahedronVoxelTemplate(
+      structuredClone(this.toJSON())
+    );
+    return newTemplate;
+  }
+
   toJSON(): OctahedronVoxelTemplateData {
     return {
       width: this.width,

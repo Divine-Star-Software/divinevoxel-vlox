@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "outDir": "../dist",
     "baseUrl": "./",
-    "types": ["@types/node", "@amodx/threads"],
+    "types": ["@types/node"],
     "allowJs": true,
     "checkJs": false,
     "resolveJsonModule": true

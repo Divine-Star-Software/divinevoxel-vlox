@@ -9,6 +9,7 @@ import {
 } from "../../Util/Binary/BinaryArrays";
 import { PaintVoxelData } from "../../Voxels/Types/PaintVoxelData";
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
 export interface VoxelSurfaceSelectionData {
   origin: Vector3Like;
@@ -26,6 +27,7 @@ export class VoxelSurfaceSelection
   normal = Vector3Like.Create();
   bitIndex: Uint8Array;
   index = Flat3DIndex.GetXZYOrder();
+  bounds = new BoundingBox();
   extrusion = 0;
 
   isSelected(x: number, y: number, z: number): boolean {
@@ -153,6 +155,27 @@ export class VoxelSurfaceSelection
     this.origin.x = min.x;
     this.origin.y = min.y;
     this.origin.z = min.z;
+
+    this.bounds.setMinMax(this.origin, {
+      x: this.origin.x + this.size.x,
+      y: this.origin.y + this.size.y,
+      z: this.origin.z + this.size.z,
+    });
+  }
+
+  clone() {
+    const newSelection = new VoxelSurfaceSelection();
+    Vector3Like.Copy(newSelection.origin, this.origin);
+    Vector3Like.Copy(newSelection.size, this.size);
+    newSelection.bounds.setMinMax(
+      this.bounds.min,
+      this.bounds.max
+    );
+    newSelection.extrusion = this.extrusion;
+    newSelection.bitIndex = structuredClone(this.bitIndex);
+    newSelection.index.setBounds(...this.index.getBounds());
+    newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
+    return newSelection;
   }
 
   toTemplate(

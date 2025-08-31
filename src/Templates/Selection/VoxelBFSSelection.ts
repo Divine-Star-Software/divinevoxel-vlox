@@ -7,6 +7,7 @@ import {
   setBitArrayIndex,
 } from "../../Util/Binary/BinaryArrays";
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
 export interface VoxelBFSSelectionData {
   origin: Vector3Like;
@@ -21,6 +22,7 @@ export class VoxelBFSSelection
   size = Vector3Like.Create();
   bitIndex: Uint8Array;
   index = Flat3DIndex.GetXZYOrder();
+  bounds = new BoundingBox();
 
   isSelected(x: number, y: number, z: number): boolean {
     if (x < this.origin.x || x >= this.origin.x + this.size.x) return false;
@@ -149,6 +151,16 @@ export class VoxelBFSSelection
       }
     }
     return template;
+  }
+
+  clone() {
+    const newSelection = new VoxelBFSSelection();
+    Vector3Like.Copy(newSelection.origin, this.origin);
+    Vector3Like.Copy(newSelection.size, this.size);
+    newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
+    newSelection.bitIndex = structuredClone(this.bitIndex);
+    newSelection.index.setBounds(...this.index.getBounds());
+    return newSelection;
   }
 
   toJSON(): VoxelBFSSelectionData {

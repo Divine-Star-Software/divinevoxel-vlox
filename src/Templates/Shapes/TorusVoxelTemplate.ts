@@ -80,6 +80,11 @@ export class TorusVoxelTemplate extends BasicVoxelShapeTemplate<
     return true;
   }
 
+  clone() {
+    const newTemplate = new TorusVoxelTemplate(structuredClone(this.toJSON()));
+    return newTemplate;
+  }
+
   toJSON(): TorusVoxelTemplateData {
     return {
       width: this.width,

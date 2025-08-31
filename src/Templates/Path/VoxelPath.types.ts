@@ -5,6 +5,7 @@ export type VoxelPathSegmentData = {
   start: Vec3Array;
   end: Vec3Array;
   voxel: PaintVoxelData;
+  transient?: boolean;
 };
 
 export type VoxelPathData = {

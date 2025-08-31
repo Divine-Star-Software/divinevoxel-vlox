@@ -72,6 +72,10 @@ export class VoxelPickResult implements VoxelPickResultData {
     this.voxel.loadIn();
   }
 
+  clone() {
+    return VoxelPickResult.FromJSON(this.toJSON());
+  }
+  
   toJSON(): VoxelPickResultData {
     return {
       rayOrigin: { ...this.rayOrigin },

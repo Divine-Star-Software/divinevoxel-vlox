@@ -150,6 +150,13 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
     }
   }
 
+  clone() {
+    const newTemplate = new ArchivedVoxelTemplate(
+      structuredClone(this.toJSON())
+    );
+    return newTemplate;
+  }
+
   getRaw(index: number, rawRef: RawVoxelData = [0, 0, 0, 0]): RawVoxelData {
     rawRef[0] = this.getId(index);
     rawRef[1] = this.getLight(index);

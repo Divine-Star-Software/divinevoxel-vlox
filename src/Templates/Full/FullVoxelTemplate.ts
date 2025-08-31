@@ -116,6 +116,11 @@ export class FullVoxelTemplate implements IVoxelTemplate {
     return rawRef;
   }
 
+  clone() {
+    const newTemplate = new FullVoxelTemplate(structuredClone(this.toJSON()));
+    return newTemplate;
+  }
+
   toJSON(): FullVoxelTemplateData {
     return {
       type: "full",

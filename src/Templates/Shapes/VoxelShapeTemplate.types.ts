@@ -14,10 +14,18 @@ export type VoxelShapeTemplateShapeDirections =
   | "+z"
   | "-z";
 
+export const VoxelShapeTemplateFillModesArray: VoxelShapeTemplateFillModes[] = [
+  "full",
+  "outline",
+  "shell",
+];
+export const VoxelShapeTemplateShapeDirectionsArray: VoxelShapeTemplateShapeDirections[] =
+  ["+x", "-x", "+y", "-y", "+z", "-z"];
+
 export interface IVoxelShapeTemplate<
   Type extends string,
   Data extends IVoxelShapeTemplateData<Type>,
-  Events extends IVoxelShapeTemplateEvents = IVoxelShapeTemplateEvents,
+  Events extends IVoxelShapeTemplateEvents = IVoxelShapeTemplateEvents
 > extends IVoxelTemplate<Type, Data>,
     TypedEventTarget<Events> {
   fillMode: VoxelShapeTemplateFillModes;

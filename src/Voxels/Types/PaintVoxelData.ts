@@ -22,6 +22,8 @@ export class PaintVoxelData {
       data.secondaryModString
     );
   }
+
+  /**Transforms numeric voxel data into a PaintVoxelData object */
   static FromRaw(data: RawVoxelData, paintData = PaintVoxelData.Create()) {
     const [trueVoxelId, state, mod] = VoxelPalettesRegister.voxels[data[0]];
     paintData.id = VoxelPalettesRegister.voxelIds.getStringId(trueVoxelId);
@@ -45,6 +47,8 @@ export class PaintVoxelData {
     paintData.levelState = VoxelLevelReader.getLevel(data[2]);
     return paintData;
   }
+
+  /**Transforms the voxel data into numeric voxel data */
   static ToRaw(data: Partial<PaintVoxelData>, light = 0): RawVoxelData {
     let stringId = data.id
       ? data.id
@@ -105,6 +109,56 @@ export class PaintVoxelData {
 
     return [id, light, levleData, secondaryId];
   }
+
+  /**Restores the data to the default state of being dve_air */
+  static Clear(data: PaintVoxelData) {
+    data.id = "dve_air";
+    data.name = "";
+    data.state = 0;
+    data.stateString = "";
+    data.mod = 0;
+    data.modString = "";
+    data.level = 0;
+    data.levelState = 0;
+    data.secondaryVoxelId = "dve_air";
+    data.secondaryName = "";
+    data.secondaryMod = 0;
+    data.secondaryModString = "";
+    data.secondaryState = 0;
+    data.secondaryStateString = "";
+    return data;
+  }
+
+  /**Clears the target data and then copies properties from source to target. */
+  static Set(
+    target: PaintVoxelData,
+    source: Partial<PaintVoxelData>
+  ): PaintVoxelData {
+    PaintVoxelData.Clear(target);
+    if (source.id !== undefined) target.id = source.id;
+    if (source.name !== undefined) target.name = source.name;
+    if (source.state !== undefined) target.state = source.state;
+    if (source.stateString !== undefined)
+      target.stateString = source.stateString;
+    if (source.mod !== undefined) target.mod = source.mod;
+    if (source.modString !== undefined) target.modString = source.modString;
+    if (source.level !== undefined) target.level = source.level;
+    if (source.levelState !== undefined) target.levelState = source.levelState;
+    if (source.secondaryVoxelId !== undefined)
+      target.secondaryVoxelId = source.secondaryVoxelId;
+    if (source.secondaryName !== undefined)
+      target.secondaryName = source.secondaryName;
+    if (source.secondaryMod !== undefined)
+      target.secondaryMod = source.secondaryMod;
+    if (source.secondaryModString !== undefined)
+      target.secondaryModString = source.secondaryModString;
+    if (source.secondaryState !== undefined)
+      target.secondaryState = source.secondaryState;
+    if (source.secondaryStateString !== undefined)
+      target.secondaryStateString = source.secondaryStateString;
+    return target;
+  }
+
   private constructor(
     public id: string = "dve_air",
     public name: string = "",

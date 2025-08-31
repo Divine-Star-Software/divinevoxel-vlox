@@ -17,7 +17,7 @@ export interface IVoxelTemplate<
   getLevel(index: number): number;
   getLight(index: number): number;
   getSecondary(index: number): number;
-
+  clone() : IVoxelTemplate;
   getRaw(index: number, rawRef?: RawVoxelData): RawVoxelData;
   toJSON(): Data;
 }

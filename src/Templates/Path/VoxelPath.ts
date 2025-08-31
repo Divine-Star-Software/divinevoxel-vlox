@@ -21,6 +21,7 @@ export class VoxelPathSegment
   start: Vec3Array;
   end: Vec3Array;
   voxel: PaintVoxelData;
+  transient = false;
   constructor(
     public path: VoxelPath,
     public index: number,
@@ -30,6 +31,7 @@ export class VoxelPathSegment
     this.start = data.start;
     this.end = data.end;
     this.voxel = data.voxel;
+    this.transient = data.transient || false;
   }
 
   setPoints([sx, sy, sz]: Vec3Array, [ex, ey, ez]: Vec3Array): void {
@@ -48,6 +50,7 @@ export class VoxelPathSegment
     this.end[1] = ey;
     this.end[2] = ez;
     if (updated) {
+      console.warn("UPDATED");
       this.dispatch("updated", {});
     }
   }
@@ -73,6 +76,7 @@ export class VoxelPathSegment
       start: [...this.start],
       end: [...this.end],
       voxel: { ...this.voxel },
+      ...(this.transient ? { transient: true } : {}),
     };
   }
 }
@@ -95,6 +99,20 @@ export class VoxelPath extends TypedEventTarget<VoxelPathEvents> {
     for (let i = 0; i < data.segments.length; i++) {
       this.segments.push(new VoxelPathSegment(this, i, data.segments[i]));
     }
+  }
+
+  get totalSegments() {
+    return this.segments.length;
+  }
+
+  lastSegment() {
+    if (!this.segments.length) return null;
+    return this.segments[(this.totalSegments - 1) % this.totalSegments];
+  }
+
+  firstSegment() {
+    if (!this.segments.length) return null;
+    return this.segments[0];
   }
 
   addSegment(data: VoxelPathSegmentData) {

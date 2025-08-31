@@ -82,6 +82,13 @@ export class CylinderVoxelTemplate extends BasicVoxelShapeTemplate<
     return true;
   }
 
+  clone() {
+    const newTemplate = new CylinderVoxelTemplate(
+      structuredClone(this.toJSON())
+    );
+    return newTemplate;
+  }
+
   toJSON(): CylinderVoxelTemplateData {
     return {
       width: this.width,

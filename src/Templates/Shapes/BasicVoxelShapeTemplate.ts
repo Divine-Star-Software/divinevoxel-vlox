@@ -8,11 +8,12 @@ import {
 } from "./VoxelShapeTemplate.types";
 import { TypedEventTarget } from "../../Util/TypedEventTarget";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { IVoxelTemplate } from "../VoxelTemplates.types";
 
 export abstract class BasicVoxelShapeTemplate<
     Type extends string,
     Data extends IVoxelShapeTemplateData<any>,
-    Events extends IVoxelShapeTemplateEvents = IVoxelShapeTemplateEvents,
+    Events extends IVoxelShapeTemplateEvents = IVoxelShapeTemplateEvents
   >
   extends TypedEventTarget<Events>
   implements IVoxelShapeTemplate<Type, Data, Events>
@@ -88,6 +89,8 @@ export abstract class BasicVoxelShapeTemplate<
   }
 
   abstract isIncluded(index: number): boolean;
+
+  abstract clone(): BasicVoxelShapeTemplate<Type, Data, Events>;
 
   isAir(index: number) {
     if (!this.isIncluded(index)) return true;
