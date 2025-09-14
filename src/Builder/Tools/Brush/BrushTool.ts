@@ -7,7 +7,7 @@ import { PyramidVoxelTemplate } from "../../../Templates/Shapes/PyramidVoxelTemp
 import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { Vector3Like } from "@amodx/math";
 import { PaintVoxelData } from "../../../Voxels";
-import { BuilderToolBase } from "../BuilderToolBase";
+import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 import { EllipsoidVoxelTemplate } from "../../../Templates/Shapes/EllipsoidVoxelTemplate";
 
 export enum BrushPositionModes {
@@ -51,17 +51,156 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     string,
     () => BasicVoxelShapeTemplate<any, any, any>
   > = {
-    Sphere: () => {
+    Sphere() {
       return new SphereVoxelTemplate(SphereVoxelTemplate.CreateNew({}));
     },
-    Box: () => {
+    Box() {
       return new BoxVoxelTemplate(BoxVoxelTemplate.CreateNew({}));
     },
-    Pyramid: () => {
+    Pyramid() {
       return new PyramidVoxelTemplate(PyramidVoxelTemplate.CreateNew({}));
     },
-    Ellipsoid: () => {
+    Ellipsoid() {
       return new EllipsoidVoxelTemplate(EllipsoidVoxelTemplate.CreateNew({}));
+    },
+  };
+  static BaseToolOptions: ToolOptionsData = [
+    {
+      cateogry: "main",
+      property: "axisXPositionMode",
+      name: "X Axis Position Mode",
+      type: "string",
+      options: [
+        ["End", BrushPositionModes.End],
+        ["Center", BrushPositionModes.Center],
+        ["Start", BrushPositionModes.Start],
+      ],
+    },
+    {
+      cateogry: "main",
+      property: "axisYPositionMode",
+      name: "Y Axis Position Mode",
+      type: "string",
+      options: [
+        ["End", BrushPositionModes.End],
+        ["Center", BrushPositionModes.Center],
+        ["Start", BrushPositionModes.Start],
+      ],
+    },
+    {
+      cateogry: "main",
+      property: "axisZPositionMode",
+      name: "Z Axis Position Mode",
+      type: "string",
+      options: [
+        ["End", BrushPositionModes.End],
+        ["Center", BrushPositionModes.Center],
+        ["Start", BrushPositionModes.Start],
+      ],
+    },
+  ];
+  static ShapeOptions: Record<string, () => ToolOptionsData> = {
+    Sphere() {
+      return [
+        {
+          cateogry: "shape",
+          property: "radius",
+          name: "Radius",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+      ];
+    },
+    Box() {
+      return [
+        {
+          cateogry: "shape",
+          property: "width",
+          name: "Width",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+        {
+          cateogry: "shape",
+          property: "height",
+          name: "Height",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+        {
+          cateogry: "shape",
+          property: "depth",
+          name: "Depth",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+      ];
+    },
+    Pyramid() {
+      return [
+        {
+          cateogry: "shape",
+          property: "direction",
+          name: "Direction",
+          type: "string",
+          options: [
+            ["Up", "+y"],
+            ["Down", "-y"],
+            ["East", "+x"],
+            ["West", "-x"],
+            ["North", "+z"],
+            ["South", "-z"],
+          ],
+        },
+        {
+          cateogry: "shape",
+          property: "height",
+          name: "Height",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+        {
+          cateogry: "shape",
+          property: "fallOff",
+          name: "Falloff",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+      ];
+    },
+    Ellipsoid() {
+      return [
+        {
+          cateogry: "shape",
+          property: "radiusX",
+          name: "Radius X",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+        {
+          cateogry: "shape",
+          property: "radiusY",
+          name: "Radius Y",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+        {
+          cateogry: "shape",
+          property: "radiusZ",
+          name: "Radius Z",
+          type: "number",
+          min: 0,
+          max: 50,
+        },
+      ];
     },
   };
   shape = "Sphere";
@@ -72,6 +211,8 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
 
   template: BasicVoxelShapeTemplate<any, any, any>;
   selection: VoxelTemplateSelection;
+  voxelData: Partial<BrushVoxelData> = {};
+  usePlacingStrategy = true;
   protected _position = Vector3Like.Create();
   constructor(public space: VoxelBuildSpace) {
     super();
@@ -79,21 +220,30 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     this.updateShape(this.shape);
   }
 
-  async use(
-    picked: VoxelPickResult,
-    voxelData: Partial<BrushVoxelData> = {},
-    usePlacingStrategy = true
-  ) {
-    if (usePlacingStrategy) {
-      if (voxelData.fill) {
-        const newData = this.space.getPlaceState(voxelData.fill, picked);
-        if (newData) voxelData.fill = newData;
+  async update() {
+    this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
+    if (!this._lastPicked) return;
+    const place = this.getPlacePosition(this._lastPicked);
+    if (!this.space.bounds.intersectsPoint(place)) return;
+    this.selection.origin.x = place.x;
+    this.selection.origin.y = place.y;
+    this.selection.origin.z = place.z;
+  }
+
+  async use() {
+    const picked = this._lastPicked;
+    if (!picked) return;
+
+    if (this.usePlacingStrategy) {
+      if (this.voxelData.fill) {
+        const newData = this.space.getPlaceState(this.voxelData.fill, picked);
+        if (newData) this.voxelData.fill = newData;
       }
     }
-    if (this.mode == BrushToolModes.Fill && voxelData.fill) {
+    if (this.mode == BrushToolModes.Fill && this.voxelData.fill) {
       if (!this.space.bounds.intersectsPoint(picked.normalPosition)) return;
 
-      this.template.setVoxels(voxelData.fill);
+      this.template.setVoxels(this.voxelData.fill);
       const place = this.getPlacePosition(picked);
       await this.space.paintTemplate(
         [place.x, place.y, place.z],
@@ -111,7 +261,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           this.template.toJSON()
         );
       }
-      return true;
+      return;
     }
   }
 
@@ -154,14 +304,6 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     return this._position;
   }
 
-  updatePlacer(picked: VoxelPickResult) {
-    const place = this.getPlacePosition(picked);
-    if (!this.space.bounds.intersectsPoint(place)) return false;
-    this.selection.origin.x = place.x;
-    this.selection.origin.y = place.y;
-    this.selection.origin.z = place.z;
-  }
-
   updateShape(shape: string) {
     const shapeCreator = BrushTool.ShapeCreators[shape];
     if (!shapeCreator) throw new Error(`Shape with id ${shape} does not exist`);
@@ -172,5 +314,36 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       this.selection.setTemplate(this.template);
       this.dispatch("shape-updated", null);
     });
+  }
+
+  getOptionValue(property: string) {
+    const data = this.getOptionData(property);
+    if (!data) return;
+    if (this.optionInCategory(property, "main")) {
+      return (this as any)[data.property];
+    }
+    if (this.optionInCategory(property, "shape")) {
+      return (this.template as any)[data.property];
+    }
+  }
+  getCurrentOptions(): ToolOptionsData {
+    const options = [
+      ...BrushTool.BaseToolOptions,
+      ...BrushTool.ShapeOptions[this.shape](),
+    ];
+    this.processOptions(options);
+    return options;
+  }
+  updateOption(property: string, value: any): void {
+    const data = this.getOptionData(property);
+    if (!data) return;
+    if (this.optionInCategory(property, "main")) {
+      (this as any)[data.property] = value;
+      return;
+    }
+    if (this.optionInCategory(property, "shape")) {
+      (this.template as any)[data.property] = value;
+      return;
+    }
   }
 }

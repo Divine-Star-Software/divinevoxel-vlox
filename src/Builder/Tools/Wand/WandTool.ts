@@ -3,16 +3,14 @@ import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels/Types/PaintVoxelData";
 import { VoxelSurfaceSelection } from "../../../Templates/Selection/VoxelSurfaceSelection";
 import { VoxelBFSSelection } from "../../../Templates/Selection/VoxelBFSSelection";
-import { BuilderToolBase } from "../BuilderToolBase";
+import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 export enum WandToolModes {
   Place = "Place",
   Extrude = "Extrude",
   Remove = "Remove",
 }
 
-interface WandToolEvents {
-
-}
+interface WandToolEvents {}
 export class WandTool extends BuilderToolBase<WandToolEvents> {
   static ToolId = "Wand";
   static ModeArray: WandToolModes[] = [
@@ -34,20 +32,23 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
   }
   surfaceSelection = new VoxelSurfaceSelection();
   bfsSelection = new VoxelBFSSelection();
-
+  voxelData: PaintVoxelData;
+  usePlacingStrategy = true;
   constructor(public space: VoxelBuildSpace) {
     super();
   }
 
-  async updatePlacer(picked: VoxelPickResult) {
+  async update() {
+    this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
+    if (!this._lastPicked) return;
     if (
       this.mode == WandToolModes.Place ||
       this.mode == WandToolModes.Extrude
     ) {
       this.surfaceSelection.fromJSON(
         await this.space.getSurfaceSelection(
-          picked.position,
-          picked.normal,
+          this._lastPicked.position,
+          this._lastPicked.normal,
           this.extrusion,
           this.maxCount
         )
@@ -55,20 +56,21 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
     }
     if (this.mode == WandToolModes.Remove) {
       this.bfsSelection.fromJSON(
-        await this.space.getBFSSelection(picked.position, this.maxCount)
+        await this.space.getBFSSelection(
+          this._lastPicked.position,
+          this.maxCount
+        )
       );
     }
   }
 
-  async use(
-    picked: VoxelPickResult,
-    voxelData: PaintVoxelData,
-    usePlacingStrategy = true
-  ) {
+  async use() {
+    const picked = this._lastPicked;
+    if (!picked) return;
+    let voxelData = this.voxelData;
     if (this.mode == WandToolModes.Place) {
-      if (!this.space.bounds.intersectsPoint(picked.normalPosition))
-        return false;
-      if (usePlacingStrategy) {
+      if (!this.space.bounds.intersectsPoint(picked.normalPosition)) return;
+      if (this.usePlacingStrategy) {
         const newData = this.space.getPlaceState(voxelData, picked);
         if (newData) voxelData = newData;
       }
@@ -80,7 +82,7 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
         voxelData
       );
       await this.space.paintTemplate(template.position, template.toJSON());
-      return true;
+      return;
     }
 
     if (this.mode == WandToolModes.Extrude) {
@@ -92,7 +94,7 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
         true
       );
       await this.space.paintTemplate(template.position, template.toJSON());
-      return true;
+      return;
     }
 
     if (this.mode == WandToolModes.Remove) {
@@ -101,7 +103,14 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
         this.maxCount
       );
       await this.space.eraseTemplate(template.position, template.toJSON());
-      return true;
+      return;
     }
   }
+  getOptionValue(id: string) {
+    return null;
+  }
+  getCurrentOptions(): ToolOptionsData {
+    return [];
+  }
+  updateOption(property: string, value: any): void {}
 }

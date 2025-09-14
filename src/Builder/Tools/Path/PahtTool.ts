@@ -2,7 +2,7 @@ import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
-import { BuilderToolBase } from "../BuilderToolBase";
+import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 import { VoxelPath, VoxelPathSegment } from "../../../Templates/Path/VoxelPath";
 import { Vector3Like } from "@amodx/math";
 export enum PathToolModes {
@@ -26,7 +26,7 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
   selection = new VoxelPointSelection();
   path = new VoxelPath(VoxelPath.CreateNew({}));
   distance = 10;
-
+  voxelData: PaintVoxelData;
   private _placedSegment = false;
   constructor(public space: VoxelBuildSpace) {
     super();
@@ -57,7 +57,7 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
     }
   }
 
-  updatePlacer() {
+  async update() {
     if (this.mode == PathToolModes.PlacePoints) {
       const rayPosition = Vector3Like.FloorInPlace(
         Vector3Like.Add(
@@ -88,7 +88,7 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
     }
   }
 
-  async use(voxelData: PaintVoxelData, usePlacingStrategy = true) {
+  async use() {
     if (this.mode == PathToolModes.PlacePoints) {
       this._placedSegment = true;
       if (!this.path.totalSegments) {
@@ -126,7 +126,7 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
 
     if (this.mode == PathToolModes.FillPath) {
       for (const segment of this.path.segments) {
-        segment.voxel = voxelData;
+        segment.voxel = this.voxelData;
       }
       await this.space.paintPath([0, 0, 0], this.path.toJSON());
       return;
@@ -137,4 +137,12 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
       return;
     }
   }
+
+  getOptionValue(id: string) {
+    return null;
+  }
+  getCurrentOptions(): ToolOptionsData {
+    return [];
+  }
+  updateOption(property: string, value: any): void {}
 }

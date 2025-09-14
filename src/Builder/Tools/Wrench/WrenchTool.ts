@@ -2,7 +2,7 @@ import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData, RawVoxelData } from "../../../Voxels";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
-import { BuilderToolBase } from "../BuilderToolBase";
+import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 import { SchemaRegister } from "../../../Voxels/State/SchemaRegister";
 import { VoxelBinaryStateSchemaNode } from "../../../Voxels/State/State.types";
 import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
@@ -59,11 +59,11 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     this._pickedResult = null;
   }
 
-  updatePlacer(picked: VoxelPickResult) {
-    console.log("update placer", this.mode);
+  async update() {
+    this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
+    if (!this._lastPicked) return;
     if (this.mode == WrenchToolModes.Pick) {
-      this._pickedResult = picked;
-      this.selection.reConstruct(picked.position);
+      this.selection.reConstruct(this._lastPicked.position);
     }
   }
 
@@ -193,8 +193,8 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
 
   async use() {
     if (this.mode == WrenchToolModes.Pick) {
-      if (this._pickedResult && !this._pickedResult.voxel.isAir()) {
-        this._pickedResult = this._pickedResult.clone();
+      if (this._lastPicked && !this._lastPicked.voxel.isAir()) {
+        this._pickedResult = this._lastPicked.clone();
         this.dispatch("picked", {});
         this.mode = WrenchToolModes.Update;
         return;
@@ -211,7 +211,19 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
         ],
         this.paintData
       );
-      return true;
+      return;
     }
+  }
+
+
+  getOptionValue(id: string) {
+    return null;
+  }
+
+  getCurrentOptions(): ToolOptionsData {
+    return [];
+  }
+  updateOption(property: string, value: any): void {
+    
   }
 }

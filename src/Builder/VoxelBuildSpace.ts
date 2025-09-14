@@ -11,16 +11,11 @@ import { RayProvider } from "./RayProvider";
 import { FullVoxelTemplate } from "../Templates/Full/FullVoxelTemplate";
 import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
 import { FullVoxelTemplateData } from "../Templates/Full/FullVoxelTemplate.types";
-import { LocationData } from "Math";
-import {
-  VoxelSurfaceSelection,
-  VoxelSurfaceSelectionData,
-} from "Templates/Selection/VoxelSurfaceSelection";
-import { VoxelBFSSelectionData } from "Templates/Selection/VoxelBFSSelection";
+import { LocationData } from "../Math";
+import type { VoxelSurfaceSelectionData } from "../Templates/Selection/VoxelSurfaceSelection";
+import type { VoxelBFSSelectionData } from "../Templates/Selection/VoxelBFSSelection";
+import { BoxVoxelTemplate } from "../Templates/Shapes/BoxVoxelTemplate";
 export type VoxelSpaceUpdateData =
-  | {
-      type: "clear";
-    }
   | {
       type: "paint-voxel";
       position: Vec3Array;
@@ -50,26 +45,54 @@ export type VoxelSpaceUpdateData =
       position: Vec3Array;
       path: VoxelPathData;
     };
-
+// 1) A helper to map each `type` to its exact update object
+type HandlerMap<U extends { type: string }> = {
+  [K in U["type"]]: (update: Extract<U, { type: K }>) => Promise<void>;
+};
 export class VoxelBuildSpace {
-  beforeUpdate: (data: VoxelSpaceUpdateData) => void;
-  afterUpdate: (data: VoxelSpaceUpdateData) => void;
+  /**Callback that is called before the update is ran. */
+  beforeUpdate: ((data: VoxelSpaceUpdateData) => Promise<void> | void) | null =
+    null;
+  /**Callback that is called durning the update call using Promise.all. */
+  duringUpdate: ((data: VoxelSpaceUpdateData) => Promise<void> | void) | null =
+    null;
+  /**Callback that is called after the update is ran. */
+  afterUpdate: ((data: VoxelSpaceUpdateData) => Promise<void> | void) | null =
+    null;
   bounds: BoundingBox;
+
+  private _rayProviders: (RayProvider | null)[] = [];
+
+  get rayProvider() {
+    return this.getRayProvider(0)!;
+  }
 
   constructor(
     public DVER: DivineVoxelEngineRender,
-    public rayProvider: RayProvider,
+    rayProvider: RayProvider,
     min = Vector3Like.Create(-Infinity, -Infinity, -Infinity),
     max = Vector3Like.Create(Infinity, Infinity, Infinity)
   ) {
     this.bounds = new BoundingBox(min, max);
+    this.addRayProvider(0, rayProvider);
   }
 
+  addRayProvider(index: number, provider: RayProvider) {
+    this._rayProviders[index] = provider;
+  }
+  getRayProvider(index: number): RayProvider | null {
+    return this._rayProviders[index];
+  }
+  removeRayProvider(index: number) {
+    this._rayProviders[index] = null;
+  }
+
+  /**Pick the current voxel space. Defaults to the rayProvider values. */
   async pick(
-    rayOrigin: Vector3Like,
-    rayDirection: Vector3Like,
-    length: number
-  ) {
+    rayOrigin: Vector3Like = this.rayProvider.origin,
+    rayDirection: Vector3Like = this.rayProvider.direction,
+    length: number = this.rayProvider.length
+  ): Promise<VoxelPickResult | null> {
     const pickedVoxel = await this.DVER.threads.world.runTaskAsync(
       "pick-voxel",
       [
@@ -84,6 +107,19 @@ export class VoxelBuildSpace {
     }
 
     return VoxelPickResult.FromJSON(pickedVoxel);
+  }
+
+  async pickWithProvider(index: number) {
+    const provider = this.getRayProvider(index);
+    if (!provider) {
+      console.warn("wtf", this, this._rayProviders);
+      throw new Error(`Ray Provider at index ${index} is not set`);
+    }
+    return await this.pick(
+      provider.origin,
+      this.rayProvider.direction,
+      this.rayProvider.length
+    );
   }
 
   async createTemplate(bounds: BoundsMinMaxData): Promise<FullVoxelTemplate> {
@@ -108,6 +144,7 @@ export class VoxelBuildSpace {
       [position, normal, extrusion, maxSize]
     );
   }
+
   async getSurfaceSelectionTemplate(
     position: Vector3Like,
     normal: Vector3Like,
@@ -122,6 +159,7 @@ export class VoxelBuildSpace {
       )
     );
   }
+
   async getBFSSelection(
     position: Vector3Like,
     maxSize?: number
@@ -131,6 +169,7 @@ export class VoxelBuildSpace {
       [position, maxSize]
     );
   }
+
   async getBFSSelectionTemplate(
     position: Vector3Like,
     maxSize?: number
@@ -142,6 +181,7 @@ export class VoxelBuildSpace {
       )
     );
   }
+
   getPlaceState(
     data: PaintVoxelData,
     picked: VoxelPickResult,
@@ -159,59 +199,82 @@ export class VoxelBuildSpace {
     data.state = schema.state.readString(state);
   }
 
-  private async _update(update: VoxelSpaceUpdateData) {
-    if (update.type == "paint-voxel") {
+  async clear() {
+    const size = this.bounds.size;
+    if (
+      Math.abs(size.x) == Infinity ||
+      Math.abs(size.y) == Infinity ||
+      Math.abs(size.z) == Infinity
+    )
+      return false;
+    const min = this.bounds.min;
+    await this.DVER.threads.world.runTaskAsync("erase-voxel-template", [
+      [0, min.x, min.y, min.z],
+      BoxVoxelTemplate.CreateNew({
+        width: size.x,
+        height: size.y,
+        depth: size.z,
+        bounds: Vector3Like.Create(size.x, size.y, size.z),
+      }),
+    ]);
+    return true;
+  }
+
+  private _updateFunctions: HandlerMap<VoxelSpaceUpdateData> = {
+    "paint-voxel": async (update) => {
       await this.DVER.threads.world.runTaskAsync("paint-voxel", [
         [0, ...update.position],
         PaintVoxelData.ToRaw(update.voxel),
       ]);
-      return;
-    }
-    if (update.type == "erase-voxel") {
+    },
+    "erase-voxel": async (update) => {
       await this.DVER.threads.world.runTaskAsync("erase-voxel", [
         0,
         ...update.position,
       ]);
-      return;
-    }
-    if (update.type == "paint-voxel-template") {
+    },
+    "paint-voxel-template": async (update) => {
       await this.DVER.threads.world.runTaskAsync("paint-voxel-template", [
         [0, ...update.position],
         update.template,
       ]);
-      return;
-    }
-    if (update.type == "erase-voxel-template") {
+    },
+    "erase-voxel-template": async (update) => {
       await this.DVER.threads.world.runTaskAsync("erase-voxel-template", [
         [0, ...update.position],
         update.template,
       ]);
-      return;
-    }
-    if (update.type == "paint-voxel-path") {
+    },
+    "paint-voxel-path": async (update) => {
       await this.DVER.threads.world.runTaskAsync("paint-voxel-path", [
         [0, ...update.position],
         update.path,
       ]);
-      return;
-    }
-    if (update.type == "erase-voxel-path") {
+    },
+    "erase-voxel-path": async (update) => {
       await this.DVER.threads.world.runTaskAsync("erase-voxel-path", [
         [0, ...update.position],
         update.path,
       ]);
-      return;
-    }
-  }
+    },
+  };
 
-  private async _doUpdate(data: VoxelSpaceUpdateData) {
-    if (this.beforeUpdate) this.beforeUpdate(data);
-    await this._update(data);
-    if (this.afterUpdate) this.afterUpdate(data);
+  async update<T extends VoxelSpaceUpdateData>(data: T) {
+    if (this.beforeUpdate) await this.beforeUpdate(data);
+
+    const run = this._updateFunctions[data.type] as (u: T) => Promise<void>;
+
+    if (this.duringUpdate) {
+      await Promise.all([run(data), this.duringUpdate(data)]);
+    } else {
+      await run(data);
+    }
+
+    if (this.afterUpdate) await this.afterUpdate(data);
   }
 
   async paintVoxel(position: Vec3Array | Vector3Like, voxel: PaintVoxelData) {
-    await this._doUpdate({
+    await this.update({
       type: "paint-voxel",
       position: Array.isArray(position)
         ? position
@@ -221,7 +284,7 @@ export class VoxelBuildSpace {
   }
 
   async eraseVoxel(position: Vec3Array | Vector3Like) {
-    await this._doUpdate({
+    await this.update({
       type: "erase-voxel",
       position: Array.isArray(position)
         ? position
@@ -233,7 +296,7 @@ export class VoxelBuildSpace {
     position: Vec3Array | Vector3Like | Vector3Like,
     template: IVoxelTemplateData<any>
   ) {
-    await this._doUpdate({
+    await this.update({
       type: "paint-voxel-template",
       position: Array.isArray(position)
         ? position
@@ -246,7 +309,7 @@ export class VoxelBuildSpace {
     position: Vec3Array | Vector3Like,
     template: IVoxelTemplateData<any>
   ) {
-    await this._doUpdate({
+    await this.update({
       type: "erase-voxel-template",
       position: Array.isArray(position)
         ? position
@@ -256,7 +319,7 @@ export class VoxelBuildSpace {
   }
 
   async paintPath(position: Vec3Array | Vector3Like, path: VoxelPathData) {
-    await this._doUpdate({
+    await this.update({
       type: "paint-voxel-path",
       position: Array.isArray(position)
         ? position
@@ -266,7 +329,7 @@ export class VoxelBuildSpace {
   }
 
   async erasePath(position: Vec3Array | Vector3Like, path: VoxelPathData) {
-    await this._doUpdate({
+    await this.update({
       type: "erase-voxel-path",
       position: Array.isArray(position)
         ? position

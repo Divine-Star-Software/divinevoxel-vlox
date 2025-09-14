@@ -5,7 +5,7 @@ import { VoxelBoxSelection } from "../../../Templates/Selection/VoxelBoxSelectio
 import { Vector3Like } from "@amodx/math";
 import { BoxSelection } from "./BoxSelection";
 import { BoxToolTemplate } from "./BoxToolTemplate";
-import { BuilderToolBase } from "../BuilderToolBase";
+import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 export enum BoxToolModes {
   Fill = "Fill",
   Extrude = "Extrude",
@@ -28,9 +28,11 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
   mode = BoxToolModes.Fill;
   selection = new VoxelBoxSelection();
   boxSelection: BoxSelection;
+  voxelData: PaintVoxelData;
+  usePlacingStrategy = true;
+
   constructor(public space: VoxelBuildSpace) {
     super();
-    console.warn("CREATE BOX TOOL",this.space,this.selection)
     this.boxSelection = new BoxSelection(this.space, this.selection);
   }
 
@@ -42,10 +44,12 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
     this.boxSelection.offset = offset;
     this.boxSelection.update();
   }
-  updatePlacer(
-    picked: VoxelPickResult | null,
-    placerMode: "start" | "end" | null = null
-  ) {
+
+  async update(placerMode: "start" | "end" | null = null) {
+    const picked = this.isSelectionStarted()
+      ? null
+      : await this.space.pickWithProvider(this.rayProviderIndex);
+    this._lastPicked = picked;
     if (!this._started && !placerMode && picked) {
       if (
         this.mode == BoxToolModes.Fill ||
@@ -95,13 +99,13 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
     }
   }
 
-  async use(voxelData: PaintVoxelData, usePlacingStrategy = true) {
+  async use() {
     if (this.mode == BoxToolModes.Fill) {
       await this.space.paintTemplate(
         Vector3Like.ToArray(this.selection.origin),
         this.selection
           .toTemplate({
-            fillVoxel: voxelData,
+            fillVoxel: this.voxelData,
           })
           .toJSON()
       );
@@ -123,4 +127,14 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
       );
     }
   }
+
+  getOptionValue(id: string) {
+    return null;
+  }
+  
+  getCurrentOptions(): ToolOptionsData {
+    return [];
+  }
+
+  updateOption(property: string, value: any): void {}
 }

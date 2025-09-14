@@ -2,7 +2,7 @@ import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
-import { BuilderToolBase } from "../BuilderToolBase";
+import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 export enum HandToolModes {
   Place = "Place",
   Remove = "Remove",
@@ -16,50 +16,75 @@ export class HandTool extends BuilderToolBase<HandToolEvents> {
   ];
   mode = HandToolModes.Place;
   selection = new VoxelPointSelection();
+  voxelData: PaintVoxelData;
+  usePlacingStrategy = true;
 
   constructor(public space: VoxelBuildSpace) {
     super();
   }
 
-  updatePlacer(picked: VoxelPickResult) {
+  async update() {
+    console.warn(
+      "update hand tool",
+      {
+        ...this.space.getRayProvider(this.rayProviderIndex)!.origin,
+      },
+      {
+        ...this.space.getRayProvider(this.rayProviderIndex)!.direction,
+      },
+      this.space.getRayProvider(this.rayProviderIndex)?.length
+    );
+    this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
+    if (!this._lastPicked) return;
     if (this.mode == HandToolModes.Place) {
-      this.selection.reConstruct(picked.normalPosition);
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)) {
+        this._lastPicked = null;
+        return;
+      }
+      this.selection.reConstruct(this._lastPicked.normalPosition);
     }
     if (this.mode == HandToolModes.Remove) {
-      this.selection.reConstruct(picked.position);
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
+        this._lastPicked = null;
+        return;
+      }
+      this.selection.reConstruct(this._lastPicked.position);
     }
   }
 
-  async use(
-    picked: VoxelPickResult,
-    voxelData: PaintVoxelData,
-    usePlacingStrategy = true
-  ) {
+  async use() {
+    if (!this._lastPicked) return;
     if (this.mode == HandToolModes.Place) {
-      if (!this.space.bounds.intersectsPoint(picked.normalPosition))
-        return false;
-      if (usePlacingStrategy) {
-        const newData = this.space.getPlaceState(voxelData, picked);
+      let voxelData = this.voxelData;
+      if (this.usePlacingStrategy) {
+        const newData = this.space.getPlaceState(voxelData, this._lastPicked);
         if (newData) voxelData = newData;
       }
       await this.space.paintVoxel(
         [
-          picked.normalPosition.x,
-          picked.normalPosition.y,
-          picked.normalPosition.z,
+          this._lastPicked.normalPosition.x,
+          this._lastPicked.normalPosition.y,
+          this._lastPicked.normalPosition.z,
         ],
         voxelData
       );
-      return true;
+      return;
     }
     if (this.mode == HandToolModes.Remove) {
-      if (!this.space.bounds.intersectsPoint(picked.position)) return false;
       await this.space.eraseVoxel([
-        picked.position.x,
-        picked.position.y,
-        picked.position.z,
+        this._lastPicked.position.x,
+        this._lastPicked.position.y,
+        this._lastPicked.position.z,
       ]);
-      return true;
+      return;
     }
   }
+
+  getOptionValue(id: string) {
+    return null;
+  }
+  getCurrentOptions(): ToolOptionsData {
+    return [];
+  }
+  updateOption(property: string, value: any): void {}
 }
