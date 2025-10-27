@@ -1,5 +1,5 @@
 import { SectionMesh } from "./SectionMesh";
-import { CompactedSectionVoxelMesh } from "../../Mesher/Geomtry/CompactedSectionVoxelMesh";
+import { CompactedSectionVoxelMesh } from "../../Mesher/Voxels/Geomtry/CompactedSectionVoxelMesh";
 export abstract class DVESectionMeshes {
   abstract updateVertexData(
     section: SectionMesh,

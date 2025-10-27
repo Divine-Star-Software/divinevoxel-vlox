@@ -7,6 +7,7 @@ import { getBitArrayIndex } from "../../Util/Binary/BinaryArrays";
 import { EngineSettings } from "../../Settings/EngineSettings";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
+const point = Vector3Like.Create();
 export class FullVoxelTemplate implements IVoxelTemplate {
   static CreateNew(
     bounds: Vec3Array,
@@ -70,6 +71,13 @@ export class FullVoxelTemplate implements IVoxelTemplate {
     if (data.mask) this.mask = data.mask;
   }
 
+  inBounds(x: number, y: number, z: number): boolean {
+    point.x = x + 0.5;
+    point.y = y + 0.5;
+    point.z = z + 0.5;
+    return this.bounds.intersectsPoint(point);
+  }
+
   setPosition(x: number, y: number, z: number): void {
     this.position.x = x;
     this.position.y = y;
@@ -81,10 +89,10 @@ export class FullVoxelTemplate implements IVoxelTemplate {
   }
 
   isIncluded(index: number) {
+    if (index < 0 || index >= this.index.size) return false;
     if (this.mask) {
       return getBitArrayIndex(this.mask, index) === 1;
     }
-
     return true;
   }
 
@@ -117,7 +125,16 @@ export class FullVoxelTemplate implements IVoxelTemplate {
   }
 
   clone() {
-    const newTemplate = new FullVoxelTemplate(structuredClone(this.toJSON()));
+    const newTemplate = new FullVoxelTemplate({
+      type: "full",
+      position: { ...this.position },
+      bounds: { ...this.bounds.size },
+      ids: this.ids.slice(),
+      light: this.light.slice(),
+      level: this.level.slice(),
+      secondary: this.secondary.slice(),
+      ...(this.mask ? { mask: this.mask.slice() } : {}),
+    });
     return newTemplate;
   }
 

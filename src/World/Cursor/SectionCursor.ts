@@ -6,7 +6,9 @@ import { Vector3Like } from "@amodx/math";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import { WorldSectionCursorInterface } from "./WorldSectionCursor.interface";
 import type { Section } from "../Section/index";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
+const point = Vector3Like.Create();
 export class SectionCursor
   implements WorldSectionCursorInterface, DataCursorInterface
 {
@@ -15,18 +17,26 @@ export class SectionCursor
   _voxelIndex = 0;
   _voxelPosition = Vector3Like.Create();
   _sectionPosition = Vector3Like.Create();
+  volumeBounds = new BoundingBox();
+  get volumePosition() {
+    return this._sectionPosition;
+  }
+  constructor() {
+    this.volumeBounds.setMinMax(
+      Vector3Like.Create(0, 0, 0),
+      Vector3Like.Create(
+        WorldSpaces.section.bounds.x,
+        WorldSpaces.section.bounds.y,
+        WorldSpaces.section.bounds.z
+      )
+    );
+  }
 
   inBounds(x: number, y: number, z: number): boolean {
-    const maxX = this._sectionPosition.x + WorldSpaces.section.bounds.x;
-    const maxY = this._sectionPosition.y + WorldSpaces.section.bounds.y;
-    const maxZ = this._sectionPosition.z + WorldSpaces.section.bounds.z;
-    if (x < this._sectionPosition.x) return false;
-    if (y < this._sectionPosition.y) return false;
-    if (z < this._sectionPosition.z) return false;
-    if (x > maxX) return false;
-    if (y > maxY) return false;
-    if (z > maxZ) return false;
-    return true;
+    point.x = x - this._sectionPosition.x + 0.5;
+    point.y = y - this._sectionPosition.y + 0.5;
+    point.z = z - this._sectionPosition.z + 0.5;
+    return this.volumeBounds.intersectsPoint(point);
   }
 
   setSection(section: Section) {

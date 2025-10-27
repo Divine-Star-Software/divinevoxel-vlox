@@ -5,7 +5,7 @@ import {
   VoxelGeometryNodes,
 } from "../../../../Voxels/Models/VoxelModel.types";
 import { CompileGeomtryNodes } from "../Functions/Compile/CompileGeomtryNodes";
-import { CompiledGeomtryNodes } from "../../../../Mesher/Models/Nodes/Types/GeomtryNode.types";
+import { CompiledGeomtryNodes } from "../../../../Mesher/Voxels/Models/Nodes/Types/GeomtryNode.types";
 import { GeomtryInput } from "./GeomtryInput";
 import { VoxelGeometryTransform } from "Mesher/Geomtry/Geometry.types";
 export interface VoxelRuleGeometryData {

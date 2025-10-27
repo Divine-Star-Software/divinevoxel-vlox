@@ -2,17 +2,38 @@ import { Vector3Like } from "@amodx/math";
 import { SectorCursor } from "./SectorCursor";
 import { WorldSpaces } from "../WorldSpaces";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
 let cursorCache: SectorCursor[] = [];
 
 const tempPosition = Vector3Like.Create();
 export class WorldCursor implements DataCursorInterface {
+  volumeBounds = new BoundingBox();
   sectorCursors: Record<number, Record<number, SectorCursor | null>> = {};
 
   origin = Vector3Like.Create();
   dimension = 0;
 
   _lastPosition = Vector3Like.Create();
+
+  constructor() {
+    this.updateBounds();
+  }
+
+  private updateBounds() {
+    this.volumeBounds.setMinMax(
+      Vector3Like.Create(
+        WorldSpaces.world.bounds.MinX,
+        WorldSpaces.world.bounds.MinY,
+        WorldSpaces.world.bounds.MinZ
+      ),
+      Vector3Like.Create(
+        WorldSpaces.world.bounds.MaxX,
+        WorldSpaces.world.bounds.MaxY,
+        WorldSpaces.world.bounds.MaxZ
+      )
+    );
+  }
 
   setFocalPoint(dimension: number, x: number, y: number, z: number) {
     const sectorPos = WorldSpaces.sector.getPosition(x, y, z, tempPosition);
@@ -51,7 +72,12 @@ export class WorldCursor implements DataCursorInterface {
       cursor = cursorCache.length ? cursorCache.shift()! : new SectorCursor();
 
       if (
-        !cursor.loadSector(this.dimension, sectorPos.x, sectorPos.y, sectorPos.z)
+        !cursor.loadSector(
+          this.dimension,
+          sectorPos.x,
+          sectorPos.y,
+          sectorPos.z
+        )
       ) {
         cursorCache.push(cursor);
         return null;

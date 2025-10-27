@@ -16,6 +16,7 @@ export class VoxelPathSegment
       start: data.start ? data.start : [0, 0, 0],
       end: data.end ? data.end : [0, 0, 0],
       voxel: data.voxel ? data.voxel : PaintVoxelData.Create(),
+      transient: data.transient ? data.transient : undefined,
     };
   }
   start: Vec3Array;
@@ -123,13 +124,16 @@ export class VoxelPath extends TypedEventTarget<VoxelPathEvents> {
   }
 
   removeSegment(segment: VoxelPathSegment) {
+    console.warn("REMOVE SEGMENT", segment, [...this.segments]);
     for (let i = this.segments.length - 1; i > -1; i--) {
       this.segments[i].index--;
       if (this.segments[i] == segment) {
+        console.log("found segment to remove", i);
         this.segments.splice(i, 1);
         break;
       }
     }
+    console.warn("DONE", [...this.segments]);
     this.dispatch("segmentRemoved", segment);
     return false;
   }

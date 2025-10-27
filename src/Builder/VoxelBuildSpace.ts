@@ -112,7 +112,6 @@ export class VoxelBuildSpace {
   async pickWithProvider(index: number) {
     const provider = this.getRayProvider(index);
     if (!provider) {
-      console.warn("wtf", this, this._rayProviders);
       throw new Error(`Ray Provider at index ${index} is not set`);
     }
     return await this.pick(
@@ -202,9 +201,9 @@ export class VoxelBuildSpace {
   async clear() {
     const size = this.bounds.size;
     if (
-      Math.abs(size.x) == Infinity ||
-      Math.abs(size.y) == Infinity ||
-      Math.abs(size.z) == Infinity
+      !isFinite(Math.abs(size.x)) ||
+      !isFinite(Math.abs(size.y)) ||
+      !isFinite(Math.abs(size.z))
     )
       return false;
     const min = this.bounds.min;

@@ -7,8 +7,11 @@
   "type": "module",
   "devDependencies": {},
   "scripts": {
-    "build": "mkdir -p dist && rm -rf dist/* && cp package.json dist/package.json && cp README.md ./dist/README.md && cp ./LICENSE.md ./dist/LICENSE.md && cd ./src && npx tsc",
-    "compile": "cd src && npx tsc --watch"
+    "clean:dist-ts": "test -d dist && find dist -type f \\( -name \"*.js\" -o -name \"*.d.ts\" \\) -delete || true",
+    "build": "mkdir -p dist && npm run clean:dist-ts && cd ./src && npx tsc",
+    "publish": "mkdir -p dist && rm -rf dist/* && cp package.json dist/package.json && cp README.md ./dist/README.md && cp ./LICENSE.md ./dist/LICENSE.md && cd ./src && npx tsc",
+    "compile": "cd src && npx tsc --watch",
+    "compile:fresh": "npm run clean:dist-ts && cd src && npx tsc --watch"
   },
   "keywords": [],
   "author": "Divine Star Software",

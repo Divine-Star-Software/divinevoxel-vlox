@@ -44,10 +44,6 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
   paintData = PaintVoxelData.Create();
   private _pickedResult: VoxelPickResult | null = null;
 
-  constructor(public space: VoxelBuildSpace) {
-    super();
-  }
-
   isUpdating() {
     if (this._pickedResult !== null && this.mode == WrenchToolModes.Update)
       return true;
@@ -63,6 +59,10 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
     if (!this._lastPicked) return;
     if (this.mode == WrenchToolModes.Pick) {
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
+        this._lastPicked = null;
+        return;
+      }
       this.selection.reConstruct(this._lastPicked.position);
     }
   }
@@ -215,7 +215,6 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     }
   }
 
-
   getOptionValue(id: string) {
     return null;
   }
@@ -223,7 +222,5 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
   getCurrentOptions(): ToolOptionsData {
     return [];
   }
-  updateOption(property: string, value: any): void {
-    
-  }
+  updateOption(property: string, value: any): void {}
 }

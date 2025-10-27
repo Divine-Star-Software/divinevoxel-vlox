@@ -1,39 +1,33 @@
-import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels";
 import { VoxelBoxSelection } from "../../../Templates/Selection/VoxelBoxSelection";
 import { Vector3Like } from "@amodx/math";
-import { BoxSelection } from "./BoxSelection";
-import { BoxToolTemplate } from "./BoxToolTemplate";
+import { SurfaceBoxSelection } from "../../Util/SurfaceBoxSelection";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 export enum BoxToolModes {
   Fill = "Fill",
-  Extrude = "Extrude",
-  Template = "Template",
+  // Extrude = "Extrude",
   Remove = "Remove",
 }
 
-interface BoxToolEvents {
-  "template-created": BoxToolTemplate;
-}
+interface BoxToolEvents {}
 
 export class BoxTool extends BuilderToolBase<BoxToolEvents> {
   static ToolId = "Box";
   static ModeArray: BoxToolModes[] = [
     BoxToolModes.Fill,
-    BoxToolModes.Extrude,
-    BoxToolModes.Template,
+    //BoxToolModes.Extrude,
     BoxToolModes.Remove,
   ];
   mode = BoxToolModes.Fill;
   selection = new VoxelBoxSelection();
-  boxSelection: BoxSelection;
+  boxSelection: SurfaceBoxSelection;
   voxelData: PaintVoxelData;
   usePlacingStrategy = true;
 
-  constructor(public space: VoxelBuildSpace) {
-    super();
-    this.boxSelection = new BoxSelection(this.space, this.selection);
+  constructor(space: VoxelBuildSpace) {
+    super(space);
+    this.boxSelection = new SurfaceBoxSelection(this.space, this.selection);
   }
 
   private _started = false;
@@ -51,11 +45,7 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
       : await this.space.pickWithProvider(this.rayProviderIndex);
     this._lastPicked = picked;
     if (!this._started && !placerMode && picked) {
-      if (
-        this.mode == BoxToolModes.Fill ||
-        this.mode == BoxToolModes.Template ||
-        this.mode == BoxToolModes.Extrude
-      ) {
+      if (this.mode == BoxToolModes.Fill) {
         this.selection.reConstruct(
           picked.normalPosition,
           picked.normal,
@@ -75,11 +65,7 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
     if (!this._started && placerMode == "start" && picked) {
       this.boxSelection.offset = 0;
       Vector3Like.Copy(this.boxSelection.planeNormal, picked.normal);
-      if (
-        this.mode == BoxToolModes.Fill ||
-        this.mode == BoxToolModes.Template ||
-        this.mode == BoxToolModes.Extrude
-      ) {
+      if (this.mode == BoxToolModes.Fill) {
         Vector3Like.Copy(this.boxSelection.planeOrigin, picked.normalPosition);
       }
       if (this.mode == BoxToolModes.Remove) {
@@ -111,15 +97,6 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
       );
     }
 
-    if (this.mode == BoxToolModes.Template) {
-      const boxTemplate = new BoxToolTemplate(
-        this.space,
-        this.selection.clone()
-      );
-      await boxTemplate.create();
-      this.dispatch("template-created", boxTemplate);
-    }
-
     if (this.mode == BoxToolModes.Remove) {
       await this.space.eraseTemplate(
         Vector3Like.ToArray(this.selection.origin),
@@ -131,7 +108,7 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
   getOptionValue(id: string) {
     return null;
   }
-  
+
   getCurrentOptions(): ToolOptionsData {
     return [];
   }

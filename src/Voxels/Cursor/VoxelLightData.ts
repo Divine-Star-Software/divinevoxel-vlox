@@ -62,6 +62,8 @@ export class VoxelLightData {
     return false;
   }
 
+  
+
   mixLight(l1: number, l2: number) {
     const s1 = this.getS(l1);
     const s2 = this.getS(l2);

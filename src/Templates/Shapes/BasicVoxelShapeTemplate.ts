@@ -9,7 +9,7 @@ import {
 import { TypedEventTarget } from "../../Util/TypedEventTarget";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 import { IVoxelTemplate } from "../VoxelTemplates.types";
-
+const point = Vector3Like.Create();
 export abstract class BasicVoxelShapeTemplate<
     Type extends string,
     Data extends IVoxelShapeTemplateData<any>,
@@ -60,6 +60,13 @@ export abstract class BasicVoxelShapeTemplate<
       data.edgeVoxel,
       data.pointVoxel
     );
+  }
+
+  inBounds(x: number, y: number, z: number): boolean {
+    point.x = x + 0.5;
+    point.y = y + 0.5;
+    point.z = z + 0.5;
+    return this.bounds.intersectsPoint(point);
   }
 
   setVoxels(

@@ -7,7 +7,7 @@ import { VoxelGeometryTransform } from "../../../../../../Mesher/Geomtry/Geometr
 import {
   CompiledTriangleVoxelGeomtryNode,
   TriangleVoxelGometryInputs,
-} from "../../../../../../Mesher/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
+} from "../../../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
 import { OcclusionFaceRegister } from "../../../Classes/OcclusionFaceRegister";
 import { GeomtryInput } from "../../../Classes/GeomtryInput";
 import { BaseVoxelTriangleData } from "../../../../VoxelModel.types";
@@ -49,7 +49,6 @@ export function CompileTriangleGeometryNode(
   }
 
   const closestFace = closestVoxelFace(averageNormal);
-
 
   const weights: [Vec4Array, Vec4Array, Vec4Array] = [] as any;
   const positions = triangle.positions.toVec3Array();

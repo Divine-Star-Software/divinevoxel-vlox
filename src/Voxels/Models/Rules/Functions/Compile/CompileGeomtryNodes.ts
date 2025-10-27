@@ -1,4 +1,4 @@
-import { CompiledGeomtryNodes } from "../../../../../Mesher/Models/Nodes/Types/GeomtryNode.types";
+import { CompiledGeomtryNodes } from "../../../../../Mesher/Voxels/Models/Nodes/Types/GeomtryNode.types";
 import { VoxelRuleGeometryData } from "../../Classes/VoxelRulesGeometry";
 import { GeomtryInput } from "../../Classes/GeomtryInput";
 import { CompileBoxGeometryNode } from "./Nodes/CompileBoxGeometryNode";

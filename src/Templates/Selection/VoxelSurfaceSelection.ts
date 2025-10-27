@@ -56,6 +56,8 @@ export class VoxelSurfaceSelection
     this.normal.x = normal.x;
     this.normal.y = normal.y;
     this.normal.z = normal.z;
+    this.extrusion = extrusion | 0;
+
     let axis = "x";
     if (normal.x) axis = "x";
     if (normal.y) axis = "y";
@@ -64,13 +66,14 @@ export class VoxelSurfaceSelection
     const min = Vector3Like.Create(Infinity, Infinity, Infinity);
     const max = Vector3Like.Create(-Infinity, -Infinity, -Infinity);
 
+    // 1) BFS to collect the *surface-adjacent* air layer (offset 1 in +normal)
     const queue: number[] = [
       position.x + normal.x,
       position.y + normal.y,
       position.z + normal.z,
     ];
     let size = 0;
-    const visted = new Set<string>();
+    const visited = new Set<string>();
 
     while (queue.length) {
       if (size > maxSize) break;
@@ -78,23 +81,24 @@ export class VoxelSurfaceSelection
       const y = queue.shift()!;
       const z = queue.shift()!;
 
-      const key = `${x}-${y}-${z}`;
-      if (visted.has(key)) continue;
-      visted.add(key);
+      const key = `${x} ${y} ${z}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+
       if (x < min.x) min.x = x;
       if (y < min.y) min.y = y;
       if (z < min.z) min.z = z;
-
       if (x > max.x) max.x = x;
       if (y > max.y) max.y = y;
       if (z > max.z) max.z = z;
 
+      // Expand only in the 2D tangent plane to the face normal.
       for (let i = 0; i < CardinalNeighbors2D.length; i++) {
         const n = CardinalNeighbors2D[i];
 
-        let nx = x;
-        let ny = y;
-        let nz = z;
+        let nx = x,
+          ny = y,
+          nz = z;
         if (axis == "x") {
           ny += n[0];
           nz += n[1];
@@ -111,6 +115,7 @@ export class VoxelSurfaceSelection
         const voxel = cursor.getVoxel(nx, ny, nz);
         if (!voxel || !voxel.isAir()) continue;
 
+        // Must be "resting" on a solid (the face we clicked)
         const bottomVoxel = cursor.getVoxel(
           nx - normal.x,
           ny - normal.y,
@@ -128,17 +133,57 @@ export class VoxelSurfaceSelection
     if (max.x == -Infinity || max.y == -Infinity || max.z == -Infinity)
       return false;
 
+    // 2) Extrude outward along +normal for 'extrusion' layers.
+    //    We grow layer-by-layer; each new layer must be air and contiguous to the previous layer stack.
+    if (this.extrusion > 0) {
+      // Collect the initial (surface-adjacent) layer as our starting front.
+      let front: Array<{ x: number; y: number; z: number }> = [];
+      for (const key of visited) {
+        const [sx, sy, sz] = key.split(" ").map(Number);
+        front.push({ x: sx, y: sy, z: sz });
+      }
+
+      for (let d = 1; d <= this.extrusion; d++) {
+        const nextFront: Array<{ x: number; y: number; z: number }> = [];
+        for (const p of front) {
+          const tx = p.x + normal.x;
+          const ty = p.y + normal.y;
+          const tz = p.z + normal.z;
+
+          const tKey = `${tx} ${ty} ${tz}`;
+          if (visited.has(tKey)) continue; // already added by another path
+
+          const world = cursor.getVoxel(tx, ty, tz);
+          if (!world || !world.isAir()) continue; // stop extrusion if we hit solid
+
+          visited.add(tKey);
+          nextFront.push({ x: tx, y: ty, z: tz });
+
+          if (tx < min.x) min.x = tx;
+          if (ty < min.y) min.y = ty;
+          if (tz < min.z) min.z = tz;
+          if (tx > max.x) max.x = tx;
+          if (ty > max.y) max.y = ty;
+          if (tz > max.z) max.z = tz;
+        }
+        if (nextFront.length === 0) break; // nothing more to grow
+        front = nextFront;
+      }
+    }
+
+    // 3) Build compact bit mask over the final bounds.
     const sizeX = max.x - min.x + 1;
     const sizeY = max.y - min.y + 1;
     const sizeZ = max.z - min.z + 1;
 
     this.index.setBounds(sizeX, sizeY, sizeZ);
     this.bitIndex = new Uint8Array(Math.ceil((sizeX * sizeY * sizeZ) / 8));
+
     for (let x = min.x; x < min.x + sizeX; x++) {
       for (let y = min.y; y < min.y + sizeY; y++) {
         for (let z = min.z; z < min.z + sizeZ; z++) {
-          const key = `${x}-${y}-${z}`;
-          if (!visted.has(key)) continue;
+          const key = `${x} ${y} ${z}`;
+          if (!visited.has(key)) continue;
           setBitArrayIndex(
             this.bitIndex,
             this.index.getIndexXYZ(x - min.x, y - min.y, z - min.z),
@@ -161,16 +206,15 @@ export class VoxelSurfaceSelection
       y: this.origin.y + this.size.y,
       z: this.origin.z + this.size.z,
     });
+
+    return true;
   }
 
   clone() {
     const newSelection = new VoxelSurfaceSelection();
     Vector3Like.Copy(newSelection.origin, this.origin);
     Vector3Like.Copy(newSelection.size, this.size);
-    newSelection.bounds.setMinMax(
-      this.bounds.min,
-      this.bounds.max
-    );
+    newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
     newSelection.extrusion = this.extrusion;
     newSelection.bitIndex = structuredClone(this.bitIndex);
     newSelection.index.setBounds(...this.index.getBounds());

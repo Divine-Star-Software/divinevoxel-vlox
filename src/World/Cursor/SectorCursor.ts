@@ -8,7 +8,9 @@ import { WorldSpaces } from "../WorldSpaces";
 import { Vector3Like } from "@amodx/math";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import { WorldSectionCursorInterface } from "./WorldSectionCursor.interface";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
+const point = Vector3Like.Create();
 export class SectorCursor
   implements DataCursorInterface, WorldSectionCursorInterface
 {
@@ -18,18 +20,26 @@ export class SectorCursor
   _voxelIndex = 0;
   _voxelPosition = Vector3Like.Create();
   _sectorPosition = Vector3Like.Create();
+  volumeBounds = new BoundingBox();
+  get volumePosition() {
+    return this._sectorPosition;
+  }
+  constructor() {
+    this.volumeBounds.setMinMax(
+      Vector3Like.Create(0, 0, 0),
+      Vector3Like.Create(
+        WorldSpaces.sector.bounds.x,
+        WorldSpaces.sector.bounds.y,
+        WorldSpaces.sector.bounds.z
+      )
+    );
+  }
 
   inBounds(x: number, y: number, z: number): boolean {
-    const maxX = this._sectorPosition.x + WorldSpaces.sector.bounds.x;
-    const maxY = this._sectorPosition.y + WorldSpaces.sector.bounds.y;
-    const maxZ = this._sectorPosition.z + WorldSpaces.sector.bounds.z;
-    if (x < this._sectorPosition.x) return false;
-    if (y < this._sectorPosition.y) return false;
-    if (z < this._sectorPosition.z) return false;
-    if (x > maxX) return false;
-    if (y > maxY) return false;
-    if (z > maxZ) return false;
-    return true;
+    point.x = x - this._sectorPosition.x + 0.5;
+    point.y = y - this._sectorPosition.y + 0.5;
+    point.z = z - this._sectorPosition.z + 0.5;
+    return this.volumeBounds.intersectsPoint(point);
   }
 
   setSector(sector: Sector) {
@@ -57,7 +67,11 @@ export class SectorCursor
     if (!section) {
       if (!section)
         throw new Error(
-          `Could not load section at ${x}-${y}-${z} | ${WorldSpaces.section.getIndex(x, y, z)}`
+          `Could not load section at ${x}-${y}-${z} | ${WorldSpaces.section.getIndex(
+            x,
+            y,
+            z
+          )}`
         );
       this._section = null;
       return null;

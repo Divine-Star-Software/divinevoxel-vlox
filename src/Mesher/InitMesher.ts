@@ -1,7 +1,7 @@
-import { RenderedMaterials } from "./Models/RenderedMaterials";
-import { VoxelModelConstructorRegister } from "./Models/VoxelModelConstructorRegister.js";
-import { LiquidGeometryNode } from "./Models/Nodes/Custom/Liquid/LiquidGeomtryNode.js";
-import { VoxelConstructor } from "./Models/VoxelConstructor.js";
+import { RenderedMaterials } from "./Voxels/Models/RenderedMaterials";
+import { VoxelModelConstructorRegister } from "./Voxels/Models/VoxelModelConstructorRegister.js";
+import { LiquidGeometryNode } from "./Voxels/Models/Nodes/Custom/Liquid/LiquidGeomtryNode.js";
+import { VoxelConstructor } from "./Voxels/Models/VoxelConstructor.js";
 import { FinalCompiledVoxelModelData } from "../Voxels/Models/CompiledVoxelModel.types";
 import { AOOcclusionFaceIndex } from "../Voxels/Models/Indexing/AOOcclusionFaceIndex";
 import { CulledOcclusionFaceIndex } from "../Voxels/Models/Indexing/CulledOcclusionFaceIndex";

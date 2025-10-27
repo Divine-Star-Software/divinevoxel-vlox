@@ -1,6 +1,5 @@
-import { Flat3DIndex, Vec3Array } from "@amodx/math";
+import { Flat3DIndex, Vec3Array, Vector3Axes } from "@amodx/math";
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
-export type TemplateRotationAxes = "x" | "y" | "z";
 export type TemplateRotationAngles = 90 | 180 | 270 | -90 | -180 | -270;
 
 type RotationFunction = (
@@ -58,7 +57,7 @@ const rotateArray = (
   [sizeX, sizeY, sizeZ]: Vec3Array,
   array: ArrayLike<number>,
   angle: TemplateRotationAngles,
-  axes: TemplateRotationAxes,
+  axes: Vector3Axes,
   index: Flat3DIndex,
   newIndex: Flat3DIndex
 ) => {
@@ -96,8 +95,14 @@ const rotateArray = (
 export default function RotateTemplate(
   template: FullVoxelTemplate,
   angle: TemplateRotationAngles,
-  axes: TemplateRotationAxes = "y"
+  axes: Vector3Axes = "y"
 ) {
+  console.warn("rotate the template", {
+    template: template.clone(),
+    angle,
+    axes,
+  });
+
   const { x: sizeX, y: sizeY, z: sizeZ } = template.bounds.size;
   const index = Flat3DIndex.GetXZYOrder();
   index.setBounds(sizeX, sizeY, sizeZ);
@@ -138,4 +143,10 @@ export default function RotateTemplate(
 
   template.index = newIndex;
   template.bounds.setSize({ x: newSizeX, y: newSizeY, z: newSizeZ });
+
+  console.warn("DONE rotating the template!!", {
+    template: template.clone(),
+    angle,
+    axes,
+  });
 }

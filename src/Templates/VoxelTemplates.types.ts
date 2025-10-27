@@ -4,7 +4,7 @@ import { RawVoxelData } from "../Voxels/Types/Voxel.types";
 
 export interface IVoxelTemplate<
   Type extends string = "",
-  Data extends IVoxelTemplateData<Type> = any,
+  Data extends IVoxelTemplateData<Type> = any
 > {
   position: Vector3Like;
   bounds: BoundingBox;
@@ -13,11 +13,12 @@ export interface IVoxelTemplate<
   getIndex(x: number, y: number, z: number): number;
   isAir(index: number): boolean;
   isIncluded(index: number): boolean;
+  inBounds(x: number, y: number, z: number): boolean;
   getId(index: number): number;
   getLevel(index: number): number;
   getLight(index: number): number;
   getSecondary(index: number): number;
-  clone() : IVoxelTemplate;
+  clone(): IVoxelTemplate;
   getRaw(index: number, rawRef?: RawVoxelData): RawVoxelData;
   toJSON(): Data;
 }
@@ -30,7 +31,7 @@ export interface IVoxelTemplateData<Type extends string> {
 
 export interface IVoxelTemplateConstructor<
   Type extends string,
-  Data extends IVoxelTemplateData<Type> = any,
+  Data extends IVoxelTemplateData<Type> = any
 > {
   new (data: Data): IVoxelTemplate<Type, Data>;
 }

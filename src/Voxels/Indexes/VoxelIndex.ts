@@ -1,4 +1,4 @@
-import { PaintVoxelData } from "../Types/PaintVoxelData"
+import { PaintVoxelData } from "../Types/PaintVoxelData";
 import {
   VoxelData,
   RawVoxelData,
@@ -15,10 +15,7 @@ export class VoxelNamedState {
     state: 0,
     stateAny: false,
   };
-  constructor(
-    public voxelId: string,
-    public data: VoxelNamedStateData
-  ) {
+  constructor(public voxelId: string, public data: VoxelNamedStateData) {
     for (const key in data.properties) {
       this.tags.set(key, data.properties[key]);
     }
@@ -57,10 +54,7 @@ export class VoxelNamedStateContainer {
   states = new Map<string, VoxelNamedState>();
 
   stateArray: VoxelNamedState[] = [];
-  constructor(
-    public voxelId: string,
-    data: VoxelNamedState[]
-  ) {
+  constructor(public voxelId: string, data: VoxelNamedState[]) {
     for (const state of data) {
       this.states.set(state.data.id, state);
       this.stateArray.push(state);
@@ -131,9 +125,9 @@ export class VoxelIndex {
 
   getStateFromRawData(data: RawVoxelData): VoxelNamedState | false {
     const [id, light, secondary] = data;
-    const [, mod, state] = VoxelPalettesRegister.voxels[id];
+    const [trueId, mod, state] = VoxelPalettesRegister.voxels[id];
     const conatiner = this.states.get(
-      VoxelPalettesRegister.voxelIds.getStringId(id)
+      VoxelPalettesRegister.voxelIds.getStringId(trueId)
     );
     if (!conatiner) return false;
     for (const modelState of conatiner?.stateArray) {

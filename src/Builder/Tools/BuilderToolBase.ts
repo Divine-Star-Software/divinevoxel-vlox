@@ -1,5 +1,6 @@
 import { VoxelPickResult } from "Voxels/Interaction/VoxelPickResult";
 import { TypedEventTarget } from "../../Util/TypedEventTarget";
+import { VoxelBuildSpace } from "../VoxelBuildSpace";
 
 type ToolOptionBase<Data> = {
   cateogry: string;
@@ -26,6 +27,10 @@ export abstract class BuilderToolBase<
   protected _lastPicked: VoxelPickResult | null = null;
   get picked(): Readonly<VoxelPickResult> | null {
     return this._lastPicked;
+  }
+
+  constructor(public space: VoxelBuildSpace) {
+    super();
   }
 
   protected _options: ToolOptionsData = [];

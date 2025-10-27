@@ -19,21 +19,7 @@ export class HandTool extends BuilderToolBase<HandToolEvents> {
   voxelData: PaintVoxelData;
   usePlacingStrategy = true;
 
-  constructor(public space: VoxelBuildSpace) {
-    super();
-  }
-
   async update() {
-    console.warn(
-      "update hand tool",
-      {
-        ...this.space.getRayProvider(this.rayProviderIndex)!.origin,
-      },
-      {
-        ...this.space.getRayProvider(this.rayProviderIndex)!.direction,
-      },
-      this.space.getRayProvider(this.rayProviderIndex)?.length
-    );
     this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
     if (!this._lastPicked) return;
     if (this.mode == HandToolModes.Place) {

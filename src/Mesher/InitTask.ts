@@ -1,10 +1,10 @@
 import { Thread, Threads } from "@amodx/threads";
 import { WorldRegister } from "../World/WorldRegister";
-import { MeshSection } from "./Functions/MeshSection";
+import { MeshSection } from "./Voxels/MeshSection";
 import { TasksIds } from "../Tasks/TasksIds";
 import { SetSectionMeshTask } from "./Types/Mesher.types";
 import { getLocationData } from "../Util/LocationData";
-import { MeshSectionSnapShot } from "./Functions/MeshSectionSnapShot";
+import { MeshSectionSnapShot } from "./Voxels/MeshSectionSnapShot";
 import {
   SectionSnapShot,
   SectionSnapShotTransferData,

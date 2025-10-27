@@ -5,12 +5,14 @@ import { SectionSnapShot } from "./SectionSnapShot";
 import { Sector } from "../Sector";
 import { SectorCursor } from "../Cursor/SectorCursor";
 import { SectionCursor } from "../Cursor/SectionCursor";
+import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
 const tempPosition = Vector3Like.Create();
 export class SectionSnapshotCursor implements DataCursorInterface {
   origin = Vector3Like.Create();
   sectorOrigin = Vector3Like.Create();
   dimension = 0;
+  volumeBounds = new BoundingBox();
 
   sectors: Sector[] = [];
   cursors: SectorCursor[] = [];
@@ -41,8 +43,22 @@ export class SectionSnapshotCursor implements DataCursorInterface {
         }
       }
     }
+    this.updateBounds();
   }
-
+  private updateBounds() {
+    this.volumeBounds.setMinMax(
+      Vector3Like.Create(
+        WorldSpaces.world.bounds.MinX,
+        WorldSpaces.world.bounds.MinY,
+        WorldSpaces.world.bounds.MinZ
+      ),
+      Vector3Like.Create(
+        WorldSpaces.world.bounds.MaxX,
+        WorldSpaces.world.bounds.MaxY,
+        WorldSpaces.world.bounds.MaxZ
+      )
+    );
+  }
   private _snapShot: SectionSnapShot;
   private _centeralCursor = new SectionCursor();
   getCenteralCursor() {

@@ -18,7 +18,7 @@ export enum BrushPositionModes {
 
 export enum BrushToolModes {
   Fill = "Fill",
-  Extrude = "Extrude",
+  // Extrude = "Extrude",
   Remove = "Remove",
 }
 
@@ -36,7 +36,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   static ToolId = "Brush";
   static ModeArray: BrushToolModes[] = [
     BrushToolModes.Fill,
-    BrushToolModes.Extrude,
+    // BrushToolModes.Extrude,
     BrushToolModes.Remove,
   ];
   static PositionModeArray: BrushPositionModes[] = [
@@ -214,8 +214,8 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   voxelData: Partial<BrushVoxelData> = {};
   usePlacingStrategy = true;
   protected _position = Vector3Like.Create();
-  constructor(public space: VoxelBuildSpace) {
-    super();
+  constructor(space: VoxelBuildSpace) {
+    super(space);
     this.selection = new VoxelTemplateSelection();
     this.updateShape(this.shape);
   }
@@ -224,27 +224,37 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
     if (!this._lastPicked) return;
     const place = this.getPlacePosition(this._lastPicked);
-    if (!this.space.bounds.intersectsPoint(place)) return;
+    if (this.mode == BrushToolModes.Fill) {
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)) {
+        this._lastPicked = null;
+        return;
+      }
+    }
+    if (this.mode == BrushToolModes.Remove) {
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
+        this._lastPicked = null;
+        return;
+      }
+    }
     this.selection.origin.x = place.x;
     this.selection.origin.y = place.y;
     this.selection.origin.z = place.z;
   }
 
   async use() {
-    const picked = this._lastPicked;
-    if (!picked) return;
-
+    if (!this._lastPicked) return;
     if (this.usePlacingStrategy) {
       if (this.voxelData.fill) {
-        const newData = this.space.getPlaceState(this.voxelData.fill, picked);
+        const newData = this.space.getPlaceState(
+          this.voxelData.fill,
+          this._lastPicked
+        );
         if (newData) this.voxelData.fill = newData;
       }
     }
     if (this.mode == BrushToolModes.Fill && this.voxelData.fill) {
-      if (!this.space.bounds.intersectsPoint(picked.normalPosition)) return;
-
       this.template.setVoxels(this.voxelData.fill);
-      const place = this.getPlacePosition(picked);
+      const place = this.getPlacePosition(this._lastPicked);
       await this.space.paintTemplate(
         [place.x, place.y, place.z],
         this.template.toJSON()
@@ -252,10 +262,9 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     }
 
     if (this.mode == BrushToolModes.Remove) {
-      if (!this.space.bounds.intersectsPoint(picked.position)) return;
-      const voxel = picked.voxel;
+      const voxel = this._lastPicked.voxel;
       if (voxel && !voxel.isAir()) {
-        const place = this.getPlacePosition(picked);
+        const place = this.getPlacePosition(this._lastPicked);
         await this.space.eraseTemplate(
           [place.x, place.y, place.z],
           this.template.toJSON()
@@ -326,6 +335,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       return (this.template as any)[data.property];
     }
   }
+
   getCurrentOptions(): ToolOptionsData {
     const options = [
       ...BrushTool.BaseToolOptions,
@@ -334,6 +344,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     this.processOptions(options);
     return options;
   }
+
   updateOption(property: string, value: any): void {
     const data = this.getOptionData(property);
     if (!data) return;

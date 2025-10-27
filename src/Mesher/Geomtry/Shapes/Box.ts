@@ -1,15 +1,8 @@
 import { Vec3Array } from "@amodx/math";
 import { Quad } from "../Primitives";
+import { VoxelFaces } from "../../../Math";
 
 type BoxPoints = [Vec3Array, Vec3Array];
-type BoxQuads = [
-  up: Quad,
-  down: Quad,
-  north: Quad,
-  south: Quad,
-  east: Quad,
-  west: Quad,
-];
 export class Box {
   static Create(
     points: BoxPoints = [
@@ -22,7 +15,7 @@ export class Box {
     });
   }
 
-  quads: BoxQuads = [
+  quads: Record<VoxelFaces, Quad> = [
     Quad.Create(),
     Quad.Create(),
     Quad.Create(),
@@ -39,43 +32,42 @@ export class Box {
     const [startX, startY, startZ] = points[0];
     const [endX, endY, endZ] = points[1];
 
-    //top
-    this.quads[0].setPositions([
+    this.quads[VoxelFaces.Up].setPositions([
       [endX, endY, endZ],
       [startX, endY, endZ],
       [startX, endY, startZ],
       [endX, endY, startZ],
     ]);
-    //bottom
-    this.quads[1].setPositions([
+
+    this.quads[VoxelFaces.Down].setPositions([
       [startX, startY, endZ],
       [endX, startY, endZ],
       [endX, startY, startZ],
       [startX, startY, startZ],
     ]);
-    //north
-    this.quads[2].setPositions([
+
+    this.quads[VoxelFaces.North].setPositions([
       [startX, endY, endZ],
       [endX, endY, endZ],
       [endX, startY, endZ],
       [startX, startY, endZ],
     ]);
-    //south
-    this.quads[3].setPositions([
+
+    this.quads[VoxelFaces.South].setPositions([
       [endX, endY, startZ],
       [startX, endY, startZ],
       [startX, startY, startZ],
       [endX, startY, startZ],
     ]);
-    //east
-    this.quads[4].setPositions([
+
+    this.quads[VoxelFaces.East].setPositions([
       [endX, endY, endZ],
       [endX, endY, startZ],
       [endX, startY, startZ],
       [endX, startY, endZ],
     ]);
-    //west
-    this.quads[5].setPositions([
+
+    this.quads[VoxelFaces.West].setPositions([
       [startX, endY, startZ],
       [startX, endY, endZ],
       [startX, startY, endZ],

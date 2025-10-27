@@ -7,7 +7,7 @@ import { VoxelGeometryTransform } from "../../../../../../Mesher/Geomtry/Geometr
 import {
   CompiledQuadVoxelGeomtryNode,
   QuadVoxelGometryInputs,
-} from "../../../../../../Mesher/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
+} from "../../../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
 import { OcclusionFaceRegister } from "../../../Classes/OcclusionFaceRegister";
 import { GeomtryInput } from "Voxels/Models/Rules/Classes/GeomtryInput";
 import { BaseVoxelQuadData } from "Voxels/Models/VoxelModel.types";

@@ -30,5 +30,11 @@ export class TemplateVoxelCursor extends VoxelCursorInterface {
     this.process();
   }
 
+  getLight() {
+    const light = super.getLight();
+    if (light <= 0) return this.dataCursor.baseLightValue;
+    return light;
+  }
+
   updateVoxel(mode: 0 | 1) {}
 }

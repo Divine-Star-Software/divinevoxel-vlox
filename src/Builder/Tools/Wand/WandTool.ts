@@ -1,5 +1,3 @@
-import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
-import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels/Types/PaintVoxelData";
 import { VoxelSurfaceSelection } from "../../../Templates/Selection/VoxelSurfaceSelection";
 import { VoxelBFSSelection } from "../../../Templates/Selection/VoxelBFSSelection";
@@ -34,9 +32,6 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
   bfsSelection = new VoxelBFSSelection();
   voxelData: PaintVoxelData;
   usePlacingStrategy = true;
-  constructor(public space: VoxelBuildSpace) {
-    super();
-  }
 
   async update() {
     this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
@@ -45,6 +40,10 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
       this.mode == WandToolModes.Place ||
       this.mode == WandToolModes.Extrude
     ) {
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)) {
+        this._lastPicked = null;
+        return;
+      }
       this.surfaceSelection.fromJSON(
         await this.space.getSurfaceSelection(
           this._lastPicked.position,
@@ -55,6 +54,10 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
       );
     }
     if (this.mode == WandToolModes.Remove) {
+      if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
+        this._lastPicked = null;
+        return;
+      }
       this.bfsSelection.fromJSON(
         await this.space.getBFSSelection(
           this._lastPicked.position,

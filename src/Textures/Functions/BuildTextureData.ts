@@ -152,7 +152,19 @@ async function loadImageForShader(
     };
   });
 }
+async function loadImageForOriginal(
+  imgSrcData: string | HTMLImageElement
+): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = typeof imgSrcData === "string" ? new Image() : imgSrcData;
+    image.onerror = reject;
 
+    if (typeof imgSrcData === "string") image.src = imgSrcData;
+    image.onload = () => {
+      resolve(image);
+    };
+  });
+}
 function getImagePath(data: TextureData, parentId: string | null = null) {
   if (data.base64) return data.base64;
   if (data.path) return data.path;
@@ -217,11 +229,17 @@ async function process(
   }
   if (!data.atlas) {
     compiled.images[textureIndex] = await loadImageForShader(imagePath);
+    compiled.originalImages[textureIndex] = await loadImageForOriginal(
+      imagePath
+    );
     return textureIndex + 1;
   }
   const tiles = await sliceImageIntoTiles(imagePath, ...data.atlas.tiles);
   for (let i = 0; i < tiles.length; i++) {
     compiled.images[textureIndex + i] = await loadImageForShader(tiles[i]);
+    compiled.originalImages[textureIndex + i] = await loadImageForOriginal(
+      tiles[i]
+    );
   }
   compiled.atlasSizeMap[textureId] = data.atlas.tiles;
   if (data.animated) {

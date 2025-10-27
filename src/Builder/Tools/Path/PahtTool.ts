@@ -1,10 +1,9 @@
-import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
-import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 import { VoxelPath, VoxelPathSegment } from "../../../Templates/Path/VoxelPath";
 import { Vector3Like } from "@amodx/math";
+import { FreePointSelection } from "../../Util/FreePointSelection";
 export enum PathToolModes {
   PlacePoints = "Place Points",
   MovePoints = "Move Points",
@@ -24,25 +23,33 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
   ];
   mode = PathToolModes.PlacePoints;
   selection = new VoxelPointSelection();
+  pointSelection = new FreePointSelection(this.space, this.selection);
   path = new VoxelPath(VoxelPath.CreateNew({}));
-  distance = 10;
+
+  get distance() {
+    return this.pointSelection.distance;
+  }
+
+  set distance(value: number) {
+    this.pointSelection.distance = value;
+  }
+
   voxelData: PaintVoxelData;
   private _placedSegment = false;
-  constructor(public space: VoxelBuildSpace) {
-    super();
-  }
 
   setMode(mode: PathToolModes) {
     const lastMode = this.mode;
     this.mode = mode;
-    if (lastMode == PathToolModes.PlacePoints && this._placedSegment) {
-      this._placedSegment = false;
-      if (this.path.lastSegment())
-        this.path.removeSegment(this.path.lastSegment()!);
+    if (lastMode == PathToolModes.PlacePoints) {
+      for (const segment of this.path.segments) {
+        if (segment.transient) {
+          this.path.removeSegment(segment);
+        }
+      }
     }
     if (mode == PathToolModes.PlacePoints && this.path.segments.length) {
       const point = this.path.lastSegment()!.getPoint(1);
-
+      this._placedSegment = false;
       this.path.addSegment(
         VoxelPathSegment.CreateNew({
           transient: true,
@@ -59,22 +66,8 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
 
   async update() {
     if (this.mode == PathToolModes.PlacePoints) {
-      const rayPosition = Vector3Like.FloorInPlace(
-        Vector3Like.Add(
-          this.space.rayProvider.origin,
-          Vector3Like.MultiplyScalar(
-            this.space.rayProvider.direction,
-            this.distance
-          )
-        )
-      );
-
-      if (!this.space.bounds.intersectsPoint(rayPosition)) {
-        //get point ray intersects with the space bounding box and use that instead
-      } else {
-        this.selection.reConstruct(rayPosition);
-      }
-
+      const updated = this.pointSelection.update();
+      if (!updated) return;
       const last = this.path.lastSegment();
       if (last) {
         last.setPoints(last.start, [
@@ -83,7 +76,6 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
           this.selection.origin.z,
         ]);
       }
-
       return;
     }
   }

@@ -1,11 +1,13 @@
 import { QuadVerticies, VoxelGeometryTransform } from "../Geometry.types";
 import { AMath, Vector3Like } from "@amodx/math";
 import { Box } from "../Shapes/Box";
+import { VoxelFacesArray } from "../../../Math";
 export function TransformBox(box: Box, transform: VoxelGeometryTransform): Box {
   // Collect all unique vertices from the quads
   const vertexMap = new Map<string, Vector3Like>();
 
-  for (const quad of box.quads) {
+  for (const face of VoxelFacesArray) {
+    const quad = box.quads[face];
     const vertices = [
       quad.positions.vertices[QuadVerticies.TopRight],
       quad.positions.vertices[QuadVerticies.TopLeft],
@@ -140,7 +142,8 @@ export function TransformBox(box: Box, transform: VoxelGeometryTransform): Box {
 
   // Update the quads with transformed vertices
 
-  for (const quad of box.quads) {
+  for (const face of VoxelFacesArray) {
+    const quad = box.quads[face];
     const originalVertices = [
       quad.positions.vertices[QuadVerticies.TopRight],
       quad.positions.vertices[QuadVerticies.TopLeft],

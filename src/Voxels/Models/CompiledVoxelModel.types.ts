@@ -6,7 +6,7 @@ import {
 } from "../State/State.types";
 import { CullingProcedureData } from "../Models/VoxelModel.types";
 import { VoxelEffectSyncData } from "../Effects/VoxelEffects.types";
-import { CompiledGeomtryNodes } from "../../Mesher/Models/Nodes/Types/GeomtryNode.types";
+import { CompiledGeomtryNodes } from "../../Mesher/Voxels/Models/Nodes/Types/GeomtryNode.types";
 
 export type CompiledVoxelGeometrySyncData = {
   id: string;

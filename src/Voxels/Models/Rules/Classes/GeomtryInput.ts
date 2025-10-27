@@ -1,4 +1,4 @@
-import { BaseVoxelGeomtryTextureProcedureData } from "Mesher/Models/Procedures/TextureProcedure";
+import { BaseVoxelGeomtryTextureProcedureData } from "Mesher/Voxels/Models/Procedures/TextureProcedure";
 import { TextureId } from "../../../../Textures";
 import { TextureManager } from "../../../../Textures/TextureManager";
 import { VoxelGeometryData } from "../../VoxelModel.types";

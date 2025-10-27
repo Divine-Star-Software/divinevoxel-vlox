@@ -13,7 +13,7 @@ import { VoxelPaletteArchiveReader } from "../../Voxels/Archive/VoxelPaletteArch
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
 type TemplateCursor = { position: Vec3Array; raw: RawVoxelData };
-
+const point = Vector3Like.Create();
 export class ArchivedVoxelTemplate implements IVoxelTemplate {
   index = Flat3DIndex.GetXZYOrder();
   position: Vector3Like;
@@ -84,6 +84,13 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
     this.position.x = x;
     this.position.y = y;
     this.position.z = z;
+  }
+
+  inBounds(x: number, y: number, z: number): boolean {
+    point.x = x + 0.5;
+    point.y = y + 0.5;
+    point.z = z + 0.5;
+    return this.bounds.intersectsPoint(point);
   }
 
   isAir(index: number) {

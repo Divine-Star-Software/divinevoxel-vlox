@@ -4,12 +4,13 @@ export class VoxelMeshTypes {
 
   static VoxelMeshStructWGSL = /* wgsl */ `
   struct VoxelMeshVertex {
-      position: vec3f,
-      normal: vec3f,
-      voxelData: f32,
-      textureIndex: vec3f,
-      uv: vec2f,
-      colors: vec3f,
+    position: vec3f, 
+    normal: vec3f,     
+    textureIndex: vec3f,    
+    uv: vec2f,    
+    colors: vec3f,
+    voxelData: f32,    
+    _padding: vec4f
   };
       `;
 }

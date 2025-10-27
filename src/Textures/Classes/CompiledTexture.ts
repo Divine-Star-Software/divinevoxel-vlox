@@ -16,6 +16,7 @@ export class CompiledTexture {
     return position;
   };
 
+  originalImages: HTMLImageElement[] = [];
   images: HTMLImageElement[] = [];
   /**Maps texture ids to their atlas sizes  */
   atlasSizeMap: Record<string, [width: number, height: number]> = {};
@@ -59,7 +60,9 @@ export class CompiledTexture {
     const index = this.textureMap[finalId];
     if (index === undefined) {
       console.warn(
-        `Texture with id [passed in: ${id.toString()}] [final: ${finalId}] does not exist on compiled texture [${this.id}]`
+        `Texture with id [passed in: ${id.toString()}] [final: ${finalId}] does not exist on compiled texture [${
+          this.id
+        }]`
       );
       return 0;
     }
@@ -68,5 +71,20 @@ export class CompiledTexture {
 
   getTexturePath(id: TextureId) {
     return this.images[this.getTextureIndex(id)].src;
+  }
+
+  async getTextureData(id: TextureId): Promise<Uint8ClampedArray> {
+    const path = this.originalImages[this.getTextureIndex(id)].src;
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(`Failed to fetch texture: ${path}`);
+
+    const blob = await res.blob();
+    const bitmap = await createImageBitmap(blob);
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("OffscreenCanvas context unavailable");
+
+    ctx.drawImage(bitmap, 0, 0);
+    return ctx.getImageData(0, 0, bitmap.width, bitmap.height).data;
   }
 }
