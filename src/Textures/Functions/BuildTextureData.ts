@@ -318,7 +318,6 @@ export async function BuildTextureData(
       } catch (error) {
         console.warn(`Could not load texture ${texture.id}`);
         console.error(error);
-
         continue;
       }
     }

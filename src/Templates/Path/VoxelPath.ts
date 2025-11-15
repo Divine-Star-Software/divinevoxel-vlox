@@ -51,7 +51,6 @@ export class VoxelPathSegment
     this.end[1] = ey;
     this.end[2] = ez;
     if (updated) {
-      console.warn("UPDATED");
       this.dispatch("updated", {});
     }
   }
@@ -124,7 +123,6 @@ export class VoxelPath extends TypedEventTarget<VoxelPathEvents> {
   }
 
   removeSegment(segment: VoxelPathSegment) {
-    console.warn("REMOVE SEGMENT", segment, [...this.segments]);
     for (let i = this.segments.length - 1; i > -1; i--) {
       this.segments[i].index--;
       if (this.segments[i] == segment) {
@@ -133,7 +131,6 @@ export class VoxelPath extends TypedEventTarget<VoxelPathEvents> {
         break;
       }
     }
-    console.warn("DONE", [...this.segments]);
     this.dispatch("segmentRemoved", segment);
     return false;
   }

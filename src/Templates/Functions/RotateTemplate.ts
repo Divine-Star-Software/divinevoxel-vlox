@@ -97,11 +97,7 @@ export default function RotateTemplate(
   angle: TemplateRotationAngles,
   axes: Vector3Axes = "y"
 ) {
-  console.warn("rotate the template", {
-    template: template.clone(),
-    angle,
-    axes,
-  });
+
 
   const { x: sizeX, y: sizeY, z: sizeZ } = template.bounds.size;
   const index = Flat3DIndex.GetXZYOrder();
@@ -144,9 +140,4 @@ export default function RotateTemplate(
   template.index = newIndex;
   template.bounds.setSize({ x: newSizeX, y: newSizeY, z: newSizeZ });
 
-  console.warn("DONE rotating the template!!", {
-    template: template.clone(),
-    angle,
-    axes,
-  });
 }

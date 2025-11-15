@@ -43,6 +43,5 @@ export default async function ImportArchivedTemplateJSON(
     buffers,
     palettes,
   };
-  console.warn("IMPORT TEMPLATE", data, jsonData);
   return data;
 }

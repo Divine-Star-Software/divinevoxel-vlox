@@ -70,7 +70,6 @@ export function MeshTexture(textureId: number, textureData: number[]) {
   const factor = 1 / width;
 
   const data = new TextureVoxelData(width, height, textureData);
-  console.warn("MESH TEXTURE", { width, height, factor, data });
 
   {
     //south face

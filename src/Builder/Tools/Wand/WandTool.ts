@@ -68,7 +68,6 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
   }
 
   async use() {
-    console.warn("use", this.mode);
     const picked = this._lastPicked;
     if (!picked) return;
     let voxelData = this.voxelData;

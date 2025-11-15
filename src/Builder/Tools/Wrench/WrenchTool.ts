@@ -139,9 +139,6 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     const voxelSchemas = SchemaRegister.getVoxelSchemas(id);
     voxelSchemas.state.startEncoding(this._pickedResult.voxel.getState());
     voxelSchemas.mod.startEncoding(this._pickedResult.voxel.getMod());
-
-    console.warn("get picked schemas", { id }, SchemaRegister.stateSchemaData);
-
     return {
       stateSchema: this.processSchema(voxelSchemas.state),
       modSchema: this.processSchema(voxelSchemas.mod),

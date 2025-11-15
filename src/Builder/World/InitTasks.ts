@@ -154,9 +154,7 @@ export function InitTasks() {
   Threads.registerTask<[location: LocationData, data: IVoxelTemplateData<any>]>(
     "paint-voxel-template",
     async ([location, data]) => {
-      console.warn("PAINT VOXEL TEMPLATE", structuredClone(data));
       const template = VoxelTemplateRegister.create(data);
-      console.warn("template", template);
       brush.dimension = location[0];
       await LockSectors(location[0], template.bounds);
       brush
