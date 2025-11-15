@@ -13,14 +13,18 @@ const missingTexture: TextureData = {
 export class TextureManager {
   static _textureTypes = new Map<string, TextureData[]>();
   static _compiledTextures = new Map<string, CompiledTexture>();
+  static addTextureType(typeId: string) {
+    let type = this._textureTypes.get(typeId);
+    if (!type) {
+      type = [missingTexture];
+      this._textureTypes.set(typeId, type);
+    }
+    return type;
+  }
   static registerTexture(textureData: TextureData[]) {
     for (const texture of textureData) {
       const typeId = texture.type || "dve_voxel";
-      let type = this._textureTypes.get(typeId);
-      if (!type) {
-        type = [missingTexture];
-        this._textureTypes.set(typeId, type);
-      }
+      let type = this.addTextureType(typeId);
       type.push(texture);
     }
   }
@@ -49,3 +53,5 @@ export class TextureManager {
     }
   }
 }
+TextureManager.addTextureType("dve_item");
+TextureManager.addTextureType("dve_voxel");
