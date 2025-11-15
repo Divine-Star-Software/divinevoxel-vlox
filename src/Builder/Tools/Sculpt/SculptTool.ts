@@ -1,26 +1,26 @@
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels";
-import { VoxelBoxSelection } from "../../../Templates/Selection/VoxelBoxSelection";
+import { VoxelBoundsSelection } from "../../../Templates/Selection/VoxelBoundsSelection";
 import { Vector3Like } from "@amodx/math";
 import { SurfaceBoxSelection } from "../../Util/SurfaceBoxSelection";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
-export enum BoxToolModes {
+export enum SculptToolModes {
   Fill = "Fill",
-  // Extrude = "Extrude",
+  Extrude = "Extrude",
   Remove = "Remove",
 }
 
-interface BoxToolEvents {}
+interface SculptToolEvents {}
 
-export class BoxTool extends BuilderToolBase<BoxToolEvents> {
-  static ToolId = "Box";
-  static ModeArray: BoxToolModes[] = [
-    BoxToolModes.Fill,
-    //BoxToolModes.Extrude,
-    BoxToolModes.Remove,
+export class SculptTool extends BuilderToolBase<SculptToolEvents> {
+  static ToolId = "Sculpt";
+  static ModeArray: SculptToolModes[] = [
+    SculptToolModes.Fill,
+    SculptToolModes.Extrude,
+    SculptToolModes.Remove,
   ];
-  mode = BoxToolModes.Fill;
-  selection = new VoxelBoxSelection();
+  mode = SculptToolModes.Fill;
+  selection = new VoxelBoundsSelection();
   boxSelection: SurfaceBoxSelection;
   voxelData: PaintVoxelData;
   usePlacingStrategy = true;
@@ -39,13 +39,17 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
     this.boxSelection.update();
   }
 
+  _normal: Vector3Like;
   async update(placerMode: "start" | "end" | null = null) {
     const picked = this.isSelectionStarted()
       ? null
       : await this.space.pickWithProvider(this.rayProviderIndex);
     this._lastPicked = picked;
     if (!this._started && !placerMode && picked) {
-      if (this.mode == BoxToolModes.Fill) {
+      if (
+        this.mode == SculptToolModes.Fill ||
+        this.mode == SculptToolModes.Extrude
+      ) {
         this.selection.reConstruct(
           picked.normalPosition,
           picked.normal,
@@ -53,7 +57,7 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
           picked.normal
         );
       }
-      if (this.mode == BoxToolModes.Remove) {
+      if (this.mode == SculptToolModes.Remove) {
         this.selection.reConstruct(
           picked.position,
           picked.normal,
@@ -61,14 +65,18 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
           picked.normal
         );
       }
+      this._normal = { ...picked.normal };
     }
     if (!this._started && placerMode == "start" && picked) {
       this.boxSelection.offset = 0;
       Vector3Like.Copy(this.boxSelection.planeNormal, picked.normal);
-      if (this.mode == BoxToolModes.Fill) {
+      if (
+        this.mode == SculptToolModes.Fill ||
+        this.mode == SculptToolModes.Extrude
+      ) {
         Vector3Like.Copy(this.boxSelection.planeOrigin, picked.normalPosition);
       }
-      if (this.mode == BoxToolModes.Remove) {
+      if (this.mode == SculptToolModes.Remove) {
         Vector3Like.Copy(this.boxSelection.planeOrigin, picked.position);
       }
       this.boxSelection.update();
@@ -86,7 +94,7 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
   }
 
   async use() {
-    if (this.mode == BoxToolModes.Fill) {
+    if (this.mode == SculptToolModes.Fill) {
       await this.space.paintTemplate(
         Vector3Like.ToArray(this.selection.origin),
         this.selection
@@ -95,9 +103,17 @@ export class BoxTool extends BuilderToolBase<BoxToolEvents> {
           })
           .toJSON()
       );
+      return;
     }
-
-    if (this.mode == BoxToolModes.Remove) {
+    if (this.mode == SculptToolModes.Extrude) {
+      const template = await this.space.getExtrudedSelectionTemplate(
+        this.selection.toJSON(),
+        this._normal
+      );
+      await this.space.paintTemplate(this.selection.origin, template.toJSON());
+      return;
+    }
+    if (this.mode == SculptToolModes.Remove) {
       await this.space.eraseTemplate(
         Vector3Like.ToArray(this.selection.origin),
         this.selection.toTemplate({}).toJSON()

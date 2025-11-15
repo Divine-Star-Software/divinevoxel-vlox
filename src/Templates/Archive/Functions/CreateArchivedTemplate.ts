@@ -208,14 +208,11 @@ export default function CreateArchivedTemplate(
         secondary: "YXZ",
       },
     },
-    position: Vector3Like.Create(),
     bounds: Vector3Like.Create(...index.getBounds()),
     palettes,
     buffers,
   };
 
-  console.log(data);
   const archived = new ArchivedVoxelTemplate(data);
-
   return archived;
 }

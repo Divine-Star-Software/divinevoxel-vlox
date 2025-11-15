@@ -6,10 +6,8 @@ export interface IVoxelTemplate<
   Type extends string = "",
   Data extends IVoxelTemplateData<Type> = any
 > {
-  position: Vector3Like;
   bounds: BoundingBox;
   index: Flat3DIndex;
-  setPosition(x: number, y: number, z: number): void;
   getIndex(x: number, y: number, z: number): number;
   isAir(index: number): boolean;
   isIncluded(index: number): boolean;
@@ -21,11 +19,11 @@ export interface IVoxelTemplate<
   clone(): IVoxelTemplate;
   getRaw(index: number, rawRef?: RawVoxelData): RawVoxelData;
   toJSON(): Data;
+  fromJSON(data: Data): void;
 }
 
 export interface IVoxelTemplateData<Type extends string> {
   type: Type;
-  position: Vector3Like;
   bounds: Vector3Like;
 }
 

@@ -9,7 +9,7 @@ import { TemplateVoxelCursor } from "../../Templates/Cursor/TemplateVoxelCursor.
 import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "./Models/RenderedMaterials.js";
 import { VoxelLightData } from "../../Voxels/Cursor/VoxelLightData.js";
-import { VoxelModelBuilder } from "Mesher/Voxels/Models/VoxelModelBuilder.js";
+import { VoxelModelBuilder } from "./Models/VoxelModelBuilder.js";
 const templateCursor = new TemplateCursor();
 const padding = Vector3Like.Create(5, 5, 5);
 const lightData = new VoxelLightData();
@@ -40,7 +40,6 @@ function meshVoxel(
 
   builder.startConstruction();
   added = constructor.process();
-  console.warn("mesh voxel", { con: constructor, builder, added });
   builder.endConstruction();
   return added;
 }
@@ -93,11 +92,7 @@ export function MeshTemplate(
     meshed.push(mesher);
   }
   const transfers: any[] = [];
-  console.warn(
-    "meshed",
-    [...meshed],
-    meshed.some((_) => _.mesh.vertexCount)
-  );
+
   const compacted = CompactTemplateMesh(meshed, transfers);
 
   for (let i = 0; i < meshed.length; i++) {

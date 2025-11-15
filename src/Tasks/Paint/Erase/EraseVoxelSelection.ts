@@ -4,29 +4,28 @@ import { canUpdate, updateArea } from "../Common";
 import { VoxelTemplateRegister } from "../../../Templates/VoxelTemplateRegister";
 import { RawVoxelData } from "../../../Voxels";
 import { Vec3Array } from "@amodx/math";
-import { IVoxelTemplateData } from "Templates/VoxelTemplates.types";
+import { IVoxelSelectionData } from "../../../Templates/Selection/VoxelSelection";
 
 const tasks = new VoxelUpdateTask();
 
 
-export default function EraseVoxelTemplate(
+export default function EraseVoxelSelection(
   dimension: number,
   [ox, oy, oz]: Vec3Array,
-  templateData: IVoxelTemplateData<any>,
+  selectionData: IVoxelSelectionData<any>,
   updateData: VoxelUpdateData
 ) {
-  const voxelTemplate = VoxelTemplateRegister.create(templateData);
+  const selection = VoxelTemplateRegister.createSelection(selectionData);
   tasks.setOriginAt([dimension, ox, oy, oz]);
 
-  const { x: sx, y: sy, z: sz } = voxelTemplate.bounds.size;
+  const { x: sx, y: sy, z: sz } = selection.bounds.size;
   for (let x = 0; x < sx; x++) {
     for (let y = 0; y < sy; y++) {
       for (let z = 0; z < sz; z++) {
         const tx = ox + x;
         const ty = oy + y;
         const tz = oz + z;
-        if (!voxelTemplate.isIncluded(voxelTemplate.getIndex(x, y, z)))
-          continue;
+        if (!selection.isSelected(tx, ty, tz)) continue;
         if (!canUpdate(tx, ty, tz, updateData)) continue;
         if (!tasks.sDataCursor.inBounds(tx, ty, tz)) continue;
         const voxel = tasks.sDataCursor.getVoxel(tx, ty, tz);

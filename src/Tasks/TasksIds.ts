@@ -12,5 +12,6 @@ export enum TasksIds {
   PaintVoxelPath = "PaintVoxelPath",
   EraseVoxel = "EraseVoxel",
   EraseVoxelTemplate = "EraseVoxelTemplate",
+  EraseVoxelSelection = "EraseVoxelSelection",
   EraseVoxelPath = "EraseVoxelPath",
 }

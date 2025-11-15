@@ -6,6 +6,7 @@ import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister.j
 import { IVoxelTemplate } from "../../Templates/VoxelTemplates.types.js";
 import { PaintVoxelData } from "../../Voxels/Types/PaintVoxelData.js";
 import { VoxelPathData } from "../../Templates/Path/VoxelPath.types.js";
+import { IVoxelSelection } from "../../Templates/Selection/VoxelSelection.js";
 const air: RawVoxelData = [0, 0, 0, 0];
 const temp: RawVoxelData = [0, 0, 0, 0];
 export class BrushTool {
@@ -212,6 +213,24 @@ export class BrushTool {
           const tz = oz + z;
           if (!this.dataCursor.inBounds(tx, ty, tz)) continue;
           if (voxelTemplate.isAir(voxelTemplate.getIndex(x, y, z))) continue;
+          this.setXYZ(x, y, z).erase();
+        }
+      }
+    }
+  }
+
+  eraseSelection(selection: IVoxelSelection) {
+    const { x: ox, y: oy, z: oz } = selection.origin;
+    const { x: sx, y: sy, z: sz } = selection.bounds.size;
+
+    for (let x = 0; x < sx; x++) {
+      for (let y = 0; y < sy; y++) {
+        for (let z = 0; z < sz; z++) {
+          const tx = ox + x;
+          const ty = oy + y;
+          const tz = oz + z;
+          if (!this.dataCursor.inBounds(tx, ty, tz)) continue;
+          if (!selection.isSelected(tx, ty, tz)) continue;
           this.setXYZ(x, y, z).erase();
         }
       }

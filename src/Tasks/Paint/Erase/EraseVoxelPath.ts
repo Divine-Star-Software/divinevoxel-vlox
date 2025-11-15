@@ -19,6 +19,7 @@ const updateBounds = (x: number, y: number, z: number) => {
   if (y > max.y) max.y = y;
   if (z > max.z) max.z = z;
 };
+
 export default function EraseVoxelPath(
   dimension: number,
   [ox,oy,oz]: Vec3Array,

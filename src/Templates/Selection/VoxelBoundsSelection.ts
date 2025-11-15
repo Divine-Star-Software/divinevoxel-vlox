@@ -1,6 +1,7 @@
 import { Vec3Array, Vec3ArrayLike, Vector3Like } from "@amodx/math";
-import { IVoxelSelection } from "./VoxelSelecton";
-import { BoxVoxelTemplate } from "../Shapes/BoxVoxelTemplate";
+import { IVoxelSelection, IVoxelSelectionData } from "./VoxelSelection";
+import { VoxelShapeTemplate } from "../Shapes/VoxelShapeTemplate";
+import { BoxVoxelShapeSelection } from "../Shapes/Selections/BoxVoxelShapeSelection";
 import { IVoxelshapeTemplateBaseData } from "../Shapes/VoxelShapeTemplate.types";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
@@ -30,16 +31,18 @@ const getSize = (start: Vector3Like, end: Vector3Like) => {
   return Vector3Like.Create(end.x - start.x, end.y - start.y, end.z - start.z);
 };
 
-export class VoxelBoxSelection implements IVoxelSelection {
+export interface VoxelBoundsSelectionData
+  extends IVoxelSelectionData<"bounds"> {}
+
+export class VoxelBoundsSelection
+  implements IVoxelSelection<"bounds", VoxelBoundsSelectionData>
+{
   origin = Vector3Like.Create();
   end = Vector3Like.Create();
-  size = Vector3Like.Create();
   bounds = new BoundingBox();
 
   isSelected(x: number, y: number, z: number): boolean {
-    if (x < this.origin.x || x >= this.end.x) return false;
-    if (y < this.origin.y || y >= this.end.y) return false;
-    if (z < this.origin.z || z >= this.end.z) return false;
+    if (!this.bounds.intersectsXYZ(x + 0.5, y + 0.5, z + 0.5)) return false;
     return true;
   }
 
@@ -100,9 +103,6 @@ export class VoxelBoxSelection implements IVoxelSelection {
       this.end.x = startPosition.x + startNormal.x;
       this.end.y = startPosition.y + startNormal.y;
       this.end.z = startPosition.z + startNormal.z;
-      this.size.x = 1;
-      this.size.y = 1;
-      this.size.z = 1;
     } else {
       this.origin.x = finalMin[0];
       this.origin.y = finalMin[1];
@@ -110,31 +110,50 @@ export class VoxelBoxSelection implements IVoxelSelection {
       this.end.x = finalMax[0];
       this.end.y = finalMax[1];
       this.end.z = finalMax[2];
-      this.size.x = finalSize[0];
-      this.size.y = finalSize[1];
-      this.size.z = finalSize[2];
     }
     this.bounds.setMinMax(this.origin, this.end);
   }
 
   clone() {
-    const newSelection = new VoxelBoxSelection();
+    const newSelection = new VoxelBoundsSelection();
     Vector3Like.Copy(newSelection.origin, this.origin);
-    Vector3Like.Copy(newSelection.size, this.size);
     Vector3Like.Copy(newSelection.end, this.end);
     newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
     return newSelection;
   }
 
   toTemplate(data?: Partial<IVoxelshapeTemplateBaseData>) {
-    const boxTemplate = BoxVoxelTemplate.CreateNew({
-      width: this.size.x,
-      height: this.size.y,
-      depth: this.size.z,
-      ...(data ? data : {}),
-    });
-    return new BoxVoxelTemplate(boxTemplate);
+    return new VoxelShapeTemplate(
+      VoxelShapeTemplate.CreateNew({
+        shapeSelection: BoxVoxelShapeSelection.CreateNew({
+          width: this.bounds.size.x,
+          height: this.bounds.size.y,
+          depth: this.bounds.size.z,
+        }),
+        ...(data ? data : {}),
+      })
+    );
   }
 
   toExtrudedTemplate(cursor: DataCursorInterface, normal: Vector3Like) {}
+
+  toJSON(): VoxelBoundsSelectionData {
+    return {
+      type: "bounds",
+      origin: { ...this.origin },
+      bounds: { ...this.bounds.size },
+    };
+  }
+
+  fromJSON(data: VoxelBoundsSelectionData): void {
+    this.origin.x = data.origin.x;
+    this.origin.y = data.origin.y;
+    this.origin.z = data.origin.z;
+
+    this.bounds.setMinMax(this.origin, {
+      x: this.origin.x + data.bounds.x,
+      y: this.origin.y + data.bounds.y,
+      z: this.origin.z + data.bounds.z,
+    });
+  }
 }

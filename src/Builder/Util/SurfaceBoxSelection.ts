@@ -1,5 +1,5 @@
 import { VoxelBuildSpace } from "../VoxelBuildSpace";
-import { VoxelBoxSelection } from "../../Templates/Selection/VoxelBoxSelection";
+import { VoxelBoundsSelection } from "../../Templates/Selection/VoxelBoundsSelection";
 import { Vector3Like } from "@amodx/math";
 export class SurfaceBoxSelection {
   planeOrigin = Vector3Like.Create();
@@ -7,7 +7,7 @@ export class SurfaceBoxSelection {
   offset = 0;
   constructor(
     public space: VoxelBuildSpace,
-    public selection: VoxelBoxSelection
+    public selection: VoxelBoundsSelection
   ) {}
 
   update() {

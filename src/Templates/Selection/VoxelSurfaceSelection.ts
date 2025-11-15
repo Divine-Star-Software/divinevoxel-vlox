@@ -1,5 +1,5 @@
 import { Flat3DIndex, Vec3Array, Vector3Like } from "@amodx/math";
-import { IVoxelSelection } from "./VoxelSelecton";
+import { IVoxelSelection, IVoxelSelectionData } from "./VoxelSelection";
 import { CardinalNeighbors2D } from "../../Math/CardinalNeighbors";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import {
@@ -11,29 +11,21 @@ import { PaintVoxelData } from "../../Voxels/Types/PaintVoxelData";
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
-export interface VoxelSurfaceSelectionData {
-  origin: Vector3Like;
-  size: Vector3Like;
+export interface VoxelSurfaceSelectionData
+  extends IVoxelSelectionData<"surface"> {
   normal: Vector3Like;
   bitIndex: Uint8Array;
-  extrusion: number;
 }
 
-export class VoxelSurfaceSelection
-  implements IVoxelSelection, VoxelSurfaceSelectionData
-{
+export class VoxelSurfaceSelection implements IVoxelSelection<"surface"> {
   origin = Vector3Like.Create();
-  size = Vector3Like.Create();
   normal = Vector3Like.Create();
   bitIndex: Uint8Array;
   index = Flat3DIndex.GetXZYOrder();
   bounds = new BoundingBox();
-  extrusion = 0;
 
   isSelected(x: number, y: number, z: number): boolean {
-    if (x < this.origin.x || x >= this.origin.x + this.size.x) return false;
-    if (y < this.origin.y || y >= this.origin.y + this.size.y) return false;
-    if (z < this.origin.z || z >= this.origin.z + this.size.z) return false;
+    if (!this.bounds.intersectsXYZ(x + 0.5, y + 0.5, z + 0.5)) return false;
     return (
       getBitArrayIndex(
         this.bitIndex,
@@ -56,7 +48,6 @@ export class VoxelSurfaceSelection
     this.normal.x = normal.x;
     this.normal.y = normal.y;
     this.normal.z = normal.z;
-    this.extrusion = extrusion | 0;
 
     let axis = "x";
     if (normal.x) axis = "x";
@@ -135,7 +126,7 @@ export class VoxelSurfaceSelection
 
     // 2) Extrude outward along +normal for 'extrusion' layers.
     //    We grow layer-by-layer; each new layer must be air and contiguous to the previous layer stack.
-    if (this.extrusion > 0) {
+    if (extrusion > 0) {
       // Collect the initial (surface-adjacent) layer as our starting front.
       let front: Array<{ x: number; y: number; z: number }> = [];
       for (const key of visited) {
@@ -143,7 +134,7 @@ export class VoxelSurfaceSelection
         front.push({ x: sx, y: sy, z: sz });
       }
 
-      for (let d = 1; d <= this.extrusion; d++) {
+      for (let d = 1; d <= extrusion; d++) {
         const nextFront: Array<{ x: number; y: number; z: number }> = [];
         for (const p of front) {
           const tx = p.x + normal.x;
@@ -193,18 +184,14 @@ export class VoxelSurfaceSelection
       }
     }
 
-    this.size.x = sizeX;
-    this.size.y = sizeY;
-    this.size.z = sizeZ;
-
     this.origin.x = min.x;
     this.origin.y = min.y;
     this.origin.z = min.z;
 
     this.bounds.setMinMax(this.origin, {
-      x: this.origin.x + this.size.x,
-      y: this.origin.y + this.size.y,
-      z: this.origin.z + this.size.z,
+      x: this.origin.x + sizeX,
+      y: this.origin.y + sizeY,
+      z: this.origin.z + sizeZ,
     });
 
     return true;
@@ -213,119 +200,46 @@ export class VoxelSurfaceSelection
   clone() {
     const newSelection = new VoxelSurfaceSelection();
     Vector3Like.Copy(newSelection.origin, this.origin);
-    Vector3Like.Copy(newSelection.size, this.size);
     newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
-    newSelection.extrusion = this.extrusion;
-    newSelection.bitIndex = structuredClone(this.bitIndex);
+    newSelection.bitIndex = this.bitIndex.slice();
     newSelection.index.setBounds(...this.index.getBounds());
     newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
     return newSelection;
   }
 
-  toTemplate(
-    cursor: DataCursorInterface,
-    voxelOrExtrude: PaintVoxelData | true
-  ): FullVoxelTemplate;
-  toTemplate(cursor: DataCursorInterface, extrude: true): FullVoxelTemplate;
-  toTemplate(
-    cursor: DataCursorInterface,
-    voxel: PaintVoxelData
-  ): FullVoxelTemplate;
-  toTemplate(
-    cursor: DataCursorInterface,
-    voxelOrExtrude: PaintVoxelData | true
-  ): FullVoxelTemplate {
-    let extrude = false;
-    let voxel: PaintVoxelData | null = null;
-    if (typeof voxelOrExtrude == "boolean") {
-      extrude = true;
-    } else {
-      voxel = voxelOrExtrude;
-    }
+  toTemplate(voxel: PaintVoxelData): FullVoxelTemplate {
+    const size = this.bounds.size;
     const template = new FullVoxelTemplate(
-      FullVoxelTemplate.CreateNew([this.size.x, this.size.y, this.size.z])
+      FullVoxelTemplate.CreateNew([size.x, size.y, size.z])
     );
 
-    if (!extrude && voxel) {
-      const raw = PaintVoxelData.ToRaw(voxel);
-      for (let x = this.origin.x; x < this.origin.x + this.size.x; x++) {
-        for (let y = this.origin.y; y < this.origin.y + this.size.y; y++) {
-          for (let z = this.origin.z; z < this.origin.z + this.size.z; z++) {
-            if (this.isSelected(x, y, z)) {
-              const index = template.getIndex(
-                x - this.origin.x,
-                y - this.origin.y,
-                z - this.origin.z
-              );
-              template.ids[index] = raw[0];
-              template.level[index] = raw[2];
-              template.secondary[index] = raw[3];
-            }
-          }
-        }
-      }
-      return template;
-    }
-    for (let x = this.origin.x; x < this.origin.x + this.size.x; x++) {
-      for (let y = this.origin.y; y < this.origin.y + this.size.y; y++) {
-        for (let z = this.origin.z; z < this.origin.z + this.size.z; z++) {
+    const raw = PaintVoxelData.ToRaw(voxel);
+    for (let x = this.origin.x; x < this.origin.x + size.x; x++) {
+      for (let y = this.origin.y; y < this.origin.y + size.y; y++) {
+        for (let z = this.origin.z; z < this.origin.z + size.z; z++) {
           if (this.isSelected(x, y, z)) {
-            let nx = x;
-            let ny = y;
-            let nz = z;
             const index = template.getIndex(
               x - this.origin.x,
               y - this.origin.y,
               z - this.origin.z
             );
-            while (true) {
-              nx -= this.normal.x;
-              ny -= this.normal.y;
-              nz -= this.normal.z;
-
-              if (!this.isSelected(nx, ny, nz)) {
-                const voxel = cursor.getVoxel(nx, ny, nz)!;
-
-                if (!voxel || voxel.isAir()) break;
-                template.ids[index] = voxel.ids[voxel._index];
-                template.level[index] = voxel.level[voxel._index];
-                template.secondary[index] = voxel.secondary[voxel._index];
-                break;
-              }
-
-              if (x < this.origin.x || x >= this.origin.x + this.size.x)
-                continue;
-              if (y < this.origin.y || y >= this.origin.y + this.size.y)
-                continue;
-              if (z < this.origin.z || z >= this.origin.z + this.size.z)
-                continue;
-
-              const nIndex = template.getIndex(
-                nx - this.origin.x,
-                ny - this.origin.y,
-                nz - this.origin.z
-              );
-              if (!template.isAir(nIndex)) {
-                template.ids[index] = template.ids[nIndex];
-                template.level[index] = template.level[nIndex];
-                template.secondary[index] = template.secondary[nIndex];
-              }
-            }
+            template.ids[index] = raw[0];
+            template.level[index] = raw[2];
+            template.secondary[index] = raw[3];
           }
         }
       }
     }
-
     return template;
   }
 
   toJSON(): VoxelSurfaceSelectionData {
     return {
+      type: "surface",
       origin: { ...this.origin },
       normal: { ...this.normal },
-      extrusion: this.extrusion,
       bitIndex: this.bitIndex.slice(),
-      size: this.size,
+      bounds: { ...this.bounds.size },
     };
   }
 
@@ -338,14 +252,14 @@ export class VoxelSurfaceSelection
     this.normal.y = data.normal.y;
     this.normal.z = data.normal.z;
 
-    this.extrusion = data.extrusion;
-
     this.bitIndex = data.bitIndex;
 
-    this.size.x = data.size.x;
-    this.size.y = data.size.y;
-    this.size.z = data.size.z;
+    this.bounds.setMinMax(this.origin, {
+      x: this.origin.x + data.bounds.x,
+      y: this.origin.y + data.bounds.y,
+      z: this.origin.z + data.bounds.z,
+    });
 
-    this.index.setBounds(this.size.x, this.size.y, this.size.z);
+    this.index.setBounds(data.bounds.x, data.bounds.y, data.bounds.z);
   }
 }

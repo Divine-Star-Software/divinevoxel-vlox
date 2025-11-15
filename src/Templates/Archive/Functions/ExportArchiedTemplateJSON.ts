@@ -56,7 +56,6 @@ export default async function ExportArchiedTemplateJSON(
     engineVersion: templateData.engineVersion,
     formatVersion: templateData.formatVersion,
     dataKey: templateData.dataKey,
-    position: templateData.position,
     bounds: templateData.bounds,
     type: templateData.type,
     buffers,

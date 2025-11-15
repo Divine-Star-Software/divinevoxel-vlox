@@ -5,7 +5,7 @@ import { PaintVoxelData, RawVoxelData } from "../../Voxels";
 import { Vec3Array, Vector3Like } from "@amodx/math";
 import { IVoxelTemplateData } from "../../Templates/VoxelTemplates.types";
 import { VoxelPathData } from "../../Templates/Path/VoxelPath.types";
-import { VoxelTemplateRegister } from "../../Templates/VoxelTempateRegister";
+import { VoxelTemplateRegister } from "../../Templates/VoxelTemplateRegister";
 import { VoxelPath } from "../../Templates/Path/VoxelPath";
 import { VoxelUpdateData } from "../../Tasks/Tasks.types";
 import PickVoxelWorld from "../../Voxels/Interaction/Functions/PickVoxelWorld";
@@ -19,6 +19,8 @@ import { VoxelBFSSelection } from "../../Templates/Selection/VoxelBFSSelection";
 import CreateFullTemplate from "../../Templates/Full/Functions/CreateFullTemplate";
 import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
 import { FullVoxelTemplateData } from "../../Templates/Full/FullVoxelTemplate.types";
+import { IVoxelSelectionData } from "../../Templates/Selection/VoxelSelection";
+import { ExtrudeSelection } from "../../Templates/Functions/ExtrudeSelection";
 
 export function InitTasks() {
   const dimension = WorldSimulation.getDimension(0);
@@ -94,33 +96,15 @@ export function InitTasks() {
     }
   );
 
-  Threads.registerTask<
-    [
-      position: Vector3Like,
-      normal: Vector3Like,
-      extrusion: number,
-      maxSize: number,
-      voxelDataOrExtrude: true | PaintVoxelData
-    ]
-  >(
-    "get-voxel-surface-selection-template",
-    async ([position, normal, extrusion, maxSize, voxelDataOrExtrude]) => {
-      await LockSectors(cursor.dimension, buildAreaBounds);
-      surfaceSelection.reConstruct(
-        cursor,
-        position,
-        normal,
-        extrusion,
-        maxSize
-      );
-      await UnLockSectors(cursor.dimension, buildAreaBounds);
-      const template = surfaceSelection
-        .toTemplate(cursor, voxelDataOrExtrude)
-        .toJSON();
-      template.position.x = surfaceSelection.origin.x;
-      template.position.y = surfaceSelection.origin.y;
-      template.position.z = surfaceSelection.origin.z;
-      return [template];
+  Threads.registerTask<[data: IVoxelSelectionData<any>, normal: Vector3Like]>(
+    "get-extruded-voxel-selection-template",
+    async ([selectionData, normal]) => {
+      const selection = VoxelTemplateRegister.createSelection(selectionData);
+      await LockSectors(cursor.dimension, selection.bounds);
+      const fullVoxelTemplate = ExtrudeSelection(cursor, selection, normal);
+      await UnLockSectors(cursor.dimension, selection.bounds);
+
+      return [fullVoxelTemplate.toJSON()];
     }
   );
 
@@ -131,20 +115,6 @@ export function InitTasks() {
       bfsSelection.reConstruct(cursor, position, maxSize);
       await UnLockSectors(cursor.dimension, buildAreaBounds);
       return [bfsSelection.toJSON()];
-    }
-  );
-
-  Threads.registerTask<[position: Vector3Like, maxSize: number]>(
-    "get-voxel-bfs-selection-template",
-    async ([position, maxSize]) => {
-      await LockSectors(cursor.dimension, buildAreaBounds);
-      bfsSelection.reConstruct(cursor, position, maxSize);
-      await UnLockSectors(cursor.dimension, buildAreaBounds);
-      const template = bfsSelection.toTemplate(cursor).toJSON();
-      template.position.x = bfsSelection.origin.x;
-      template.position.y = bfsSelection.origin.y;
-      template.position.z = bfsSelection.origin.z;
-      return [template];
     }
   );
 
@@ -184,7 +154,9 @@ export function InitTasks() {
   Threads.registerTask<[location: LocationData, data: IVoxelTemplateData<any>]>(
     "paint-voxel-template",
     async ([location, data]) => {
+      console.warn("PAINT VOXEL TEMPLATE", structuredClone(data));
       const template = VoxelTemplateRegister.create(data);
+      console.warn("template", template);
       brush.dimension = location[0];
       await LockSectors(location[0], template.bounds);
       brush
@@ -206,6 +178,17 @@ export function InitTasks() {
       await UnLockSectors(location[0], template.bounds);
     }
   );
+  Threads.registerTask<
+    [location: LocationData, data: IVoxelSelectionData<any>]
+  >("erase-voxel-selection", async ([location, selectionData]) => {
+    brush.dimension = location[0];
+    const selection = VoxelTemplateRegister.createSelection(selectionData);
+    await LockSectors(location[0], selection.bounds);
+    brush
+      .setXYZ(location[1], location[2], location[3])
+      .eraseSelection(selection, updateData);
+    await UnLockSectors(location[0], selection.bounds);
+  });
 
   Threads.registerTask<[location: LocationData, data: VoxelPathData]>(
     "paint-voxel-path",

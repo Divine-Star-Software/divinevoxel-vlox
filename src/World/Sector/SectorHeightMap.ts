@@ -5,6 +5,9 @@ import { WorldRegister } from "../WorldRegister";
 import { WorldSpaces } from "../WorldSpaces";
 
 export class SectorHeightMap {
+  /**
+   * Gets the relative height of the sector. Meaning will get the tallest sector in a square around it.
+   */
   static getRelative(location: LocationData) {
     location = [...location];
     const sectionWidth = WorldSpaces.section.bounds.x;
@@ -21,6 +24,9 @@ export class SectorHeightMap {
     }
     return maxHeight;
   }
+  /**
+   * Gets the exact heigh of the single sector.
+   */
   static getAbsolute(dimension: number, x: number, sy: number, z: number) {
     const sector = WorldRegister.sectors.get(dimension, x, sy, z);
     if (!sector) return WorldSpaces.world.bounds.MinY;

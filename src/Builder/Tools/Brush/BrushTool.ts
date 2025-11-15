@@ -1,14 +1,15 @@
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
-import { BasicVoxelShapeTemplate } from "../../../Templates/Shapes/BasicVoxelShapeTemplate";
 import { VoxelTemplateSelection } from "../../../Templates/Selection/VoxelTemplateSelection";
-import { SphereVoxelTemplate } from "../../../Templates/Shapes/SphereVoxelTemplate";
-import { BoxVoxelTemplate } from "../../../Templates/Shapes/BoxVoxelTemplate";
-import { PyramidVoxelTemplate } from "../../../Templates/Shapes/PyramidVoxelTemplate";
+import { VoxelShapeTemplate } from "../../../Templates/Shapes/VoxelShapeTemplate";
+import { SphereVoxelShapeSelection } from "../../../Templates/Shapes/Selections/SphereVoxelShapeSelection";
+import { BoxVoxelShapeSelection } from "../../../Templates/Shapes/Selections/BoxVoxelShapeSelection";
+import { PyramidVoxelShapeSelection } from "../../../Templates/Shapes/Selections/PyramidVoxelShapeSelection";
+import { EllipsoidVoxelShapeSelection } from "../../../Templates/Shapes/Selections/EllipsoidVoxelShapeSelection";
+
 import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { Vector3Like } from "@amodx/math";
 import { PaintVoxelData } from "../../../Voxels";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
-import { EllipsoidVoxelTemplate } from "../../../Templates/Shapes/EllipsoidVoxelTemplate";
 
 export enum BrushPositionModes {
   Start = "Start",
@@ -18,7 +19,7 @@ export enum BrushPositionModes {
 
 export enum BrushToolModes {
   Fill = "Fill",
-  // Extrude = "Extrude",
+  Extrude = "Extrude",
   Remove = "Remove",
 }
 
@@ -36,7 +37,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   static ToolId = "Brush";
   static ModeArray: BrushToolModes[] = [
     BrushToolModes.Fill,
-    // BrushToolModes.Extrude,
+    BrushToolModes.Extrude,
     BrushToolModes.Remove,
   ];
   static PositionModeArray: BrushPositionModes[] = [
@@ -47,21 +48,34 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   static get ShapesArray() {
     return Object.keys(this.ShapeCreators);
   }
-  static ShapeCreators: Record<
-    string,
-    () => BasicVoxelShapeTemplate<any, any, any>
-  > = {
+  static ShapeCreators: Record<string, () => VoxelShapeTemplate> = {
     Sphere() {
-      return new SphereVoxelTemplate(SphereVoxelTemplate.CreateNew({}));
+      return new VoxelShapeTemplate(
+        VoxelShapeTemplate.CreateNew({
+          shapeSelection: SphereVoxelShapeSelection.CreateNew({}),
+        })
+      );
     },
     Box() {
-      return new BoxVoxelTemplate(BoxVoxelTemplate.CreateNew({}));
+      return new VoxelShapeTemplate(
+        VoxelShapeTemplate.CreateNew({
+          shapeSelection: BoxVoxelShapeSelection.CreateNew({}),
+        })
+      );
     },
     Pyramid() {
-      return new PyramidVoxelTemplate(PyramidVoxelTemplate.CreateNew({}));
+      return new VoxelShapeTemplate(
+        VoxelShapeTemplate.CreateNew({
+          shapeSelection: PyramidVoxelShapeSelection.CreateNew({}),
+        })
+      );
     },
     Ellipsoid() {
-      return new EllipsoidVoxelTemplate(EllipsoidVoxelTemplate.CreateNew({}));
+      return new VoxelShapeTemplate(
+        VoxelShapeTemplate.CreateNew({
+          shapeSelection: EllipsoidVoxelShapeSelection.CreateNew({}),
+        })
+      );
     },
   };
   static BaseToolOptions: ToolOptionsData = [
@@ -209,22 +223,26 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   axisZPositionMode = BrushPositionModes.Center;
   mode = BrushToolModes.Fill;
 
-  template: BasicVoxelShapeTemplate<any, any, any>;
-  selection: VoxelTemplateSelection;
+  template: VoxelShapeTemplate;
+  get selection() {
+    return this.template.shapeSelection;
+  }
   voxelData: Partial<BrushVoxelData> = {};
   usePlacingStrategy = true;
+  placePosition = Vector3Like.Create();
   protected _position = Vector3Like.Create();
   constructor(space: VoxelBuildSpace) {
     super(space);
-    this.selection = new VoxelTemplateSelection();
     this.updateShape(this.shape);
   }
 
   async update() {
     this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
     if (!this._lastPicked) return;
-    const place = this.getPlacePosition(this._lastPicked);
-    if (this.mode == BrushToolModes.Fill) {
+    if (
+      this.mode == BrushToolModes.Fill ||
+      this.mode == BrushToolModes.Extrude
+    ) {
       if (!this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)) {
         this._lastPicked = null;
         return;
@@ -236,6 +254,11 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
         return;
       }
     }
+
+    const place = this.getPlacePosition(this._lastPicked);
+    this.placePosition.x = place.x;
+    this.placePosition.y = place.y;
+    this.placePosition.z = place.z;
     this.selection.origin.x = place.x;
     this.selection.origin.y = place.y;
     this.selection.origin.z = place.z;
@@ -259,6 +282,16 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
         [place.x, place.y, place.z],
         this.template.toJSON()
       );
+      return;
+    }
+
+    if (this.mode == BrushToolModes.Extrude) {
+      const template = await this.space.getExtrudedSelectionTemplate(
+        this.selection.toJSON(),
+        this._lastPicked.normal
+      );
+      await this.space.paintTemplate(this.selection.origin, template.toJSON());
+      return;
     }
 
     if (this.mode == BrushToolModes.Remove) {
@@ -318,11 +351,6 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     if (!shapeCreator) throw new Error(`Shape with id ${shape} does not exist`);
     this.shape = shape;
     this.template = shapeCreator();
-    this.selection.setTemplate(this.template);
-    this.template.addEventListener("updated", () => {
-      this.selection.setTemplate(this.template);
-      this.dispatch("shape-updated", null);
-    });
   }
 
   getOptionValue(property: string) {
@@ -332,7 +360,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       return (this as any)[data.property];
     }
     if (this.optionInCategory(property, "shape")) {
-      return (this.template as any)[data.property];
+      return (this.selection as any)[data.property];
     }
   }
 
@@ -353,7 +381,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       return;
     }
     if (this.optionInCategory(property, "shape")) {
-      (this.template as any)[data.property] = value;
+      (this.selection as any)[data.property] = value;
       return;
     }
   }

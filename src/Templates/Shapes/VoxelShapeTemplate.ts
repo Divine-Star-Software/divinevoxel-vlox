@@ -1,43 +1,40 @@
 import { Flat3DIndex, Vector3Like } from "@amodx/math";
 import { PaintVoxelData, RawVoxelData } from "../../Voxels";
 import {
-  IVoxelShapeTemplate,
-  IVoxelShapeTemplateData,
+  VoxelShapeTemplateData,
   VoxelShapeTemplateFillModes,
-  IVoxelShapeTemplateEvents,
 } from "./VoxelShapeTemplate.types";
-import { TypedEventTarget } from "../../Util/TypedEventTarget";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
-import { IVoxelTemplate } from "../VoxelTemplates.types";
-const point = Vector3Like.Create();
-export abstract class BasicVoxelShapeTemplate<
-    Type extends string,
-    Data extends IVoxelShapeTemplateData<any>,
-    Events extends IVoxelShapeTemplateEvents = IVoxelShapeTemplateEvents
-  >
-  extends TypedEventTarget<Events>
-  implements IVoxelShapeTemplate<Type, Data, Events>
+import { IVoxelTemplate, IVoxelTemplateData } from "../VoxelTemplates.types";
+import {
+  IVoxelShapeSelection,
+  IVoxelShapeSelectionData,
+} from "./Selections/VoxelShapeSelection";
+import { BoxVoxelShapeSelection } from "./Selections/BoxVoxelShapeSelection";
+import type { VoxelTemplateRegister } from "../VoxelTemplateRegister";
+export class VoxelShapeTemplate
+  implements IVoxelTemplate<"shape", VoxelShapeTemplateData>
 {
-  static CreateBaseData<Type extends string>(
-    type: Type,
-    data: Partial<IVoxelShapeTemplateData<Type>>
-  ): IVoxelShapeTemplateData<Type> {
+  static Register: typeof VoxelTemplateRegister;
+  static CreateNew(
+    data: Partial<VoxelShapeTemplateData>
+  ): VoxelShapeTemplateData {
     return {
-      type,
-      bounds: data.bounds || { x: 1, y: 1, z: 1 },
-      position: Vector3Like.Create(),
-      fillMode: "full",
-      fillVoxel: PaintVoxelData.Create(),
-      faceVoxel: PaintVoxelData.Create(),
-      edgeVoxel: PaintVoxelData.Create(),
-      pointVoxel: PaintVoxelData.Create(),
-      ...data,
+      type: "shape",
+      bounds: data.bounds ||
+        data.shapeSelection?.bounds || { x: 1, y: 1, z: 1 },
+      fillMode: data.fillMode || "full",
+      fillVoxel: data.fillVoxel || PaintVoxelData.Create(),
+      faceVoxel: data.faceVoxel || PaintVoxelData.Create(),
+      edgeVoxel: data.edgeVoxel || PaintVoxelData.Create(),
+      pointVoxel: data.pointVoxel || PaintVoxelData.Create(),
+      shapeSelection:
+        data.shapeSelection || BoxVoxelShapeSelection.CreateNew({}),
     };
   }
-  position = Vector3Like.Create();
   index = Flat3DIndex.GetXZYOrder();
   bounds: BoundingBox;
-  type = "";
+
   fillMode: VoxelShapeTemplateFillModes;
   fillVoxel: PaintVoxelData;
   faceVoxel: PaintVoxelData;
@@ -47,26 +44,14 @@ export abstract class BasicVoxelShapeTemplate<
   _faceVoxel: RawVoxelData;
   _edgeVoxel: RawVoxelData;
   _pointVoxel: RawVoxelData;
-  constructor(data: Data) {
-    super();
-    this.type = data.type;
-    this.fillMode = data.fillMode;
-    this.bounds = new BoundingBox();
-    this.bounds.setMinPositionAndSize(data.position, data.bounds);
-    this.index.setBounds(data.bounds.x, data.bounds.y, data.bounds.z);
-    this.setVoxels(
-      data.fillVoxel,
-      data.faceVoxel,
-      data.edgeVoxel,
-      data.pointVoxel
-    );
+  shapeSelection: IVoxelShapeSelection<any, IVoxelShapeSelectionData<any>>;
+
+  constructor(data?: VoxelShapeTemplateData) {
+    if (data) this.fromJSON(data);
   }
 
   inBounds(x: number, y: number, z: number): boolean {
-    point.x = x + 0.5;
-    point.y = y + 0.5;
-    point.z = z + 0.5;
-    return this.bounds.intersectsPoint(point);
+    return this.bounds.intersectsXYZ(x + 0.5, y + 0.5, z + 0.5);
   }
 
   setVoxels(
@@ -89,15 +74,14 @@ export abstract class BasicVoxelShapeTemplate<
     return this.index.getIndexXYZ(x, y, z);
   }
 
-  setPosition(x: number, y: number, z: number): void {
-    this.position.x = x;
-    this.position.y = y;
-    this.position.z = z;
+  isIncluded(index: number) {
+    const [x, y, z] = this.index.getXYZ(index);
+    return this.shapeSelection.isSelected(
+      x + this.shapeSelection.origin.x,
+      y + this.shapeSelection.origin.y,
+      z + this.shapeSelection.origin.z
+    );
   }
-
-  abstract isIncluded(index: number): boolean;
-
-  abstract clone(): BasicVoxelShapeTemplate<Type, Data, Events>;
 
   isAir(index: number) {
     if (!this.isIncluded(index)) return true;
@@ -148,27 +132,42 @@ export abstract class BasicVoxelShapeTemplate<
     return rawRef;
   }
 
-  protected _updateBounds() {
-    this.bounds.setSize(this.bounds.size);
+  clone() {
+    const newTemplate = new VoxelShapeTemplate();
+    newTemplate.fromJSON(this.toJSON());
+    return newTemplate;
+  }
+
+  toJSON(): VoxelShapeTemplateData {
+    return {
+      type: "shape",
+      bounds: { ...this.bounds.size },
+      fillMode: this.fillMode,
+      fillVoxel: { ...this.fillVoxel },
+      faceVoxel: { ...this.faceVoxel },
+      edgeVoxel: { ...this.edgeVoxel },
+      pointVoxel: { ...this.pointVoxel },
+      shapeSelection: this.shapeSelection.toJSON(),
+    };
+  }
+
+  fromJSON(data: VoxelShapeTemplateData): void {
+    this.fillMode = data.fillMode;
+    this.bounds = new BoundingBox();
+    this.shapeSelection = VoxelShapeTemplate.Register.createSelection(
+      data.shapeSelection
+    );
+    this.bounds.setSize(this.shapeSelection.bounds.size);
     this.index.setBounds(
       this.bounds.size.x,
       this.bounds.size.y,
       this.bounds.size.z
     );
-  }
-
-  abstract toJSON(): Data;
-
-  protected getBaseJSON(): IVoxelShapeTemplateData<any> {
-    return {
-      type: this.type,
-      position: this.position,
-      bounds: this.bounds.size,
-      fillMode: this.fillMode,
-      fillVoxel: this.fillVoxel,
-      faceVoxel: this.faceVoxel,
-      edgeVoxel: this.edgeVoxel,
-      pointVoxel: this.pointVoxel,
-    };
+    this.setVoxels(
+      data.fillVoxel,
+      data.faceVoxel,
+      data.edgeVoxel,
+      data.pointVoxel
+    );
   }
 }

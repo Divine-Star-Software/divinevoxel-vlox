@@ -1,5 +1,5 @@
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
-import { VoxelBoxSelection } from "../../../Templates/Selection/VoxelBoxSelection";
+import { VoxelBoundsSelection } from "../../../Templates/Selection/VoxelBoundsSelection";
 import { FreeBoxSelection } from "../../Util/FreeBoxSelection";
 import { FullVoxelTemplate } from "../../../Templates/Full/FullVoxelTemplate";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
@@ -10,7 +10,7 @@ export enum TemplateToolModes {
   Remove = "Remove",
 }
 interface TemplateToolEvents {
-  "selection-created": VoxelBoxSelection;
+  "selection-created": VoxelBoundsSelection;
 }
 export class TemplateTool extends BuilderToolBase<TemplateToolEvents> {
   static ToolId = "Template";
@@ -37,7 +37,7 @@ export class TemplateTool extends BuilderToolBase<TemplateToolEvents> {
   private _started = false;
 
   async selectionToTemplate(
-    selection: VoxelBoxSelection
+    selection: VoxelBoundsSelection
   ): Promise<FullVoxelTemplate> {
     const bounds = selection.bounds.getMinMax();
     return await this.space.createTemplate(bounds);

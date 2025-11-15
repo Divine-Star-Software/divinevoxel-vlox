@@ -1,5 +1,5 @@
 import { Flat3DIndex, Vector3Like } from "@amodx/math";
-import { IVoxelSelection } from "./VoxelSelecton";
+import { IVoxelSelection, IVoxelSelectionData } from "./VoxelSelection";
 import { CardinalNeighbors3D } from "../../Math/CardinalNeighbors";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import {
@@ -9,25 +9,20 @@ import {
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
-export interface VoxelBFSSelectionData {
-  origin: Vector3Like;
-  size: Vector3Like;
+export interface VoxelBFSSelectionData extends IVoxelSelectionData<"bfs"> {
   bitIndex: Uint8Array;
 }
 
 export class VoxelBFSSelection
-  implements IVoxelSelection, VoxelBFSSelectionData
+  implements IVoxelSelection<"bfs", VoxelBFSSelectionData>
 {
   origin = Vector3Like.Create();
-  size = Vector3Like.Create();
   bitIndex: Uint8Array;
   index = Flat3DIndex.GetXZYOrder();
   bounds = new BoundingBox();
 
   isSelected(x: number, y: number, z: number): boolean {
-    if (x < this.origin.x || x >= this.origin.x + this.size.x) return false;
-    if (y < this.origin.y || y >= this.origin.y + this.size.y) return false;
-    if (z < this.origin.z || z >= this.origin.z + this.size.z) return false;
+    if (!this.bounds.intersectsXYZ(x + 0.5, y + 0.5, z + 0.5)) return false;
     return (
       getBitArrayIndex(
         this.bitIndex,
@@ -113,27 +108,26 @@ export class VoxelBFSSelection
       }
     }
 
-    this.size.x = sizeX;
-    this.size.y = sizeY;
-    this.size.z = sizeZ;
-
     this.origin.x = min.x;
     this.origin.y = min.y;
     this.origin.z = min.z;
+
+    this.bounds.setMinMax(this.origin, {
+      x: this.origin.x + sizeX,
+      y: this.origin.y + sizeY,
+      z: this.origin.z + sizeZ,
+    });
   }
 
   toTemplate(cursor: DataCursorInterface): FullVoxelTemplate {
-    const templateData = FullVoxelTemplate.CreateNew([
-      this.size.x,
-      this.size.y,
-      this.size.z,
-    ]);
+    const size = this.bounds.size;
+    const templateData = FullVoxelTemplate.CreateNew([size.x, size.y, size.z]);
     templateData.mask = this.bitIndex.slice();
     const template = new FullVoxelTemplate(templateData);
 
-    for (let x = this.origin.x; x < this.origin.x + this.size.x; x++) {
-      for (let y = this.origin.y; y < this.origin.y + this.size.y; y++) {
-        for (let z = this.origin.z; z < this.origin.z + this.size.z; z++) {
+    for (let x = this.origin.x; x < this.origin.x + size.x; x++) {
+      for (let y = this.origin.y; y < this.origin.y + size.y; y++) {
+        for (let z = this.origin.z; z < this.origin.z + size.z; z++) {
           if (!this.isSelected(x, y, z)) continue;
           const voxel = cursor.getVoxel(x, y, z);
           if (!voxel || voxel.isAir()) continue;
@@ -156,17 +150,17 @@ export class VoxelBFSSelection
   clone() {
     const newSelection = new VoxelBFSSelection();
     Vector3Like.Copy(newSelection.origin, this.origin);
-    Vector3Like.Copy(newSelection.size, this.size);
     newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
-    newSelection.bitIndex = structuredClone(this.bitIndex);
+    newSelection.bitIndex = this.bitIndex.slice();
     newSelection.index.setBounds(...this.index.getBounds());
     return newSelection;
   }
 
   toJSON(): VoxelBFSSelectionData {
     return {
+      type: "bfs",
       origin: { ...this.origin },
-      size: { ...this.size },
+      bounds: { ...this.bounds.size },
       bitIndex: this.bitIndex.slice(),
     };
   }
@@ -176,12 +170,14 @@ export class VoxelBFSSelection
     this.origin.y = data.origin.y;
     this.origin.z = data.origin.z;
 
-    this.size.x = data.size.x;
-    this.size.y = data.size.y;
-    this.size.z = data.size.z;
-
     this.bitIndex = data.bitIndex;
 
-    this.index.setBounds(this.size.x, this.size.y, this.size.z);
+    this.bounds.setMinMax(this.origin, {
+      x: this.origin.x + data.bounds.x,
+      y: this.origin.y + data.bounds.y,
+      z: this.origin.z + data.bounds.z,
+    });
+
+    this.index.setBounds(data.bounds.x, data.bounds.y, data.bounds.z);
   }
 }

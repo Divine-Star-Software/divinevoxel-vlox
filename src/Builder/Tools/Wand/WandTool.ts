@@ -68,6 +68,7 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
   }
 
   async use() {
+    console.warn("use", this.mode);
     const picked = this._lastPicked;
     if (!picked) return;
     let voxelData = this.voxelData;
@@ -77,35 +78,47 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
         const newData = this.space.getPlaceState(voxelData, picked);
         if (newData) voxelData = newData;
       }
-      const template = await this.space.getSurfaceSelectionTemplate(
-        picked.position,
-        picked.normal,
-        this.extrusion,
-        this.maxCount,
-        voxelData
+      this.surfaceSelection.fromJSON(
+        await this.space.getSurfaceSelection(
+          picked.position,
+          picked.normal,
+          this.extrusion,
+          this.maxCount
+        )
       );
-      await this.space.paintTemplate(template.position, template.toJSON());
+      await this.space.paintTemplate(
+        this.surfaceSelection.origin,
+        this.surfaceSelection.toTemplate(voxelData).toJSON()
+      );
       return;
     }
 
     if (this.mode == WandToolModes.Extrude) {
-      const template = await this.space.getSurfaceSelectionTemplate(
-        picked.position,
-        picked.normal,
-        this.extrusion,
-        this.maxCount,
-        true
+      this.surfaceSelection.fromJSON(
+        await this.space.getSurfaceSelection(
+          picked.position,
+          picked.normal,
+          this.extrusion,
+          this.maxCount
+        )
       );
-      await this.space.paintTemplate(template.position, template.toJSON());
+      const template = await this.space.getExtrudedSelectionTemplate(
+        this.surfaceSelection.toJSON(),
+        picked.normal
+      );
+      await this.space.paintTemplate(
+        this.surfaceSelection.origin,
+        template.toJSON()
+      );
       return;
     }
 
     if (this.mode == WandToolModes.Remove) {
-      const template = await this.space.getBFSSelectionTemplate(
+      const selection = await this.space.getBFSSelection(
         picked.position,
         this.maxCount
       );
-      await this.space.eraseTemplate(template.position, template.toJSON());
+      await this.space.eraseSelection(selection);
       return;
     }
   }

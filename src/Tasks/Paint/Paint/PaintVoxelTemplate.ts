@@ -1,7 +1,7 @@
 import { PaintVoxelTemplateTask, VoxelUpdateData } from "../../Tasks.types";
 import { VoxelUpdateTask } from "../../VoxelUpdateTask";
 import { canUpdate, updateArea } from "../Common";
-import { VoxelTemplateRegister } from "../../../Templates/VoxelTempateRegister";
+import { VoxelTemplateRegister } from "../../../Templates/VoxelTemplateRegister";
 import { RawVoxelData } from "../../../Voxels/Types/Voxel.types";
 import { Vec3Array } from "@amodx/math";
 import { IVoxelTemplateData } from "../../../Templates/VoxelTemplates.types";

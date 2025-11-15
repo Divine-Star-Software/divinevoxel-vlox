@@ -14,7 +14,13 @@ import { FullVoxelTemplateData } from "../Templates/Full/FullVoxelTemplate.types
 import { LocationData } from "../Math";
 import type { VoxelSurfaceSelectionData } from "../Templates/Selection/VoxelSurfaceSelection";
 import type { VoxelBFSSelectionData } from "../Templates/Selection/VoxelBFSSelection";
-import { BoxVoxelTemplate } from "../Templates/Shapes/BoxVoxelTemplate";
+import {
+  IVoxelSelection,
+  IVoxelSelectionData,
+} from "../Templates/Selection/VoxelSelection";
+import { VoxelShapeTemplate } from "../Templates/Shapes/VoxelShapeTemplate";
+import { BoxVoxelShapeSelection } from "../Templates/Shapes/Selections/BoxVoxelShapeSelection";
+import "../Templates/VoxelTemplateRegister";
 export type VoxelSpaceUpdateData =
   | {
       type: "paint-voxel";
@@ -34,6 +40,10 @@ export type VoxelSpaceUpdateData =
       type: "erase-voxel-template";
       position: Vec3Array;
       template: IVoxelTemplateData<any>;
+    }
+  | {
+      type: "erase-voxel-selection";
+      selection: IVoxelSelectionData<any>;
     }
   | {
       type: "paint-voxel-path";
@@ -143,22 +153,6 @@ export class VoxelBuildSpace {
       [position, normal, extrusion, maxSize]
     );
   }
-
-  async getSurfaceSelectionTemplate(
-    position: Vector3Like,
-    normal: Vector3Like,
-    extrusion: number,
-    maxSize: number,
-    voxelDataOrExtrude: true | PaintVoxelData
-  ): Promise<FullVoxelTemplate> {
-    return new FullVoxelTemplate(
-      await this.DVER.threads.world.runTaskAsync(
-        "get-voxel-surface-selection-template",
-        [position, normal, extrusion, maxSize, voxelDataOrExtrude]
-      )
-    );
-  }
-
   async getBFSSelection(
     position: Vector3Like,
     maxSize?: number
@@ -169,16 +163,15 @@ export class VoxelBuildSpace {
     );
   }
 
-  async getBFSSelectionTemplate(
-    position: Vector3Like,
-    maxSize?: number
-  ): Promise<FullVoxelTemplate> {
-    return new FullVoxelTemplate(
-      await this.DVER.threads.world.runTaskAsync(
-        "get-voxel-bfs-selection-template",
-        [position, maxSize]
-      )
+  async getExtrudedSelectionTemplate(
+    selection: IVoxelSelectionData<any>,
+    nomral: Vector3Like
+  ) {
+    const templateData = await this.DVER.threads.world.runTaskAsync(
+      "get-extruded-voxel-selection-template",
+      [selection, nomral]
     );
+    return new FullVoxelTemplate(templateData);
   }
 
   getPlaceState(
@@ -200,20 +193,17 @@ export class VoxelBuildSpace {
 
   async clear() {
     const size = this.bounds.size;
-    if (
-      !isFinite(Math.abs(size.x)) ||
-      !isFinite(Math.abs(size.y)) ||
-      !isFinite(Math.abs(size.z))
-    )
+    if (!isFinite(size.x) || !isFinite(size.y) || !isFinite(size.z))
       return false;
     const min = this.bounds.min;
     await this.DVER.threads.world.runTaskAsync("erase-voxel-template", [
       [0, min.x, min.y, min.z],
-      BoxVoxelTemplate.CreateNew({
-        width: size.x,
-        height: size.y,
-        depth: size.z,
-        bounds: Vector3Like.Create(size.x, size.y, size.z),
+      VoxelShapeTemplate.CreateNew({
+        shapeSelection: BoxVoxelShapeSelection.CreateNew({
+          width: this.bounds.size.x,
+          height: this.bounds.size.y,
+          depth: this.bounds.size.z,
+        }),
       }),
     ]);
     return true;
@@ -242,6 +232,17 @@ export class VoxelBuildSpace {
       await this.DVER.threads.world.runTaskAsync("erase-voxel-template", [
         [0, ...update.position],
         update.template,
+      ]);
+    },
+    "erase-voxel-selection": async (update) => {
+      await this.DVER.threads.world.runTaskAsync("erase-voxel-selection", [
+        [
+          0,
+          update.selection.origin.x,
+          update.selection.origin.y,
+          update.selection.origin.z,
+        ],
+        update.selection,
       ]);
     },
     "paint-voxel-path": async (update) => {
@@ -316,7 +317,12 @@ export class VoxelBuildSpace {
       template,
     });
   }
-
+  async eraseSelection(selection: IVoxelSelectionData<any>) {
+    await this.update({
+      type: "erase-voxel-selection",
+      selection,
+    });
+  }
   async paintPath(position: Vec3Array | Vector3Like, path: VoxelPathData) {
     await this.update({
       type: "paint-voxel-path",

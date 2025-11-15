@@ -6,6 +6,7 @@ import {
   EraseVoxelTemplateTask,
   PaintVoxelPathTask,
   EraseVoxelPathTask,
+  EraseVoxelSelectionTask,
 } from "../../Tasks/Tasks.types";
 import { LocationData } from "../../Math";
 import { TasksIds } from "../../Tasks/TasksIds.js";
@@ -48,10 +49,7 @@ class TaskQueue<Data extends any = any, ReturnData extends any = void> {
 export class LocationTaskToolTask implements ITask<LocationData> {
   private _count = 0;
   _threads: Thread[];
-  constructor(
-    public id: string,
-    threads: Thread | ThreadPool
-  ) {
+  constructor(public id: string, threads: Thread | ThreadPool) {
     if (threads instanceof Thread) {
       this._threads = [threads];
     } else {
@@ -90,10 +88,7 @@ export class TaskToolTask<Data extends any = any, ReturnData extends any = void>
 {
   private _count = 0;
   _threads: Thread[];
-  constructor(
-    public id: string,
-    threads: Thread | ThreadPool
-  ) {
+  constructor(public id: string, threads: Thread | ThreadPool) {
     if (threads instanceof Thread) {
       this._threads = [threads];
     } else {
@@ -130,6 +125,7 @@ class VoxelTasks {
 
   erase: TaskToolTask<EraseVoxelTask>;
   eraseTemplate: TaskToolTask<EraseVoxelTemplateTask>;
+  eraseSelection: TaskToolTask<EraseVoxelSelectionTask>;
   erasePath: TaskToolTask<EraseVoxelPathTask>;
 
   constructor(public tool: TaskTool) {
@@ -142,6 +138,10 @@ class VoxelTasks {
     this.erase = new TaskToolTask(TasksIds.EraseVoxel, tool.generators);
     this.eraseTemplate = new TaskToolTask(
       TasksIds.EraseVoxelTemplate,
+      tool.generators
+    );
+    this.eraseSelection = new TaskToolTask(
+      TasksIds.EraseVoxelSelection,
       tool.generators
     );
     this.erasePath = new TaskToolTask(TasksIds.EraseVoxelPath, tool.generators);

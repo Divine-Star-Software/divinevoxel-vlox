@@ -8,6 +8,7 @@ import type EraseVoxelTemplate from "./Paint/Erase/EraseVoxelTemplate.js";
 import type EraseVoxelPath from "./Paint/Erase/EraseVoxelPath.js";
 import { PaintVoxel } from "./Paint/Paint/PaintVoxel.js";
 import PaintVoxelTemplate from "./Paint/Paint/PaintVoxelTemplate.js";
+import EraseVoxelSelection from "./Paint/Erase/EraseVoxelSelection.js";
 
 export type VoxelUpdateData = {
   /**An array of allowed areas to update in. If not set will be ignored.*/
@@ -29,6 +30,7 @@ export type PaintVoxelPathTask = [
 
 export type EraseVoxelTask = Parameters<typeof EraseVoxel>;
 export type EraseVoxelTemplateTask = Parameters<typeof EraseVoxelTemplate>;
+export type EraseVoxelSelectionTask = Parameters<typeof EraseVoxelSelection>;
 export type EraseVoxelPathTask = Parameters<typeof EraseVoxelPath>;
 
 export type WorldLockTasks = [

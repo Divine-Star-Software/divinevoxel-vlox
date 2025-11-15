@@ -15,6 +15,8 @@ import PaintVoxelPath from "../../Tasks/Paint/Paint/PaintVoxelPath";
 import { EraseVoxel } from "../../Tasks/Paint/Erase/EraseVoxel";
 import EraseVoxelTemplate from "../../Tasks/Paint/Erase/EraseVoxelTemplate";
 import EraseVoxelPath from "../../Tasks/Paint/Erase/EraseVoxelPath";
+import { IVoxelSelection } from "../../Templates/Selection/VoxelSelection";
+import EraseVoxelSelection from "../../Tasks/Paint/Erase/EraseVoxelSelection";
 
 export class SimulationBrush extends BrushTool {
   private taskTool: TaskTool;
@@ -270,6 +272,81 @@ export class SimulationBrush extends BrushTool {
       this.dimension,
       [this.x, this.y, this.z],
       voxelTemplate.toJSON(),
+      updateData,
+    ]);
+
+    return this;
+  }
+
+  eraseSelection(selection: IVoxelSelection, updateData: VoxelUpdateData = {}) {
+    const { x: ox, y: oy, z: oz } = this;
+    const { x: sx, y: sy, z: sz } = selection.bounds.size;
+
+    for (let x = 0; x < sx; x++) {
+      for (let y = 0; y < sy; y++) {
+        for (let z = 0; z < sz; z++) {
+          const tx = ox + x;
+          const ty = oy + y;
+          const tz = oz + z;
+          if (selection.isSelected(tx, ty, tz)) continue;
+          const voxel = this.dataCursor.getVoxel(tx, ty, tz);
+          if (!voxel) continue;
+          const tags =
+            VoxelTagsRegister.VoxelTags[
+              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+            ];
+
+          const behavior = VoxelBehaviorsRegister.get(
+            tags["dve_simulation_behavior"] || "default"
+          );
+
+          behavior.onErase(this._dimension.simulation, tx, ty, tz);
+        }
+      }
+    }
+
+    EraseVoxelSelection(
+      this.dimension,
+      [this.x, this.y, this.z],
+      selection.toJSON(),
+      updateData
+    );
+
+    return this;
+  }
+
+  async eraseSelectionAsync(
+    selection: IVoxelSelection,
+    updateData: VoxelUpdateData = {}
+  ) {
+    const { x: ox, y: oy, z: oz } = this;
+    const { x: sx, y: sy, z: sz } = selection.bounds.size;
+    for (let x = 0; x < sx; x++) {
+      for (let y = 0; y < sy; y++) {
+        for (let z = 0; z < sz; z++) {
+          const tx = ox + x;
+          const ty = oy + y;
+          const tz = oz + z;
+          if (selection.isSelected(tx, ty, tz)) continue;
+          const voxel = this.dataCursor.getVoxel(tx, ty, tz);
+          if (!voxel) continue;
+          const tags =
+            VoxelTagsRegister.VoxelTags[
+              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+            ];
+
+          const behavior = VoxelBehaviorsRegister.get(
+            tags["dve_simulation_behavior"] || "default"
+          );
+
+          behavior.onErase(this._dimension.simulation, tx, ty, tz);
+        }
+      }
+    }
+    await this.taskTool.voxel.eraseTemplate.runAsync([
+      this.dimension,
+      [this.x, this.y, this.z],
+      selection.toJSON(),
       updateData,
     ]);
 

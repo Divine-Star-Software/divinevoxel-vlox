@@ -1,20 +1,22 @@
 import { Vector3Like } from "@amodx/math";
-
-import { IVoxelSelection } from "./VoxelSelecton";
-import { IVoxelTemplate } from "../VoxelTemplates.types";
+import { IVoxelSelection, IVoxelSelectionData } from "./VoxelSelection";
+import { IVoxelTemplate, IVoxelTemplateData } from "../VoxelTemplates.types";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import type { VoxelTemplateRegister } from "../VoxelTemplateRegister";
 
-export class VoxelTemplateSelection implements IVoxelSelection {
+export interface VoxelTemplateSelectionData
+  extends IVoxelSelectionData<"template"> {
+  template: IVoxelTemplateData<any>;
+}
+
+export class VoxelTemplateSelection implements IVoxelSelection<"template"> {
+  static Register: typeof VoxelTemplateRegister;
   origin = Vector3Like.Create();
-  size = Vector3Like.Create();
   bounds = new BoundingBox();
-
   template: IVoxelTemplate;
 
   isSelected(x: number, y: number, z: number): boolean {
-    if (x < this.origin.x || x >= this.origin.x + this.size.x) return false;
-    if (y < this.origin.y || y >= this.origin.y + this.size.y) return false;
-    if (z < this.origin.z || z >= this.origin.z + this.size.z) return false;
+    if (!this.bounds.intersectsXYZ(x + 0.5, y + 0.5, z + 0.5)) return false;
     const rx = x - this.origin.x;
     const ry = y - this.origin.y;
     const rz = z - this.origin.z;
@@ -27,7 +29,6 @@ export class VoxelTemplateSelection implements IVoxelSelection {
   clone() {
     const newSelection = new VoxelTemplateSelection();
     Vector3Like.Copy(newSelection.origin, this.origin);
-    Vector3Like.Copy(newSelection.size, this.size);
     newSelection.bounds.setMinMax(this.bounds.min, this.bounds.max);
     newSelection.template = this.template.clone();
     return newSelection;
@@ -35,8 +36,26 @@ export class VoxelTemplateSelection implements IVoxelSelection {
 
   setTemplate(template: IVoxelTemplate) {
     this.template = template;
-    this.size.x = template.bounds.size.x;
-    this.size.y = template.bounds.size.y;
-    this.size.z = template.bounds.size.z;
+    this.bounds.setMinMax(
+      this.origin,
+      Vector3Like.Add(this.origin, template.bounds.size)
+    );
+  }
+
+  toJSON(): VoxelTemplateSelectionData {
+    return {
+      type: "template",
+      origin: { ...this.origin },
+      bounds: { ...this.bounds.size },
+      template: this.template.toJSON(),
+    };
+  }
+
+  fromJSON(data: VoxelTemplateSelectionData) {
+    this.origin.x = data.origin.x;
+    this.origin.y = data.origin.y;
+    this.origin.z = data.origin.z;
+    const template = VoxelTemplateSelection.Register.create(data.template);
+    this.setTemplate(template);
   }
 }

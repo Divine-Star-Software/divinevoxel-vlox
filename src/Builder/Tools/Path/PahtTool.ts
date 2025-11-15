@@ -2,7 +2,6 @@ import { PaintVoxelData } from "../../../Voxels";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
 import { VoxelPath, VoxelPathSegment } from "../../../Templates/Path/VoxelPath";
-import { Vector3Like } from "@amodx/math";
 import { FreePointSelection } from "../../Util/FreePointSelection";
 export enum PathToolModes {
   PlacePoints = "Place Points",

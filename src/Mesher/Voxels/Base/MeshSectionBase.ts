@@ -12,7 +12,7 @@ import { VoxelMeshBVHBuilder } from "../Geomtry/VoxelMeshBVHBuilder";
 import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "../Models/RenderedMaterials";
 import { CompactVoxelSectionMesh } from "./CompactVoxelSectionMesh";
-import { DataCursorInterface } from "Voxels/Cursor/DataCursor.interface";
+import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
 
 let space: VoxelGeometryBuilderCacheSpace;
 const bvhTool = new VoxelMeshBVHBuilder();

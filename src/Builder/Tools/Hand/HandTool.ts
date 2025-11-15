@@ -46,6 +46,7 @@ export class HandTool extends BuilderToolBase<HandToolEvents> {
         const newData = this.space.getPlaceState(voxelData, this._lastPicked);
         if (newData) voxelData = newData;
       }
+      console.warn("hand tool paint", { ...voxelData });
       await this.space.paintVoxel(
         [
           this._lastPicked.normalPosition.x,

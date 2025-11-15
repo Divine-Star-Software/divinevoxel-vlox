@@ -1,14 +1,14 @@
 import { VoxelBuildSpace } from "../VoxelBuildSpace";
-import { VoxelBoxSelection } from "../../Templates/Selection/VoxelBoxSelection";
+import { VoxelBoundsSelection } from "../../Templates/Selection/VoxelBoundsSelection";
 import { Vector3Like } from "@amodx/math";
 import { Axes } from "@amodx/math/Vectors/Axes";
 import { FreePointSelection } from "./FreePointSelection";
 export class FreeBoxSelection {
   start: Vector3Like;
-  selection: VoxelBoxSelection;
+  selection: VoxelBoundsSelection;
   constructor(public space: VoxelBuildSpace, public point: FreePointSelection) {
     this.start = { ...point.selection.origin };
-    this.selection = new VoxelBoxSelection();
+    this.selection = new VoxelBoundsSelection();
     this.selection.reConstruct(
       this.start,
       Axes.UpReadOnly(),

@@ -16,7 +16,6 @@ type TemplateCursor = { position: Vec3Array; raw: RawVoxelData };
 const point = Vector3Like.Create();
 export class ArchivedVoxelTemplate implements IVoxelTemplate {
   index = Flat3DIndex.GetXZYOrder();
-  position: Vector3Like;
   bounds: BoundingBox;
   ids: BinaryBuffer;
   level: BinaryBuffer;
@@ -26,64 +25,9 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
 
   levelPalette: NumberPalette;
   secondaryPalette: NumberPalette;
-
-  constructor(private _data: ArchivedVoxelTemplateData) {
-    this.bounds = new BoundingBox();
-    this.position = { ..._data.position };
-    this.bounds.setMinPositionAndSize(_data.position, _data.bounds);
-    this.index.setBounds(_data.bounds.x, _data.bounds.y, _data.bounds.z);
-
-    this.voxelPalette = new VoxelPaletteArchiveReader(_data.palettes);
-    if (_data.palettes.level) {
-      this.levelPalette = new NumberPalette(
-        BinaryBuffer.ToTypedArray(_data.palettes.level)
-      );
-    } else {
-      this.levelPalette = new NumberPalette([0]);
-    }
-
-    if (_data.palettes.secondary) {
-      this.secondaryPalette = new NumberPalette(
-        BinaryBuffer.ToTypedArray(_data.palettes.secondary)
-      );
-    } else {
-      this.secondaryPalette = new NumberPalette([0]);
-    }
-
-    const volume = this.index.size;
-    this.ids = _data.buffers.ids
-      ? new BinaryBuffer(_data.buffers.ids)
-      : new BinaryBuffer(
-          BinaryBuffer.Create({
-            format: BinaryBufferFormat.Uint16,
-            byteLength: volume,
-            buffer: 0,
-          })
-        );
-    this.level = _data.buffers.level
-      ? new BinaryBuffer(_data.buffers.level)
-      : new BinaryBuffer(
-          BinaryBuffer.Create({
-            format: BinaryBufferFormat.Uint8,
-            byteLength: volume,
-            buffer: 0,
-          })
-        );
-    this.secondary = _data.buffers.secondary
-      ? new BinaryBuffer(_data.buffers.secondary)
-      : new BinaryBuffer(
-          BinaryBuffer.Create({
-            format: BinaryBufferFormat.Uint16,
-            byteLength: volume,
-            buffer: 0,
-          })
-        );
-  }
-
-  setPosition(x: number, y: number, z: number): void {
-    this.position.x = x;
-    this.position.y = y;
-    this.position.z = z;
+  private data: ArchivedVoxelTemplateData;
+  constructor(data: ArchivedVoxelTemplateData) {
+    this.fromJSON(data);
   }
 
   inBounds(x: number, y: number, z: number): boolean {
@@ -173,6 +117,59 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
   }
 
   toJSON(): ArchivedVoxelTemplateData {
-    return this._data;
+    return this.data;
+  }
+
+  fromJSON(data: ArchivedVoxelTemplateData): void {
+    this.data = data;
+    this.bounds = new BoundingBox();
+    this.bounds.setSize(data.bounds);
+    this.index.setBounds(data.bounds.x, data.bounds.y, data.bounds.z);
+
+    this.voxelPalette = new VoxelPaletteArchiveReader(data.palettes);
+    if (data.palettes.level) {
+      this.levelPalette = new NumberPalette(
+        BinaryBuffer.ToTypedArray(data.palettes.level)
+      );
+    } else {
+      this.levelPalette = new NumberPalette([0]);
+    }
+
+    if (data.palettes.secondary) {
+      this.secondaryPalette = new NumberPalette(
+        BinaryBuffer.ToTypedArray(data.palettes.secondary)
+      );
+    } else {
+      this.secondaryPalette = new NumberPalette([0]);
+    }
+
+    const volume = this.index.size;
+    this.ids = data.buffers.ids
+      ? new BinaryBuffer(data.buffers.ids)
+      : new BinaryBuffer(
+          BinaryBuffer.Create({
+            format: BinaryBufferFormat.Uint16,
+            byteLength: volume,
+            buffer: 0,
+          })
+        );
+    this.level = data.buffers.level
+      ? new BinaryBuffer(data.buffers.level)
+      : new BinaryBuffer(
+          BinaryBuffer.Create({
+            format: BinaryBufferFormat.Uint8,
+            byteLength: volume,
+            buffer: 0,
+          })
+        );
+    this.secondary = data.buffers.secondary
+      ? new BinaryBuffer(data.buffers.secondary)
+      : new BinaryBuffer(
+          BinaryBuffer.Create({
+            format: BinaryBufferFormat.Uint16,
+            byteLength: volume,
+            buffer: 0,
+          })
+        );
   }
 }

@@ -39,7 +39,6 @@ export default async function ImportArchivedTemplateJSON(
     formatVersion: jsonData.formatVersion,
     dataKey: jsonData.dataKey,
     type: jsonData.type,
-    position: jsonData.position,
     bounds: jsonData.bounds,
     buffers,
     palettes,

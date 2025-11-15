@@ -1,67 +1,81 @@
-import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
-import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData } from "../../../Voxels";
-import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
+import { Vector3Like } from "@amodx/math";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
+import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
+import { FreePointSelection } from "../../Util/FreePointSelection";
+import { FreeBoxSelection } from "../../Util/FreeBoxSelection";
 export enum ShapeToolModes {
-  Place = "Place",
+  Fill = "Fill",
   Remove = "Remove",
 }
-interface ShapeToolEvents {}
-export class ShapeTool extends BuilderToolBase<ShapeToolEvents> {
+
+interface BoxToolEvents {}
+
+export class ShapeTool extends BuilderToolBase<BoxToolEvents> {
   static ToolId = "Shape";
   static ModeArray: ShapeToolModes[] = [
-    ShapeToolModes.Place,
+    ShapeToolModes.Fill,
     ShapeToolModes.Remove,
   ];
-  mode = ShapeToolModes.Place;
+  mode = ShapeToolModes.Fill;
   selection = new VoxelPointSelection();
+  pointSelection = new FreePointSelection(this.space, this.selection);
+
+  boxSelection: FreeBoxSelection | null = null;
   voxelData: PaintVoxelData;
   usePlacingStrategy = true;
 
-  async update() {
-    this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
-    if (!this._lastPicked) return;
-    if (this.mode == ShapeToolModes.Place) {
-      if (!this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)) {
-        this._lastPicked = null;
-        return;
-      }
-      this.selection.reConstruct(this._lastPicked.normalPosition);
+  get distance() {
+    return this.pointSelection.distance;
+  }
+
+  set distance(distance: number) {
+    if (this.boxSelection) this.pointSelection.distance = distance;
+  }
+
+  private _started = false;
+  isSelectionStarted() {
+    return this._started;
+  }
+
+  async update(placerMode: "start" | "end" | null = null) {
+    if (this.boxSelection) {
+      this.boxSelection.update();
+    } else {
+      this.pointSelection.update();
     }
-    if (this.mode == ShapeToolModes.Remove) {
-      if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
-        this._lastPicked = null;
-        return;
-      }
-      this.selection.reConstruct(this._lastPicked.position);
+
+    if (placerMode == "start") {
+      this._started = true;
+      this.boxSelection = new FreeBoxSelection(this.space, this.pointSelection);
+    }
+
+    if (placerMode == "end") {
+      this._started = false;
     }
   }
 
   async use() {
-    if (!this._lastPicked) return;
-    if (this.mode == ShapeToolModes.Place) {
-      let voxelData = this.voxelData;
-      if (this.usePlacingStrategy) {
-        const newData = this.space.getPlaceState(voxelData, this._lastPicked);
-        if (newData) voxelData = newData;
-      }
-      await this.space.paintVoxel(
-        [
-          this._lastPicked.normalPosition.x,
-          this._lastPicked.normalPosition.y,
-          this._lastPicked.normalPosition.z,
-        ],
-        voxelData
+    if (!this.boxSelection) return;
+    if (this.mode == ShapeToolModes.Fill) {
+      await this.space.paintTemplate(
+        Vector3Like.ToArray(this.boxSelection.selection.origin),
+        this.boxSelection.selection
+          .toTemplate({
+            fillVoxel: this.voxelData,
+          })
+          .toJSON()
       );
+      this.boxSelection = null;
       return;
     }
+
     if (this.mode == ShapeToolModes.Remove) {
-      await this.space.eraseVoxel([
-        this._lastPicked.position.x,
-        this._lastPicked.position.y,
-        this._lastPicked.position.z,
-      ]);
+      await this.space.eraseTemplate(
+        Vector3Like.ToArray(this.boxSelection.selection.origin),
+        this.boxSelection.selection.toTemplate({}).toJSON()
+      );
+      this.boxSelection = null;
       return;
     }
   }
@@ -69,8 +83,10 @@ export class ShapeTool extends BuilderToolBase<ShapeToolEvents> {
   getOptionValue(id: string) {
     return null;
   }
+
   getCurrentOptions(): ToolOptionsData {
     return [];
   }
+
   updateOption(property: string, value: any): void {}
 }

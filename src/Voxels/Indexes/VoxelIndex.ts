@@ -109,10 +109,11 @@ export class VoxelIndex {
     }
   }
 
-  getStateFromPaintData(data: PaintVoxelData): VoxelNamedState | false {
-    const conatiner = this.states.get(data.id);
-    if (!conatiner) return false;
-    const { mod, state } = data;
+  private findState(
+    conatiner: VoxelNamedStateContainer,
+    mod: number,
+    state: number
+  ) {
     for (const modelState of conatiner?.stateArray) {
       if (
         (mod == modelState.compiled.mod || modelState.compiled.modAny) &&
@@ -123,20 +124,20 @@ export class VoxelIndex {
     return false;
   }
 
+  getStateFromPaintData(data: PaintVoxelData): VoxelNamedState | false {
+    const conatiner = this.states.get(data.id);
+    if (!conatiner) return false;
+    const { mod, state } = data;
+    return this.findState(conatiner, mod, state);
+  }
+
   getStateFromRawData(data: RawVoxelData): VoxelNamedState | false {
     const [id, light, secondary] = data;
-    const [trueId, mod, state] = VoxelPalettesRegister.voxels[id];
+    const [trueId, state, mod] = VoxelPalettesRegister.voxels[id];
     const conatiner = this.states.get(
       VoxelPalettesRegister.voxelIds.getStringId(trueId)
     );
     if (!conatiner) return false;
-    for (const modelState of conatiner?.stateArray) {
-      if (
-        (mod == modelState.compiled.mod || modelState.compiled.modAny) &&
-        (state == modelState.compiled.state || modelState.compiled.stateAny)
-      )
-        return modelState;
-    }
-    return false;
+    return this.findState(conatiner, mod, state);
   }
 }

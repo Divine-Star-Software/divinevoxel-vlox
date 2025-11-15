@@ -8,7 +8,7 @@ import { EngineSettings } from "../../Settings/EngineSettings";
 import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
 
 const point = Vector3Like.Create();
-export class FullVoxelTemplate implements IVoxelTemplate {
+export class FullVoxelTemplate implements IVoxelTemplate<"full"> {
   static CreateNew(
     bounds: Vec3Array,
     baseLightValue = 0
@@ -40,7 +40,6 @@ export class FullVoxelTemplate implements IVoxelTemplate {
     bufferStart += voxelSize;
     return {
       type: "full",
-      position: Vector3Like.Create(),
       bounds: Vector3Like.Create(...bounds),
       ids,
       light,
@@ -50,7 +49,6 @@ export class FullVoxelTemplate implements IVoxelTemplate {
   }
 
   index = Flat3DIndex.GetXZYOrder();
-  position = Vector3Like.Create();
   bounds: BoundingBox;
   ids: Uint16Array;
   level: Uint8Array;
@@ -60,15 +58,7 @@ export class FullVoxelTemplate implements IVoxelTemplate {
   mask?: Uint8Array;
 
   constructor(data: FullVoxelTemplateData) {
-    this.position = { ...data.position };
-    this.bounds = new BoundingBox();
-    this.bounds.setMinPositionAndSize(data.position, data.bounds);
-    this.index.setBounds(data.bounds.x, data.bounds.y, data.bounds.z);
-    this.ids = data.ids;
-    this.level = data.level;
-    this.light = data.light;
-    this.secondary = data.secondary;
-    if (data.mask) this.mask = data.mask;
+    this.fromJSON(data);
   }
 
   inBounds(x: number, y: number, z: number): boolean {
@@ -78,11 +68,6 @@ export class FullVoxelTemplate implements IVoxelTemplate {
     return this.bounds.intersectsPoint(point);
   }
 
-  setPosition(x: number, y: number, z: number): void {
-    this.position.x = x;
-    this.position.y = y;
-    this.position.z = z;
-  }
 
   isAir(index: number) {
     return this.ids[index] === 0;
@@ -127,7 +112,6 @@ export class FullVoxelTemplate implements IVoxelTemplate {
   clone() {
     const newTemplate = new FullVoxelTemplate({
       type: "full",
-      position: { ...this.position },
       bounds: { ...this.bounds.size },
       ids: this.ids.slice(),
       light: this.light.slice(),
@@ -141,7 +125,6 @@ export class FullVoxelTemplate implements IVoxelTemplate {
   toJSON(): FullVoxelTemplateData {
     return {
       type: "full",
-      position: this.position,
       bounds: this.bounds.size,
       ids: this.ids,
       light: this.light,
@@ -149,5 +132,16 @@ export class FullVoxelTemplate implements IVoxelTemplate {
       secondary: this.secondary,
       ...(this.mask ? { mask: this.mask } : {}),
     };
+  }
+
+  fromJSON(data: FullVoxelTemplateData): void {
+    this.bounds = new BoundingBox();
+    this.bounds.setSize(data.bounds);
+    this.index.setBounds(data.bounds.x, data.bounds.y, data.bounds.z);
+    this.ids = data.ids;
+    this.level = data.level;
+    this.light = data.light;
+    this.secondary = data.secondary;
+    if (data.mask) this.mask = data.mask;
   }
 }
