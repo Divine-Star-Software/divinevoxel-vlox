@@ -63,6 +63,10 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
     }
   }
 
+  cancel(): void {
+    this._lastPicked = null;
+  }
+
   async update() {
     if (this.mode == PathToolModes.PlacePoints) {
       const updated = this.pointSelection.update();

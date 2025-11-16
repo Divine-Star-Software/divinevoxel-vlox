@@ -188,6 +188,10 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     return voxelStates;
   }
 
+  cancel(): void {
+    this._lastPicked = null;
+  }
+
   async use() {
     if (this.mode == WrenchToolModes.Pick) {
       if (this._lastPicked && !this._lastPicked.voxel.isAir()) {

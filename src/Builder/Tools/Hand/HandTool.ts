@@ -38,6 +38,10 @@ export class HandTool extends BuilderToolBase<HandToolEvents> {
     }
   }
 
+  cancel(): void {
+    this._lastPicked = null;
+  }
+
   async use() {
     if (!this._lastPicked) return;
     if (this.mode == HandToolModes.Place) {

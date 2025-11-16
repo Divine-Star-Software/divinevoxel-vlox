@@ -65,6 +65,12 @@ export class TemplateTool extends BuilderToolBase<TemplateToolEvents> {
     }
   }
 
+  cancel(): void {
+    this._started = false;
+    this._lastPicked = null;
+    this.boxSelection = null;
+  }
+
   async use() {
     if (!this.boxSelection) return;
     if (this.mode == TemplateToolModes.Select) {

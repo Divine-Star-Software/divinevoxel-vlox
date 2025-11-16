@@ -74,6 +74,7 @@ export abstract class BuilderToolBase<
   abstract getCurrentOptions(): ToolOptionsData;
   abstract updateOption(property: string, value: any): void;
 
+  abstract cancel(): void;
   abstract use(...args: any): Promise<void>;
   abstract update(...args: any): Promise<void>;
 }

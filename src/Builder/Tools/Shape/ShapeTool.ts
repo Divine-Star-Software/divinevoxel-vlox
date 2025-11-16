@@ -38,6 +38,11 @@ export class ShapeTool extends BuilderToolBase<BoxToolEvents> {
     return this._started;
   }
 
+  cancel(){
+    this._started= false;
+    this.boxSelection = null;
+  }
+
   async update(placerMode: "start" | "end" | null = null) {
     if (this.boxSelection) {
       this.boxSelection.update();

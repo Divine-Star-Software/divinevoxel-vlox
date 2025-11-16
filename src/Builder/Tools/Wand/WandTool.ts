@@ -67,6 +67,10 @@ export class WandTool extends BuilderToolBase<WandToolEvents> {
     }
   }
 
+  cancel(): void {
+    this._lastPicked = null;
+  }
+
   async use() {
     const picked = this._lastPicked;
     if (!picked) return;

@@ -264,6 +264,10 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     this.selection.origin.z = place.z;
   }
 
+  cancel(): void {
+    this._lastPicked = null;
+  }
+
   async use() {
     if (!this._lastPicked) return;
     if (this.usePlacingStrategy) {
@@ -312,35 +316,41 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
 
     if (this.axisXPositionMode == BrushPositionModes.Center) {
       this._position.x =
-        picked.normalPosition.x - Math.floor(this.template.bounds.size.x / 2);
+        picked.normalPosition.x -
+        Math.floor(this.template.shapeSelection.bounds.size.x / 2);
     }
     if (this.axisXPositionMode == BrushPositionModes.Start) {
       this._position.x = picked.normalPosition.x;
     }
     if (this.axisXPositionMode == BrushPositionModes.End) {
-      this._position.x = picked.normalPosition.x - this.template.bounds.size.x;
+      this._position.x =
+        picked.normalPosition.x - this.template.shapeSelection.bounds.size.x;
     }
     //y
     if (this.axisYPositionMode == BrushPositionModes.Center) {
       this._position.y =
-        picked.normalPosition.y - Math.floor(this.template.bounds.size.y / 2);
+        picked.normalPosition.y -
+        Math.floor(this.template.shapeSelection.bounds.size.y / 2);
     }
     if (this.axisYPositionMode == BrushPositionModes.Start) {
       this._position.y = picked.normalPosition.y;
     }
     if (this.axisYPositionMode == BrushPositionModes.End) {
-      this._position.y = picked.normalPosition.y - this.template.bounds.size.y;
+      this._position.y =
+        picked.normalPosition.y - this.template.shapeSelection.bounds.size.y;
     }
     //z
     if (this.axisZPositionMode == BrushPositionModes.Center) {
       this._position.z =
-        picked.normalPosition.z - Math.floor(this.template.bounds.size.z / 2);
+        picked.normalPosition.z -
+        Math.floor(this.template.shapeSelection.bounds.size.z / 2);
     }
     if (this.axisZPositionMode == BrushPositionModes.Start) {
       this._position.z = picked.normalPosition.z;
     }
     if (this.axisXPositionMode == BrushPositionModes.End) {
-      this._position.z = picked.normalPosition.z - this.template.bounds.size.z;
+      this._position.z =
+        picked.normalPosition.z - this.template.shapeSelection.bounds.size.z;
     }
 
     return this._position;

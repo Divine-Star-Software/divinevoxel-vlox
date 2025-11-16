@@ -30,6 +30,10 @@ export class SculptTool extends BuilderToolBase<SculptToolEvents> {
     this.boxSelection = new SurfaceBoxSelection(this.space, this.selection);
   }
 
+  cancel() {
+    this._started = false;
+  }
+
   private _started = false;
   isSelectionStarted() {
     return this._started;
