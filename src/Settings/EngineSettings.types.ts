@@ -11,8 +11,10 @@ export interface RenderSettingsData {}
 export class RenderSettingsData {
   /**Set the mode to change how mesh data is generated based on the underlying rendering API. */
   mode: "webgl" | "webgpu" = "webgl";
-  /**If set to try the engine will not try to send vertex buffers to workers for GC. */
+  /**Renderer will not dispose of buffers to keep them renderering. */
   cpuBound = false;
+  /* Single buffer mode will store vertex and indicies in single big buffer. While multi will store a buffer for each section mesh.*/
+  bufferMode: "single" | "multi" = "multi";
 }
 export interface UpdatingSettings {}
 export class UpdatingSettings {

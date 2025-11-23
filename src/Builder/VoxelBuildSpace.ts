@@ -21,40 +21,60 @@ import {
 import { VoxelShapeTemplate } from "../Templates/Shapes/VoxelShapeTemplate";
 import { BoxVoxelShapeSelection } from "../Templates/Shapes/Selections/BoxVoxelShapeSelection";
 import "../Templates/VoxelTemplateRegister";
+
+type VoxelSpaceBaseUpdateData<Type extends string, Data extends any> = {
+  type: Type;
+  remote?: true;
+} & Data;
+
 export type VoxelSpaceUpdateData =
-  | {
-      type: "paint-voxel";
-      position: Vec3Array;
-      voxel: PaintVoxelData;
-    }
-  | {
-      type: "erase-voxel";
-      position: Vec3Array;
-    }
-  | {
-      type: "paint-voxel-template";
-      position: Vec3Array;
-      template: IVoxelTemplateData<any>;
-    }
-  | {
-      type: "erase-voxel-template";
-      position: Vec3Array;
-      template: IVoxelTemplateData<any>;
-    }
-  | {
-      type: "erase-voxel-selection";
-      selection: IVoxelSelectionData<any>;
-    }
-  | {
-      type: "paint-voxel-path";
-      position: Vec3Array;
-      path: VoxelPathData;
-    }
-  | {
-      type: "erase-voxel-path";
-      position: Vec3Array;
-      path: VoxelPathData;
-    };
+  | VoxelSpaceBaseUpdateData<
+      "paint-voxel",
+      {
+        position: Vec3Array;
+        voxel: PaintVoxelData;
+      }
+    >
+  | VoxelSpaceBaseUpdateData<
+      "erase-voxel",
+      {
+        position: Vec3Array;
+      }
+    >
+  | VoxelSpaceBaseUpdateData<
+      "paint-voxel-template",
+      {
+        position: Vec3Array;
+        template: IVoxelTemplateData<any>;
+      }
+    >
+  | VoxelSpaceBaseUpdateData<
+      "erase-voxel-template",
+      {
+        position: Vec3Array;
+        template: IVoxelTemplateData<any>;
+      }
+    >
+  | VoxelSpaceBaseUpdateData<
+      "erase-voxel-selection",
+      {
+        selection: IVoxelSelectionData<any>;
+      }
+    >
+  | VoxelSpaceBaseUpdateData<
+      "paint-voxel-path",
+      {
+        position: Vec3Array;
+        path: VoxelPathData;
+      }
+    >
+  | VoxelSpaceBaseUpdateData<
+      "erase-voxel-path",
+      {
+        position: Vec3Array;
+        path: VoxelPathData;
+      }
+    >;
 // 1) A helper to map each `type` to its exact update object
 type HandlerMap<U extends { type: string }> = {
   [K in U["type"]]: (update: Extract<U, { type: K }>) => Promise<void>;
