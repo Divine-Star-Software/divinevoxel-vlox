@@ -159,6 +159,65 @@ export class PaintVoxelData {
     return target;
   }
 
+  /**Takes PaintVoxelData and convert mod and state strings to numbers and then */
+  static Populate(data: Partial<PaintVoxelData>) {
+    let stringId = data.id
+      ? data.id
+      : data.name
+      ? VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!
+      : "dve_air";
+    let secondaryStringId = data.secondaryName
+      ? data.secondaryVoxelId
+      : data.secondaryName
+      ? VoxelPalettesRegister.voxelNametoIdMap.get(data.secondaryName)!
+      : "dve_air";
+
+    if (data.name && !data.id) {
+      data.id = VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!;
+    }
+    if (!data.name && !data.id) {
+      data.id = "dve_air";
+    }
+
+    delete data.name;
+    let state = data.state || 0;
+    let mod = data.mod || 0;
+
+    if (SchemaRegister.hasVoxelSchema(stringId)) {
+      const schema = SchemaRegister.getVoxelSchemas(stringId);
+      if (data.stateString && data.stateString !== "") {
+        state = schema.state.readString(data.stateString);
+      }
+      if (data.modString && data.modString !== "") {
+        mod = schema.mod.readString(data.modString);
+      }
+    }
+
+    data.state = state;
+    data.mod = mod;
+    delete data.stateString;
+    delete data.modString;
+
+    let secondaryState = data.secondaryState || 0;
+    let secondaryMod = data.secondaryMod || 0;
+
+    if (secondaryStringId && SchemaRegister.hasVoxelSchema(secondaryStringId)) {
+      const schema = SchemaRegister.getVoxelSchemas(secondaryStringId);
+      if (data.secondaryStateString && data.secondaryStateString !== "") {
+        secondaryState = schema.state.readString(data.secondaryStateString);
+      }
+      if (data.secondaryModString && data.secondaryModString !== "") {
+        secondaryMod = schema.mod.readString(data.secondaryModString);
+      }
+    }
+
+    data.secondaryState = secondaryState;
+    data.secondaryMod = secondaryMod;
+    delete data.secondaryModString;
+    delete data.secondaryStateString;
+    return data;
+  }
+
   private constructor(
     public id: string = "dve_air",
     public name: string = "",

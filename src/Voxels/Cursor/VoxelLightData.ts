@@ -98,8 +98,8 @@ export class VoxelLightData {
     let v = 0;
     v = this.setS(s, v);
     v = this.setR(r, v);
-    v = this.setG(r, v);
-    return this.setB(r, v);
+    v = this.setG(g, v);
+    return this.setB(b, v);
   }
 
   /**# Set Light Values

@@ -18,8 +18,8 @@ export default function (props: { worldThread: Thread }) {
   Threads.registerBinaryTask(
     TasksIds.Decorate,
     (data) =>
-      new Promise<void>((resolve) =>
-        WorldGeneration.generate(getLocationData(data), "decorate", resolve)
-      )
+      new Promise<void>((resolve) => {
+        WorldGeneration.generate(getLocationData(data), "decorate", resolve);
+      })
   );
 }

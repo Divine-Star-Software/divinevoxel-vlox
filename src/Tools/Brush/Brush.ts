@@ -9,6 +9,7 @@ import { VoxelPathData } from "../../Templates/Path/VoxelPath.types.js";
 import { IVoxelSelection } from "../../Templates/Selection/VoxelSelection.js";
 const air: RawVoxelData = [0, 0, 0, 0];
 const temp: RawVoxelData = [0, 0, 0, 0];
+PaintVoxelData.Set
 export class BrushTool {
   data = PaintVoxelData.Create();
 
@@ -104,6 +105,7 @@ export class BrushTool {
     this.data.secondaryName = name;
     return this;
   }
+
   setShapeState(state: number) {
     this.data.state = state;
     return this;

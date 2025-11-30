@@ -1,13 +1,16 @@
 import { Vector4Like } from "@amodx/math";
 import type { Quad } from "../../../../Geomtry";
 import { VoxelModelBuilder } from "Mesher/Voxels/Models/VoxelModelBuilder";
-import { TextureProcedure,BaseVoxelGeomtryTextureProcedureData } from "../TextureProcedure";
+import {
+  TextureProcedure,
+  BaseVoxelGeomtryTextureProcedureData,
+} from "../TextureProcedure";
 
 import { TextureId } from "Textures";
 
 import { Vec3Array } from "@amodx/math";
-import { VoxelFaces } from "../../../../../Math/index.js";
-interface OutlinedTextureProcedureData
+import { VoxelFaceDirections, VoxelFaces } from "../../../../../Math/index.js";
+export interface OutlinedTextureProcedureData
   extends BaseVoxelGeomtryTextureProcedureData {
   type: "outlined";
   texture: TextureId | number;
@@ -84,55 +87,91 @@ const uvsSets: Record<string, Record<number, number>> = {
   },
 };
 
-const topAndDown: Record<string, Vec3Array[]> = {
-  north: [
-    [0, 0, 1],
-    [1, 0, 1],
-    [-1, 0, 1],
-  ],
-  south: [
-    [0, 0, -1],
-    [1, 0, -1],
-    [-1, 0, -1],
-  ],
-  east: [[1, 0, 0]],
-  west: [[-1, 0, 0]],
-};
-const eastAndWest: Record<string, Vec3Array[]> = {
-  north: [
-    [0, 1, 0],
-    [0, 1, 1],
-    [0, 1, -1],
-  ],
-  south: [
-    [0, -1, 0],
-    [0, -1, 1],
-    [0, -1, -1],
-  ],
-  east: [[0, 0, 1]],
-  west: [[0, 0, -1]],
-};
-const northAndSouth: Record<string, Vec3Array[]> = {
-  north: [
-    [0, 1, 0],
-    [1, 1, 0],
-    [-1, 1, 0],
-  ],
-  south: [
-    [0, -1, 0],
-    [1, -1, 0],
-    [-1, -1, 0],
-  ],
-  east: [[1, 0, 0]],
-  west: [[-1, 0, 0]],
-};
 const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
-  [VoxelFaces.Up]: topAndDown,
-  [VoxelFaces.Down]: topAndDown,
-  [VoxelFaces.North]: northAndSouth,
-  [VoxelFaces.South]: northAndSouth,
-  [VoxelFaces.East]: eastAndWest,
-  [VoxelFaces.West]: eastAndWest,
+  [VoxelFaces.Up]: {
+    north: [
+      [0, 0, 1],
+      [1, 0, 1],
+      [-1, 0, 1],
+    ],
+    south: [
+      [0, 0, -1],
+      [1, 0, -1],
+      [-1, 0, -1],
+    ],
+    east: [[1, 0, 0]],
+    west: [[-1, 0, 0]],
+  },
+  [VoxelFaces.Down]: {
+    north: [
+      [0, 0, 1],
+      [1, 0, 1],
+      [-1, 0, 1],
+    ],
+    south: [
+      [0, 0, -1],
+      [1, 0, -1],
+      [-1, 0, -1],
+    ],
+    east: [[-1, 0, 0]],
+    west: [[1, 0, 0]],
+  },
+  [VoxelFaces.North]: {
+    north: [
+      [0, 1, 0],
+      [1, 1, 0],
+      [-1, 1, 0],
+    ],
+    south: [
+      [0, -1, 0],
+      [1, -1, 0],
+      [-1, -1, 0],
+    ],
+    east: [[-1, 0, 0]],
+    west: [[1, 0, 0]],
+  },
+  [VoxelFaces.South]: {
+    north: [
+      [0, 1, 0],
+      [1, 1, 0],
+      [-1, 1, 0],
+    ],
+    south: [
+      [0, -1, 0],
+      [1, -1, 0],
+      [-1, -1, 0],
+    ],
+    east: [[1, 0, 0]],
+    west: [[-1, 0, 0]],
+  },
+  [VoxelFaces.East]: {
+    north: [
+      [0, 1, 0],
+      [0, 1, 1],
+      [0, 1, -1],
+    ],
+    south: [
+      [0, -1, 0],
+      [0, -1, 1],
+      [0, -1, -1],
+    ],
+    east: [[0, 0, 1]],
+    west: [[0, 0, -1]],
+  },
+  [VoxelFaces.West]: {
+    north: [
+      [0, 1, 0],
+      [0, 1, 1],
+      [0, 1, -1],
+    ],
+    south: [
+      [0, -1, 0],
+      [0, -1, 1],
+      [0, -1, -1],
+    ],
+    east: [[0, 0, -1]],
+    west: [[0, 0, 1]],
+  },
 };
 
 const generateCheck = (
@@ -178,7 +217,6 @@ const generateCheck = (
   return textureMap[index];
 };
 
-const normal: Vec3Array = [0, 0, 0];
 export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTextureProcedureData> {
   getTexture(
     builder: VoxelModelBuilder,
@@ -197,13 +235,28 @@ export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTexturePr
     ref: Vector4Like
   ): Vector4Like {
     const set = CheckSets[closestFace];
-    const x = generateCheck("north", builder, normal, set.north);
+    const normal = VoxelFaceDirections[closestFace];
+
+    const isTopOrBottom =
+      closestFace === VoxelFaces.Up || closestFace === VoxelFaces.Down;
+
+    // For top/bottom faces, use north/south/east/west sets.
+    // For side faces (north/south/east/west), use top/bottom/right/left sets.
+    const dirNorth: keyof typeof uvsSets = isTopOrBottom ? "north" : "top";
+    const dirSouth: keyof typeof uvsSets = isTopOrBottom ? "south" : "bottom";
+    const dirEast: keyof typeof uvsSets = isTopOrBottom ? "east" : "right";
+    const dirWest: keyof typeof uvsSets = isTopOrBottom ? "west" : "left";
+
+    const x = generateCheck(dirNorth, builder, normal, set.north);
     if (x) ref.x = (data as any).textureRecrod[x];
-    const y = generateCheck("south", builder, normal, set.south);
+
+    const y = generateCheck(dirSouth, builder, normal, set.south);
     if (y) ref.y = (data as any).textureRecrod[y];
-    const z = generateCheck("east", builder, normal, set.east);
+
+    const z = generateCheck(dirEast, builder, normal, set.east);
     if (z) ref.z = (data as any).textureRecrod[z];
-    const w = generateCheck("west", builder, normal, set.west);
+
+    const w = generateCheck(dirWest, builder, normal, set.west);
     if (w) ref.w = (data as any).textureRecrod[w];
 
     return ref;

@@ -15,7 +15,8 @@ export class TaskSegment {
 
   constructor(
     public dimension: DimensionSegment,
-    public generationTask: boolean
+    public generationTask: boolean,
+    public log = false
   ) {}
 
   _getLocationData(dimension: number, x: number, y: number, z: number) {

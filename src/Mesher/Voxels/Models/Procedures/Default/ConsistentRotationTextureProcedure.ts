@@ -14,7 +14,7 @@ import { VoxelFaces } from "Math";
  * Extend your data type so we can add a seed if we want, and define
  * the rotations we can choose from.
  */
-interface VoxelGeometryConsistentRotationTextureProcedureData
+export interface ConsistentRotationTextureProcedureData
   extends BaseVoxelGeomtryTextureProcedureData {
   type: "consistent-rotation";
   texture: TextureId | number;
@@ -27,10 +27,10 @@ interface VoxelGeometryConsistentRotationTextureProcedureData
 
 const voxelPos = Vector3Like.Create();
 const defaultBounds: Vec3Array = [4, 4, 4];
-export class ConsistentRotationTextureProcedure extends TextureProcedure<VoxelGeometryConsistentRotationTextureProcedureData> {
+export class ConsistentRotationTextureProcedure extends TextureProcedure<ConsistentRotationTextureProcedureData> {
   getTexture(
     builder: VoxelModelBuilder,
-    data: VoxelGeometryConsistentRotationTextureProcedureData,
+    data: ConsistentRotationTextureProcedureData,
     closestFace: VoxelFaces,
     primitive: Quad
   ): number {
@@ -39,7 +39,7 @@ export class ConsistentRotationTextureProcedure extends TextureProcedure<VoxelGe
 
   getOverlayTexture(
     builder: VoxelModelBuilder,
-    data: VoxelGeometryConsistentRotationTextureProcedureData,
+    data: ConsistentRotationTextureProcedureData,
     closestFace: VoxelFaces,
     primitive: Quad,
     ref: Vector4Like
@@ -49,7 +49,7 @@ export class ConsistentRotationTextureProcedure extends TextureProcedure<VoxelGe
 
   transformUVs(
     builder: VoxelModelBuilder,
-    data: VoxelGeometryConsistentRotationTextureProcedureData,
+    data: ConsistentRotationTextureProcedureData,
     closestFace: VoxelFaces,
     primitive: Quad
   ): void {

@@ -4,7 +4,7 @@ import { VoxelUpdateTask } from "../../VoxelUpdateTask.js";
 import { canUpdate, updateArea, updatePowerTask } from "../Common.js";
 import { PowerUpdate } from "../../Propagation/Power/PowerUpdate.js";
 import type { LocationData } from "../../../Math/Location";
-import { RawVoxelData } from "../../../Voxels/Types/Voxel.types.js"
+import { RawVoxelData } from "../../../Voxels/Types/Voxel.types.js";
 
 const tasks = new VoxelUpdateTask();
 
@@ -24,7 +24,7 @@ export function PaintVoxel(
   voxel.setRaw(raw);
   voxel.updateVoxel(0);
 
-  updateArea(tasks, x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
+  updateArea(tasks, x, y, z, x, y, z);
 
   if (ES.doPower) {
     if (

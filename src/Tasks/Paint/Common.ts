@@ -91,7 +91,7 @@ export const checkLightUpdate = (
   let needRGBRemove = false;
   let needRGBUpdate = false;
 
-  const voxel = tasks.nDataCursor.getVoxel(x, y, z)!;
+  let voxel = tasks.nDataCursor.getVoxel(x, y, z)!;
   const lightValue = voxel.getLight();
 
   const sunValue = lightData.getS(lightValue);
@@ -113,14 +113,17 @@ export const checkLightUpdate = (
 
   const hasSunLight = sunValue > 0;
   const hasRGBLight = voxel.hasRGBLight();
+
   let foundHigherSun = false;
   let foundHigherRed = false;
   let foundHigherGreen = false;
   let foundHigherBlue = false;
+
   let lowestSunValue = Infinity;
   let lowestRedValue = Infinity;
   let lowestGreenValue = Infinity;
   let lowestBlueValue = Infinity;
+
   for (let i = 0; i < CardinalNeighbors3D.length; i++) {
     const n = CardinalNeighbors3D[i];
     const nx = n[0] + x;
@@ -128,6 +131,7 @@ export const checkLightUpdate = (
     const nz = n[2] + z;
     const nVoxel = tasks.nDataCursor.getVoxel(nx, ny, nz);
     if (!nVoxel) continue;
+
     const nLight = nVoxel.getLight();
     if (nLight === -1) continue;
 
@@ -143,7 +147,7 @@ export const checkLightUpdate = (
 
     if (hasRGBLight) {
       const nRedValue = lightData.getR(nLight);
-      if (nRedValue > lowestRedValue) {
+      if (nRedValue < lowestRedValue) {
         lowestRedValue = nRedValue;
       }
       if (nRedValue > redValue) {
@@ -159,16 +163,17 @@ export const checkLightUpdate = (
       }
 
       const nBlueValue = lightData.getB(nLight);
-      if (nBlueValue > lowestBlueValue) {
+      if (nBlueValue < lowestBlueValue) {
         lowestBlueValue = nBlueValue;
       }
-      if (nBlueValue < blueValue) {
+      if (nBlueValue > blueValue) {
         foundHigherBlue = true;
       }
     }
   }
+
   if (hasSunLight) {
-    //sun
+    // sun
     if (sunValue != 15 && sunValue != 0 && !foundHigherSun) {
       needSunRemove = true;
     }
@@ -179,8 +184,9 @@ export const checkLightUpdate = (
       needSunUpdate = true;
     }
   }
-  if (hasRGBLight) {
-    //red
+  voxel = tasks.nDataCursor.getVoxel(x, y, z)!;
+  if (hasRGBLight && !voxel.isLightSource()) {
+    // red
     if (redValue != 15 && !foundHigherRed) {
       needRGBRemove = true;
     }
@@ -188,7 +194,7 @@ export const checkLightUpdate = (
       needRGBUpdate = true;
     }
 
-    //green
+    // green
     if (greenValue != 15 && !foundHigherGreen) {
       needRGBRemove = true;
     }
@@ -199,7 +205,7 @@ export const checkLightUpdate = (
       needRGBUpdate = true;
     }
 
-    //blue
+    // blue
     if (blueValue != 15 && !foundHigherBlue) {
       needRGBRemove = true;
     }
@@ -209,7 +215,11 @@ export const checkLightUpdate = (
     ) {
       needRGBUpdate = true;
     }
+  } else if (voxel.isLightSource()) {
+    needRGBUpdate = true;
+    needRGBRemove = false;
   }
+
   if (needSunRemove) {
     tasks.sun.remove.push(x, y, z);
   }
@@ -236,7 +246,6 @@ export const updateArea = (
   ey: number,
   ez: number
 ) => {
-
   for (let x = sx - 1; x < ex + 1; x++) {
     for (let y = sy - 1; y < ey + 1; y++) {
       for (let z = sz - 1; z < ez + 1; z++) {

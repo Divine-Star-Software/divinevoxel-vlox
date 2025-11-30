@@ -3,6 +3,17 @@ import { VoxelGeometryData } from "../VoxelModel.types";
 export const cube: VoxelGeometryData = {
   id: "dve_cube",
   arguments: {
+    allTexs: {
+      type: "arg-list",
+      arguments: [
+        "upTex",
+        "downTex",
+        "northTex",
+        "southTex",
+        "eastTex",
+        "westTex",
+      ],
+    },
     upTex: {
       type: "texture",
     },

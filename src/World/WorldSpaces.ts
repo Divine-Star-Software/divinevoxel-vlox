@@ -327,13 +327,13 @@ class VoxelSpace {
 
 class Hash {
   static hashVec3(vector3: Vector3Like) {
-    return `${vector3.x}-${vector3.y}-${vector3.z}`;
+    return `${vector3.x}_${vector3.y}_${vector3.z}`;
   }
   static hashVec3Array(vector3: Vec3Array) {
-    return `${vector3[0]}-${vector3[1]}-${vector3[2]}`;
+    return `${vector3[0]}_${vector3[1]}_${vector3[2]}`;
   }
   static hashXYZ(x: number, y: number, z: number) {
-    return `${x}-${y}-${z}`;
+    return `${x}_${y}_${z}`;
   }
 }
 

@@ -42,7 +42,7 @@ export function RGBRemove(tasks: VoxelUpdateTask) {
   const remove = tasks.rgb.remove;
   const update = tasks.rgb.update;
   const removeMap = tasks.rgb.removeMap;
-  const updateMap = tasks.sun.updateMap;
+  const updateMap = tasks.rgb.updateMap;
   while (remove.length) {
     const x = remove.shift()!;
     const y = remove.shift()!;

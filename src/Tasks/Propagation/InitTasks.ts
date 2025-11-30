@@ -17,6 +17,8 @@ export default function InitTasks() {
     WorldRegister.sectors
       .get(...location)!
       .setBitFlag(Sector.FlagIds.isWorldPropagationDone, true);
+
+
   });
 
   Threads.registerBinaryTask(TasksIds.WorldSun, (view) => {

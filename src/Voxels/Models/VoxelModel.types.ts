@@ -1,7 +1,6 @@
 import { Vec2Array, Vec3Array } from "@amodx/math";
 import { VoxelFaceNames } from "../../Math";
 import {
-  
   VoxelModelRelationsSchemaNodes,
   VoxelBinaryStateSchemaNode,
 } from "../../Voxels/State/State.types";
@@ -66,6 +65,11 @@ export interface VoxelTriangleGeometryNode extends BaseVoxelTriangleData {
 //arguments
 export interface VoxelGeometryTextureArgument {
   type: "texture";
+}
+/**Creates a way to set multiple arguments to the same thing. What ever value is passed in will be passed to the arguments. */
+export interface VoxelGeometryArgumentAliasList {
+  type: "arg-list";
+  arguments: string[];
 }
 export interface VoxelGeometryBooleanArgument {
   type: "boolean";
@@ -140,6 +144,7 @@ export interface VoxelGeometryData {
     | VoxelGeometryIntArgument
     | VoxelGeometryBooleanArgument
     | VoxelGeometryFloatArgument
+    | VoxelGeometryArgumentAliasList
   >;
 }
 
@@ -173,7 +178,7 @@ export interface VoxelModelData {
     | VoxelGeometryBooleanArgument
     | VoxelGeometryFloatArgument
   >;
-  stateSchema:  VoxelBinaryStateSchemaNode[];
+  stateSchema: VoxelBinaryStateSchemaNode[];
   /**Define default properties for the voxel. */
   properties?: Partial<VoxelBaseProperties>;
   effects?: VoxelEffectData[];

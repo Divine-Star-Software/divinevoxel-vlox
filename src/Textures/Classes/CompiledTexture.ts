@@ -32,6 +32,9 @@ export class CompiledTexture {
   }
 
   getTextureIndex(id: TextureId) {
+    if (typeof id == "number") {
+      return id;
+    }
     let finalId: string = "";
     let frameIndex = 0;
     if (!Array.isArray(id)) {
@@ -62,7 +65,8 @@ export class CompiledTexture {
       console.warn(
         `Texture with id [passed in: ${id.toString()}] [final: ${finalId}] does not exist on compiled texture [${
           this.id
-        }]`
+        }]`,
+        this.textureMap
       );
       return 0;
     }

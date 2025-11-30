@@ -8,7 +8,7 @@ export function BuildFinalInputs(model: VoxelRulesModoel) {
 
   for (const [voxelId, voxel] of model.voxels) {
     const voxelModData = model.voxelModData.get(voxelId)!;
-
+voxel.inputs
     for (const modVoxelInputKey in voxel.inputs) {
       const modVoxelInput = voxel.inputs[modVoxelInputKey];
       const baseStates: any[] = [];
@@ -21,19 +21,34 @@ export function BuildFinalInputs(model: VoxelRulesModoel) {
           if (!geo) throw new Error(`Geometry does not exist`);
           geo.input.resetDefaults();
           for (const geoArg in node.inputs) {
-            const constructorArg = node.inputs[geoArg];
-            if (geo.input.isArgString(constructorArg)) {
-              const arg = constructorArg.replace("@", "");
-              if (!Object.hasOwn(modVoxelInput, arg)) {
-                console.warn(
-                  `Could not input for voxel ${voxelId} and geo ${geo.data.id}. ${geoArg} does not exist`
-                );
+            const arg = geo.input.arguments[geoArg];
+            const keys: string[] = [];
+            let proxyValue = null;
+            if (arg.type === "arg-list") {
+              keys.push(...arg.arguments);
+              proxyValue = node.inputs[geoArg];
+              console.warn("arg list",state,proxyValue);
+            } else {
+              keys.push(geoArg);
+            }
+            geo.input.currentModel = voxel;
+            geo.input.currentModelState = state;
+            for (const key of keys) {
+              const constructorArg = proxyValue ?? node.inputs[key];
+
+              if (geo.input.isArgString(constructorArg)) {
+                const arg = constructorArg.replace("@", "");
+                if (!Object.hasOwn(modVoxelInput, arg)) {
+                  console.warn(
+                    `Could not input for voxel ${voxelId} and geo ${geo.data.id}. ${key} does not exist`
+                  );
+                  continue;
+                }
+                geo.input.proxy[key] = modVoxelInput[arg];
                 continue;
               }
-              geo.input.proxy[geoArg] = modVoxelInput[arg];
-              continue;
+              geo.input.proxy[key] = constructorArg;
             }
-            geo.input.proxy[geoArg] = constructorArg;
           }
 
           geoNodes[model.stateData.geometryLinkStateMap[state][n]] =

@@ -81,13 +81,17 @@ export class WorldSimulation {
   }
 
   static tick(generationOnly = false) {
+    let total = 0;
     for (const [, dimension] of WorldSimulationDimensions._dimensions) {
       dimension.incrementTick();
+
       for (let i = 0; i < dimension.activeSectors._sectors.length; i++) {
+        total += dimension.activeSectors._sectors[i].tickQueue.getTotalTicks();
         dimension.activeSectors._sectors[i].tickUpdate();
         dimension.activeSectors._sectors[i].generateUpdate();
       }
     }
+
     let needActiveSectorUpdate = false;
     for (const gen of this._generators) {
       gen.update();
@@ -107,9 +111,16 @@ export class WorldSimulation {
     WorldSimulationTasks.worldDecorateTasks.runTask();
     WorldSimulationTasks.worldSunTasks.runTask();
     WorldSimulationTasks.worldPropagationTasks.runTask();
-
+/*    console.log(
+      "total ticks",
+      total,
+      "building",
+          "building",
+      WorldSimulationTasks.buildTasks.getTotalWaitingFor(0),
+      WorldSimulationTasks.buildTasks.getTotal(0)
+    ); */
     if (generationOnly) return;
-    WorldSimulationTasks.buildTasks.runTask(125);
+    WorldSimulationTasks.buildTasks.runTask(32);
     WorldSimulationTasks.saveTasks.runTask(50);
     WorldSimulationTasks.unloadTasks.runTask(50);
     WorldSimulationTasks.unbuildTasks.runTask();

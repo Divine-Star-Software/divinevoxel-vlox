@@ -1,12 +1,18 @@
 import { BaseVoxelGeomtryTextureProcedureData } from "Mesher/Voxels/Models/Procedures/TextureProcedure";
 import { TextureId } from "../../../../Textures";
 import { TextureManager } from "../../../../Textures/TextureManager";
-import { VoxelGeometryData } from "../../VoxelModel.types";
+import {
+  VoxelGeometryData,
+  VoxelModelConstructorData,
+} from "../../VoxelModel.types";
 
 export class GeomtryInput {
   inputObservers = new Map<string, ((data: any) => void)[]>();
   orginalArgs: any[] = [];
   args: any[] = [];
+  get arguments() {
+    return this.geomtry.arguments;
+  }
   proxy: Record<string, any> = {};
   isArgString(data: any) {
     if (typeof data !== "string") return false;
@@ -19,6 +25,8 @@ export class GeomtryInput {
     this.args = structuredClone(this.orginalArgs);
   }
 
+  currentModelState: string;
+  currentModel: VoxelModelConstructorData;
   constructor(public geomtry: VoxelGeometryData) {
     for (const arg in geomtry.arguments) {
       if (this.inputObservers.has(arg)) continue;
@@ -26,23 +34,39 @@ export class GeomtryInput {
       this.inputObservers.set(arg, obs)!;
       const data = geomtry.arguments[arg];
       Object.defineProperty(this.proxy, arg, {
-        set(value) {
+        set: (value) => {
           if (data.type == "texture") {
             const textureId = value as TextureId;
             if (!Array.isArray(textureId) && typeof textureId == "object") {
-              const procedureData = {
+              const procedureData = structuredClone({
                 ...(textureId as any),
-              } as BaseVoxelGeomtryTextureProcedureData;
+              }) as BaseVoxelGeomtryTextureProcedureData;
               if (procedureData.texture) {
-                procedureData.texture = TextureManager.getTexture(
-                  "dve_voxel"
-                )?.getTextureIndex(procedureData.texture as any);
+                let texture = procedureData.texture as any;
+                if (typeof texture == "string" && texture[0] === "@") {
+                  const input = texture.replace("@", "");
+                  texture =
+                    this.currentModel.inputs["*"]?.[input] ??
+                    this.currentModel.inputs[this.currentModelState][input];
+                }
+                procedureData.texture =
+                  TextureManager.getTexture("dve_voxel")?.getTextureIndex(
+                    texture
+                  );
               }
               if (procedureData.textureRecrod) {
                 for (const key in procedureData.textureRecrod) {
-                  procedureData.textureRecrod[key] = TextureManager.getTexture(
-                    "dve_voxel"
-                  )?.getTextureIndex(procedureData.textureRecrod[key] as any);
+                  let texture = procedureData.textureRecrod[key] as any;
+                  if (typeof texture == "string" && texture[0] === "@") {
+                    const input = texture.replace("@", "");
+                    texture =
+                      this.currentModel.inputs["*"]?.[input] ??
+                      this.currentModel.inputs[this.currentModelState][input];
+                  }
+                  procedureData.textureRecrod[key] =
+                    TextureManager.getTexture("dve_voxel")?.getTextureIndex(
+                      texture
+                    );
                 }
               }
               value = { ...procedureData };

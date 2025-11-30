@@ -4,6 +4,14 @@ import { VoxelCursorInterface } from "../../../Voxels/Cursor/VoxelCursor.interfa
 export interface VoxelBehaviorsData {
   type: string;
   inherits?: string;
+  needUpdate?(
+    simulation: DimensionSimulation,
+    voxel: VoxelCursorInterface,
+    x: number,
+    y: number,
+    z: number
+  ): boolean;
+
   onInteract?(
     simulation: DimensionSimulation,
     voxel: VoxelCursorInterface,
@@ -39,6 +47,11 @@ export interface VoxelBehaviorsData {
 
 export class VoxelBehavior {
   constructor(public data: VoxelBehaviorsData) {}
+  needUpdate(simulation: DimensionSimulation, x: number, y: number, z: number) {
+    if (!this.data.needUpdate) return;
+    const voxel = simulation.getVoxelForUpdate(x, y, z);
+    return this.data.needUpdate(simulation, voxel, x, y, z);
+  }
   onInteract(simulation: DimensionSimulation, x: number, y: number, z: number) {
     if (!this.data.onInteract) return;
     const voxel = simulation.getVoxelForUpdate(x, y, z);

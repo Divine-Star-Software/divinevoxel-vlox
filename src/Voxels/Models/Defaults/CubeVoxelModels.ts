@@ -790,68 +790,13 @@ export const simpleHalfCube: VoxelModelData = {
 
 export const pillarCube: VoxelModelData = {
   id: "dve_pillar_cube",
-  relationsSchema: [
-    {
-      name: "same-down",
-      conditions: [
-        {
-          type: "same-voxel",
-          direction: [0, -1, 0],
-        },
-      ],
-    },
-    {
-      name: "same-up",
-      conditions: [
-        {
-          type: "same-voxel",
-          direction: [0, 1, 0],
-        },
-      ],
-    },
-    {
-      name: "same-east",
-      conditions: [
-        {
-          type: "same-voxel",
-          direction: [1, 0, 0],
-        },
-      ],
-    },
-    {
-      name: "same-west",
-      conditions: [
-        {
-          type: "same-voxel",
-          direction: [-1, 0, 0],
-        },
-      ],
-    },
-    {
-      name: "same-north",
-      conditions: [
-        {
-          type: "same-voxel",
-          direction: [0, 0, 1],
-        },
-      ],
-    },
-    {
-      name: "same-south",
-      conditions: [
-        {
-          type: "same-voxel",
-          direction: [0, 0, -1],
-        },
-      ],
-    },
-  ],
+  relationsSchema: [],
   stateSchema: [
     {
       name: "direction",
       bitIndex: 0,
       bitSize: 2,
-      values: ["down-up", "south-north", "west-east"],
+      values: ["up-down", "north-south", "east-west"],
     },
   ],
   arguments: {
@@ -879,66 +824,65 @@ export const pillarCube: VoxelModelData = {
     dve_placing_strategy: "*",
   },
   stateNodes: {
-    "direction=down-up,same-down=false,same-up=false": [
+    "direction=up-down": [
       {
         geometryId: "dve_cube",
         inputs: {
-          upTex: "@upTex",
-          downTex: "@downTex",
-          northTex: "@sideDisconnectedTex",
-          southTex: "@sideDisconnectedTex",
-          eastTex: "@sideDisconnectedTex",
-          westTex: "@sideDisconnectedTex",
+          allTexs: {
+            type: "pillar",
+            texture: "@sideDisconnectedTex",
+            textureRecrod: {
+              sideConnectedTex: "@sideConnectedTex",
+              sideDisconnectedTex: "@sideDisconnectedTex",
+              sideUpTex: "@sideUpTex",
+              sideDownTex: "@sideDownTex",
+              upTex: "@upTex",
+              downTex: "@downTex",
+            },
+            direction: "up-down",
+          },
         },
       },
     ],
-    "direction=down-up,same-down=true,same-up=false": [
+    "direction=east-west": [
       {
         geometryId: "dve_cube",
         inputs: {
-          upTex: "@upTex",
-          downTex: "@downTex",
-          northTex: "@sideUpTex",
-          southTex: "@sideUpTex",
-          eastTex: "@sideUpTex",
-          westTex: "@sideUpTex",
+          allTexs: {
+            type: "pillar",
+            texture: "@sideDisconnectedTex",
+            textureRecrod: {
+              sideConnectedTex: "@sideConnectedTex",
+              sideDisconnectedTex: "@sideDisconnectedTex",
+              sideUpTex: "@sideUpTex",
+              sideDownTex: "@sideDownTex",
+              upTex: "@upTex",
+              downTex: "@downTex",
+            },
+            direction: "east-west",
+          },
         },
       },
     ],
-    "direction=down-up,same-down=false,same-up=true": [
+    "direction=north-south": [
       {
         geometryId: "dve_cube",
         inputs: {
-          upTex: "@upTex",
-          downTex: "@downTex",
-          northTex: "@sideDownTex",
-          southTex: "@sideDownTex",
-          eastTex: "@sideDownTex",
-          westTex: "@sideDownTex",
+          allTexs: {
+            type: "pillar",
+            texture: "@sideDisconnectedTex",
+            textureRecrod: {
+              sideConnectedTex: "@sideConnectedTex",
+              sideDisconnectedTex: "@sideDisconnectedTex",
+              sideUpTex: "@sideUpTex",
+              sideDownTex: "@sideDownTex",
+              upTex: "@upTex",
+              downTex: "@downTex",
+            },
+            direction: "north-south",
+          },
         },
       },
     ],
-    "direction=down-up,same-down=true,same-up=true": [
-      {
-        geometryId: "dve_cube",
-        inputs: {
-          upTex: "@upTex",
-          downTex: "@downTex",
-          northTex: "@sideConnectedTex",
-          southTex: "@sideConnectedTex",
-          eastTex: "@sideConnectedTex",
-          westTex: "@sideConnectedTex",
-        },
-      },
-    ],
-
-    "direction=south-north,same-south=false,same-north=false": [],
-    "direction=south-north,same-south=true,same-north=false": [],
-    "direction=south-north,same-south=false,same-north=true": [],
-    "direction=south-north,same-south=true,same-north=true": [],
-    "direction=west-east,same-west=false,same-east=false": [],
-    "direction=west-east,same-west=true,same-east=false": [],
-    "direction=west-east,same-west=false,same-east=true": [],
-    "direction=west-east,same-west=true,same-east=true": [],
   },
 };

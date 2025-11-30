@@ -64,7 +64,7 @@ export function BuildTagAndPaletteData(
 
     for (const tag of VoxelTagsRegister.IncludedVoxelTags) {
       if (voxel.properties[tag] === undefined) {
-        (tags as any)[tag] = VoxelTagsRegister.VoxelTagDefaults[tag] || false;
+        (tags as any)[tag] = VoxelTagsRegister.VoxelTagDefaults[tag] ?? false;
 
         continue;
       }

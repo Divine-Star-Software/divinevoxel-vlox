@@ -11,6 +11,7 @@ import { MooreNeighborhood2D } from "../../Math/CardinalNeighbors";
 import { Thread } from "@amodx/threads";
 import { WorldDataSyncIds } from "../../World/Types/WorldDataSyncIds";
 import { EngineSettings } from "../../Settings/EngineSettings";
+import { SectionCursor } from "../../World/Cursor/SectionCursor";
 const tempPosition = Vector3Like.Create();
 export class SimulationSector {
   position: Vec3Array = [0, 0, 0];
@@ -23,12 +24,14 @@ export class SimulationSector {
 
   _rendered = false;
   _genAllDone = false;
+  _firstTick = false;
 
   /**An array of the last tick each section was built at */
   _displayTicks = new Uint32Array(WorldSpaces.sector.sectionVolumne);
 
   tickQueue: TickQueue;
 
+  sectionCursor = new SectionCursor();
   neighbors: SimulationSector[] = [];
   fullNeighbors = false;
   readonly maxNeighbors: number = MooreNeighborhood2D.length - 1;
@@ -144,9 +147,10 @@ export class SimulationSector {
       this._rendered = true;
     }
 
-    /*   if (this.ticking) {
+    if (this.ticking) {
       this.dimension.simulation.setOrigin(...this.position);
-      this.dimension.simulation.bounds.start();
+      this.dimension.simulation.bounds.start(this.dimension.id);
+
       this.tickQueue.run();
 
       const [min, max] = sector.getMinMax();
@@ -184,8 +188,54 @@ export class SimulationSector {
         if (!ticks) break;
       }
 
+      let allNeighborsTicking = true;
+      for (const neighbors of this.neighbors) {
+        if (!neighbors.ticking || !neighbors._genAllDone) {
+          allNeighborsTicking = false;
+          break;
+        }
+      }
+      if (!this._firstTick && this.renderering && allNeighborsTicking) {
+        for (const section of sector.sections) {
+          this.sectionCursor.setSection(section);
+          const [minY, maxY] = section.getMinMax();
+
+          if (minY == Infinity && maxY == -Infinity) {
+            continue;
+          }
+          const { x: cx, y: cy, z: cz } = this.sectionCursor._sectionPosition;
+
+          const slice =
+            WorldSpaces.section.bounds.x * WorldSpaces.section.bounds.z;
+
+          const startY = minY * slice;
+          const endY = (maxY + 1) * slice;
+
+          //  console.warn([startY,endY],{...this.sectionCursor._voxelPosition})
+
+          for (let i = startY; i < endY; i++) {
+            if (!(i % slice)) {
+              const y = i / slice;
+              if (!section.getHasVoxel(y) && !section.getHasVoxelDirty(y)) {
+                i += slice - 1;
+                continue;
+              }
+            }
+            if (!section.ids[i] || section.getBuried(i)) continue;
+            const voxel = this.sectionCursor.getVoxelAtIndex(i);
+            const x = cx + this.sectionCursor._voxelPosition.x;
+            const y = cy + this.sectionCursor._voxelPosition.y;
+            const z = cz + this.sectionCursor._voxelPosition.z;
+            const behavior = VoxelBehaviorsRegister.get(
+              voxel.tags["dve_simulation_behavior"]
+            );
+            behavior.needUpdate(this.dimension.simulation, x, y, z);
+          }
+        }
+        this._firstTick = true;
+      }
       this.dimension.simulation.bounds.markDisplayDirty();
-    } */
+    }
 
     return true;
   }

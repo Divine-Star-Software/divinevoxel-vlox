@@ -36,9 +36,7 @@ import {
 import {
   diagonalFlatPanelEastWest,
   diagonalFlatPanelWestEast,
-  thinPanelDown,
-  thinPanelSouth,
-  thinPanelWest,
+  thinPanel,
 } from "./Models/Defaults/PanelVoxelGeometry";
 import { stair } from "./Models/Defaults/StairVoxelModel";
 import {
@@ -56,6 +54,7 @@ import { SchemaRegister } from "../Voxels/State/SchemaRegister";
 import {
   simpleCrossedPannel,
   simpleThinPannel,
+  simpleTransparentThinPannel,
 } from "./Models/Defaults/PanelVoxelModels";
 import { VoxelIndex } from "../Voxels/Indexes/VoxelIndex";
 import { CacheManager } from "../Cache/CacheManager";
@@ -90,9 +89,9 @@ function RegisterModels(data: InitVoxelDataProps) {
     quaterCubeUpDown,
     quaterCubeWestEast,
     eighthCube,
-    thinPanelDown,
-    thinPanelSouth,
-    thinPanelWest,
+
+    thinPanel,
+
     diagonalFlatPanelEastWest,
     diagonalFlatPanelWestEast,
 
@@ -125,6 +124,7 @@ function RegisterModels(data: InitVoxelDataProps) {
     simpleHalfCube,
     pillarCube,
     simpleThinPannel,
+    simpleTransparentThinPannel,
 
     stair,
     simpleCrossedPannel,
@@ -295,16 +295,6 @@ export function InitVoxelData(data: InitVoxelDataProps): CompiledVoxelData {
       },
     },
     {
-      id: "dve_glow",
-      properties: {
-        dve_parent_substance: "dve_solid",
-        dve_is_solid: true,
-        dve_is_liquid: false,
-        dve_is_transparent: false,
-        dve_flow_rate: 0,
-      },
-    },
-    {
       id: "dve_translucent",
       properties: {
         dve_parent_substance: "dve_solid",
@@ -384,6 +374,12 @@ export function InitVoxelData(data: InitVoxelDataProps): CompiledVoxelData {
     substances,
     materials,
   });
+
+  console.warn(
+    "FINAL",
+    structuredClone(voxelData),
+    voxelData.data.tags.filter((_) => _["dve_substance"] == "dve_glow")
+  );
 
   let models = GetModelData(data);
 

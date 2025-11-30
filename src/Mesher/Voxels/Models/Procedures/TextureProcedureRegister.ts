@@ -1,5 +1,6 @@
 import { ConsistentRotationTextureProcedure } from "./Default/ConsistentRotationTextureProcedure";
 import { OutlinedTextureProcedure } from "./Default/OutlinedTextureProcedure";
+import { PillarTextureProcedure } from "./Default/PillarTextureProcedure";
 import { TextureProcedure } from "./TextureProcedure";
 
 export class TextureProcedureRegister {
@@ -19,7 +20,5 @@ TextureProcedureRegister.register(
   "consistent-rotation",
   new ConsistentRotationTextureProcedure()
 );
-TextureProcedureRegister.register(
-  "outlined",
-  new OutlinedTextureProcedure()
-);
+TextureProcedureRegister.register("outlined", new OutlinedTextureProcedure());
+TextureProcedureRegister.register("pillar", new PillarTextureProcedure());

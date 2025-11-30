@@ -10,11 +10,119 @@ export const simpleThinPannel: VoxelModelData = {
       bitSize: 3,
       values: ["down", "up", "north", "south", "east", "west"],
     },
+  ],
+  arguments: {
+    upDownTextures: {
+      type: "texture",
+    },
+    sideTextures: {
+      type: "texture",
+    },
+  },
+  properties: {
+    dve_placing_strategy: "*",
+  },
+  conditonalNodes: {},
+  stateNodes: {
+    "placement=south": [
+      {
+        geometryId: "dve_thin_panel",
+        inputs: {
+          upTex: "@upDownTextures",
+          downTex: "@upDownTextures",
+          northTex: "@sideTextures",
+          southTex: "@sideTextures",
+          eastTex: "@sideTextures",
+          westTex: "@sideTextures",
+        },
+      },
+    ],
+    "placement=north": [
+      {
+        geometryId: "dve_thin_panel",
+        rotation: [0, 180, 0],
+        position: [0, 0, (16 - 3) / 16],
+        inputs: {
+          upTex: "@upDownTextures",
+          downTex: "@upDownTextures",
+          northTex: "@sideTextures",
+          southTex: "@sideTextures",
+          eastTex: "@sideTextures",
+          westTex: "@sideTextures",
+        },
+      },
+    ],
+    "placement=west": [
+      {
+        geometryId: "dve_thin_panel",
+        rotation: [0, 90, 0],
+        position: [(-8 + 3 / 2) / 16, 0, (8 - 3 / 2) / 16],
+        inputs: {
+          upTex: "@upDownTextures",
+          downTex: "@upDownTextures",
+          northTex: "@sideTextures",
+          southTex: "@sideTextures",
+          eastTex: "@sideTextures",
+          westTex: "@sideTextures",
+        },
+      },
+    ],
+    "placement=east": [
+      {
+        geometryId: "dve_thin_panel",
+        rotation: [0, -90, 0],
+        position: [(8 - 3 / 2) / 16, 0, (8 - 3 / 2) / 16],
+        inputs: {
+          upTex: "@upDownTextures",
+          downTex: "@upDownTextures",
+          northTex: "@sideTextures",
+          southTex: "@sideTextures",
+          eastTex: "@sideTextures",
+          westTex: "@sideTextures",
+        },
+      },
+    ],
+    "placement=down": [
+      {
+        geometryId: "dve_thin_panel",
+        rotation: [90, 0, 0],
+        position: [0, (-8 + 3 / 2) / 16, (8 - 3 / 2) / 16],
+        inputs: {
+          upTex: "@upDownTextures",
+          downTex: "@upDownTextures",
+          northTex: "@sideTextures",
+          southTex: "@sideTextures",
+          eastTex: "@sideTextures",
+          westTex: "@sideTextures",
+        },
+      },
+    ],
+    "placement=up": [
+      {
+        geometryId: "dve_thin_panel",
+        rotation: [-90, 0, 0],
+        position: [0, (8 - 3 / 2) / 16, (8 - 3 / 2) / 16],
+        inputs: {
+          upTex: "@upDownTextures",
+          downTex: "@upDownTextures",
+          northTex: "@sideTextures",
+          southTex: "@sideTextures",
+          eastTex: "@sideTextures",
+          westTex: "@sideTextures",
+        },
+      },
+    ],
+  },
+};
+export const simpleTransparentThinPannel: VoxelModelData = {
+  id: "dve_simple_transparent_thin_panel",
+  relationsSchema: [],
+  stateSchema: [
     {
-      name: "direction",
-      bitIndex: 3,
-      bitSize: 2,
-      values: ["north", "south", "east", "west"],
+      name: "placement",
+      bitIndex: 0,
+      bitSize: 3,
+      values: ["down", "up", "north", "south", "east", "west"],
     },
   ],
   arguments: {
@@ -30,14 +138,15 @@ export const simpleThinPannel: VoxelModelData = {
   },
   conditonalNodes: {},
   stateNodes: {
-    "placement=down,direction=south": [
+    "placement=south": [
       {
-        geometryId: "dve_thin_panel_down",
+        geometryId: "dve_thin_panel",
+        cullingProcedure: {
+          type: "transparent",
+        },
         inputs: {
           upTex: "@upDownTextures",
-          upTexRotation: 0,
           downTex: "@upDownTextures",
-          downTexRotation: 0,
           northTex: "@sideTextures",
           southTex: "@sideTextures",
           eastTex: "@sideTextures",
@@ -45,14 +154,17 @@ export const simpleThinPannel: VoxelModelData = {
         },
       },
     ],
-    "placement=down,direction=north": [
+    "placement=north": [
       {
-        geometryId: "dve_thin_panel_down",
+        geometryId: "dve_thin_panel",
+        cullingProcedure: {
+          type: "transparent",
+        },
+        rotation: [0, 180, 0],
+        position: [0, 0, (16 - 3) / 16],
         inputs: {
           upTex: "@upDownTextures",
-          upTexRotation: 180,
           downTex: "@upDownTextures",
-          downTexRotation: 180,
           northTex: "@sideTextures",
           southTex: "@sideTextures",
           eastTex: "@sideTextures",
@@ -60,14 +172,17 @@ export const simpleThinPannel: VoxelModelData = {
         },
       },
     ],
-    "placement=down,direction=east": [
+    "placement=west": [
       {
-        geometryId: "dve_thin_panel_down",
+        geometryId: "dve_thin_panel",
+        cullingProcedure: {
+          type: "transparent",
+        },
+        rotation: [0, 90, 0],
+        position: [(-8 + 3 / 2) / 16, 0, (8 - 3 / 2) / 16],
         inputs: {
           upTex: "@upDownTextures",
-          upTexRotation: 90,
           downTex: "@upDownTextures",
-          downTexRotation: 90,
           northTex: "@sideTextures",
           southTex: "@sideTextures",
           eastTex: "@sideTextures",
@@ -75,14 +190,17 @@ export const simpleThinPannel: VoxelModelData = {
         },
       },
     ],
-    "placement=down,direction=west": [
+    "placement=east": [
       {
-        geometryId: "dve_thin_panel_down",
+        geometryId: "dve_thin_panel",
+        cullingProcedure: {
+          type: "transparent",
+        },
+        rotation: [0, -90, 0],
+        position: [(8 - 3 / 2) / 16, 0, (8 - 3 / 2) / 16],
         inputs: {
           upTex: "@upDownTextures",
-          upTexRotation: 270,
           downTex: "@upDownTextures",
-          downTexRotation: 270,
           northTex: "@sideTextures",
           southTex: "@sideTextures",
           eastTex: "@sideTextures",
@@ -90,16 +208,17 @@ export const simpleThinPannel: VoxelModelData = {
         },
       },
     ],
-
-    "placement=up,direction=north": [
+    "placement=down": [
       {
-        geometryId: "dve_thin_panel_down",
-        position: [0, 1 - 3 / 16, 0],
+        geometryId: "dve_thin_panel",
+        cullingProcedure: {
+          type: "transparent",
+        },
+        rotation: [90, 0, 0],
+        position: [0, (-8 + 3 / 2) / 16, (8 - 3 / 2) / 16],
         inputs: {
           upTex: "@upDownTextures",
-          upTexRotation: 180,
           downTex: "@upDownTextures",
-          downTexRotation: 180,
           northTex: "@sideTextures",
           southTex: "@sideTextures",
           eastTex: "@sideTextures",
@@ -107,328 +226,21 @@ export const simpleThinPannel: VoxelModelData = {
         },
       },
     ],
-    "placement=up,direction=south": [
+    "placement=up": [
       {
-        geometryId: "dve_thin_panel_down",
-        position: [0, 1 - 3 / 16, 0],
+        geometryId: "dve_thin_panel",
+        cullingProcedure: {
+          type: "transparent",
+        },
+        rotation: [-90, 0, 0],
+        position: [0, (8 - 3 / 2) / 16, (8 - 3 / 2) / 16],
         inputs: {
           upTex: "@upDownTextures",
-          upTexRotation: 0,
           downTex: "@upDownTextures",
-          downTexRotation: 0,
           northTex: "@sideTextures",
           southTex: "@sideTextures",
           eastTex: "@sideTextures",
           westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=up,direction=east": [
-      {
-        geometryId: "dve_thin_panel_down",
-        position: [0, 1 - 3 / 16, 0],
-        inputs: {
-          upTex: "@upDownTextures",
-          upTexRotation: 90,
-
-          downTex: "@upDownTextures",
-          downTexRotation: 90,
-
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=up,direction=west": [
-      {
-        geometryId: "dve_thin_panel_down",
-        position: [0, 1 - 3 / 16, 0],
-        inputs: {
-          upTex: "@upDownTextures",
-          upTexRotation: 270,
-          downTex: "@upDownTextures",
-          downTexRotation: 270,
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-
-    "placement=north,direction=north": [
-      {
-        geometryId: "dve_thin_panel_south",
-        position: [0, 0, 1 - 3 / 16],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 180,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 180,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=north,direction=south": [
-      {
-        geometryId: "dve_thin_panel_south",
-        position: [0, 0, 1 - 3 / 16],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 0,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 0,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=north,direction=east": [
-      {
-        geometryId: "dve_thin_panel_south",
-        position: [0, 0, 1 - 3 / 16],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 90,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 90,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=north,direction=west": [
-      {
-        geometryId: "dve_thin_panel_south",
-        position: [0, 0, 1 - 3 / 16],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 270,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 270,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-
-    "placement=south,direction=north": [
-      {
-        geometryId: "dve_thin_panel_south",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 180,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 180,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=south,direction=south": [
-      {
-        geometryId: "dve_thin_panel_south",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 0,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 0,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=south,direction=east": [
-      {
-        geometryId: "dve_thin_panel_south",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 90,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 90,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=south,direction=west": [
-      {
-        geometryId: "dve_thin_panel_south",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@upDownTextures",
-          northTexRotation: 270,
-
-          southTex: "@upDownTextures",
-          southTexRotation: 270,
-
-          eastTex: "@sideTextures",
-          westTex: "@sideTextures",
-        },
-      },
-    ],
-    "placement=east,direction=north": [
-      {
-        geometryId: "dve_thin_panel_west",
-        position: [1 - 3 / 16, 0, 0],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 0,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 0,
-        },
-      },
-    ],
-    "placement=east,direction=south": [
-      {
-        geometryId: "dve_thin_panel_west",
-        position: [1 - 3 / 16, 0, 0],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 180,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 180,
-        },
-      },
-    ],
-    "placement=east,direction=east": [
-      {
-        geometryId: "dve_thin_panel_west",
-        position: [1 - 3 / 16, 0, 0],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 90,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 90,
-        },
-      },
-    ],
-    "placement=east,direction=west": [
-      {
-        geometryId: "dve_thin_panel_west",
-        position: [1 - 3 / 16, 0, 0],
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 270,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 270,
-        },
-      },
-    ],
-
-    "placement=west,direction=north": [
-      {
-        geometryId: "dve_thin_panel_west",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 0,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 0,
-        },
-      },
-    ],
-    "placement=west,direction=south": [
-      {
-        geometryId: "dve_thin_panel_west",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 180,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 180,
-        },
-      },
-    ],
-    "placement=west,direction=east": [
-      {
-        geometryId: "dve_thin_panel_west",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 90,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 90,
-        },
-      },
-    ],
-    "placement=west,direction=west": [
-      {
-        geometryId: "dve_thin_panel_west",
-        inputs: {
-          upTex: "@sideTextures",
-          downTex: "@sideTextures",
-          northTex: "@sideTextures",
-          southTex: "@sideTextures",
-          eastTex: "@upDownTextures",
-          eastTexRotation: 270,
-
-          westTex: "@upDownTextures",
-          westTexRotation: 270,
         },
       },
     ],
@@ -472,6 +284,7 @@ export const simpleCrossedPannel: VoxelModelData = {
     ],
   },
 };
+
 export const orientedCrossedPannel: VoxelModelData = {
   id: "dve_oriented_crossed_panels",
   relationsSchema: [],

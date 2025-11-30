@@ -160,7 +160,7 @@ export const stair: VoxelModelData = {
         },
       },
     ],
-    "placement=down,rotation=90,connected=false": [
+    "placement=down,rotation=180,connected=false": [
       {
         geometryId: "dve_half_cube_down_half",
         inputs: {
@@ -185,7 +185,7 @@ export const stair: VoxelModelData = {
         },
       },
     ],
-    "placement=down,rotation=180,connected=false": [
+    "placement=down,rotation=90,connected=false": [
       {
         geometryId: "dve_half_cube_down_half",
         inputs: {

@@ -188,8 +188,11 @@ export class WorldSimulationTasks {
         .sector!?.getSection(location[1], location[2], location[3])
         ?.setInProgress(true);
       if (EngineSettings.settings.memoryAndCPU.useSharedMemory) {
-        task.completeTask(taskId);
-        WorldSimulationTools.taskTool.build.section.run(location);
+        WorldSimulationTools.taskTool.build.section
+          .runAsync(location)
+          .then(() => {
+            task.completeTask(taskId);
+          });
         return;
       }
       const [dim, x, y, z] = location;

@@ -81,6 +81,7 @@ export function MeshSectionBase(
 
   const slice = WorldSpaces.section.bounds.x * WorldSpaces.section.bounds.z;
 
+
   const startY = minY * slice;
   const endY = (maxY + 1) * slice;
 

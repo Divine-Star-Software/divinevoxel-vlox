@@ -28,6 +28,7 @@ function setG(value: number, sl: number) {
 function setB(value: number, sl: number) {
   return (sl & ~(0xf << 12)) | (value << 12);
 }
+
 /**# Is Less Than For RGB Remove
  * ---
  * Compares values for the RGB encoded light values.

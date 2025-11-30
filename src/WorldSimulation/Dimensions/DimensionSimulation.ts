@@ -1,12 +1,13 @@
 import { WorldSpaces } from "../../World/WorldSpaces";
-import { LocationData } from "../../Math";
+import { LocationData, VoxelFaceNames, VoxelFaces } from "../../Math";
 import { WorldCursor } from "../../World/Cursor/WorldCursor";
 import { DimensionSegment } from "./DimensionSegment";
 import { WorldRegister } from "../../World/WorldRegister";
 import { Vec3Array, Vector3Like } from "@amodx/math";
-import { VoxelTickUpdate } from "../Voxels/Ticks/VoxelTickUpdate"
+import { VoxelTickUpdate } from "../Voxels/Ticks/VoxelTickUpdate";
 import { PriorityQueue } from "../../Util/PriorityQueue";
 import { VoxelUpdate } from "../Voxels/Behaviors";
+import { SimulationBrush } from "../Tools/SimulationBrush";
 const NegativeInfinityVec3 = Vector3Like.Create(
   -Infinity,
   -Infinity,
@@ -78,19 +79,31 @@ class UpdatedBounds {
         }
       }
     }
+    return true;
   }
+  
 }
 
 export class DimensionSimulation {
   private cursor = new WorldCursor();
   nDataCursor = new WorldCursor();
   sDataCursor = new WorldCursor();
+  tickCursor: Record<VoxelFaces, WorldCursor> = {
+    [VoxelFaces.Up]: new WorldCursor(),
+    [VoxelFaces.Down]: new WorldCursor(),
+    [VoxelFaces.North]: new WorldCursor(),
+    [VoxelFaces.South]: new WorldCursor(),
+    [VoxelFaces.East]: new WorldCursor(),
+    [VoxelFaces.West]: new WorldCursor(),
+  };
   bounds = new UpdatedBounds();
+  brush: SimulationBrush;
 
   updateQueue = new PriorityQueue<VoxelUpdate>();
 
-
-  constructor(public dimension: DimensionSegment) {}
+  constructor(public dimension: DimensionSegment) {
+    this.brush = dimension.getBrush();
+  }
 
   setOrigin(x: number, y: number, z: number) {
     this.cursor.setFocalPoint(this.dimension.id, x, y, z);

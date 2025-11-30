@@ -23,6 +23,17 @@ export type SimulationTaskBaseData = {
 export class SimulationTaskBase {
   constructor(public data: SimulationTaskBaseData) {}
 
+  getTotal(dimensionId: number) {
+    const dimension = WorldSimulationDimensions.getDimension(dimensionId);
+    const task = dimension.getTask(this.data.id);
+    return task.nodes.length;
+  }
+
+  getTotalWaitingFor(dimensionId: number) {
+    const dimension = WorldSimulationDimensions.getDimension(dimensionId);
+    const task = dimension.getTask(this.data.id);
+    return task.waitingFor;
+  }
   add(dimensionId: number, x: number, y: number, z: number) {
     const dimension = WorldSimulationDimensions.getDimension(dimensionId);
     const task = dimension.getTask(this.data.id);
@@ -49,8 +60,6 @@ export class SimulationTaskBase {
         const updatePosition = dimension.getUpdatePosition();
         task.sort(updatePosition.x, updatePosition.y, updatePosition.z);
       }
-      let count = 0;
-
       const addBack: number[] = [];
       for (const location of task.run()) {
         const [d, x, y, z] = location;
@@ -61,10 +70,8 @@ export class SimulationTaskBase {
         }
 
         const taskId = task.addTask(x, y, z);
-
         this.data.run(dimension, location, taskId, task, sector);
-        if (count + task.waitingFor > max) break;
-        count++;
+        if (task.waitingFor > max) break;
       }
       for (let i = 0; i < addBack.length; i += 3) {
         task.add(addBack[i], addBack[i + 1], addBack[i + 2]);

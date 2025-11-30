@@ -55,7 +55,6 @@ export function CompactVoxelSectionMesh(
 
   // We'll track our position in the buffer here
   let byteCount = headerSize;
-
   for (let i = 0; i < tools.length; i++) {
     const tool = tools[i];
 
@@ -146,6 +145,7 @@ export function CompactVoxelSectionMesh(
 
   // Transfer the ArrayBuffer to your worker if needed
   transfers.push(buffer);
+
 
   // Return the buffer or the task object as needed
   return buffer as unknown as SetSectionMeshTask;
