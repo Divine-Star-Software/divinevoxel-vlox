@@ -2,7 +2,7 @@ import type { RawVoxelData } from "../../Voxels/Types/Voxel.types.js";
 import { WorldCursor } from "../../World/Cursor/WorldCursor.js";
 import { VoxelCursor } from "../../Voxels/Cursor/VoxelCursor.js";
 import { WorldRegister } from "../../World/WorldRegister.js";
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister.js";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT.js";
 import { IVoxelTemplate } from "../../Templates/VoxelTemplates.types.js";
 import { PaintVoxelData } from "../../Voxels/Types/PaintVoxelData.js";
 import { VoxelPathData } from "../../Templates/Path/VoxelPath.types.js";
@@ -74,12 +74,12 @@ export class BrushTool {
 
   setId(id: string) {
     this.data.id = id;
-    this.data.name = VoxelPalettesRegister.voxelIdToNameMap.get(id)!;
+    this.data.name = VoxelLUT.voxelIdToNameMap.get(id)!;
     return this;
   }
 
   setName(name: string) {
-    this.data.id = VoxelPalettesRegister.voxelNametoIdMap.get(name)!;
+    this.data.id = VoxelLUT.voxelNametoIdMap.get(name)!;
     this.data.name = name;
     return this;
   }
@@ -87,7 +87,7 @@ export class BrushTool {
   setSecondaryId(id: string) {
     this.data.secondaryVoxelId = id;
     if (id) {
-      this.data.secondaryName = VoxelPalettesRegister.voxelIdToNameMap.get(id)!;
+      this.data.secondaryName = VoxelLUT.voxelIdToNameMap.get(id)!;
     } else {
       this.data.secondaryName = "";
     }
@@ -97,7 +97,7 @@ export class BrushTool {
   setSecondaryName(name: string) {
     if (name) {
       this.data.secondaryVoxelId =
-        VoxelPalettesRegister.voxelNametoIdMap.get(name)!;
+        VoxelLUT.voxelNametoIdMap.get(name)!;
     } else {
       this.data.secondaryVoxelId = "";
     }

@@ -7,6 +7,7 @@ import { WorldSimulationTools } from "./Internal/WorldSimulationTools";
 import { WorldSimulationDimensions } from "./Internal/WorldSimulationDimensions";
 import { Vector3Like } from "@amodx/math";
 import { InitalLoad } from "./Procedures/InitalLoad";
+import { BuildOnly } from "./Procedures/BuildOnly";
 import SaveAllSectors from "./Procedures/SaveAllSectors";
 import { runActiveSectorUpdate } from "./Internal/runActiveSectorUpdate";
 
@@ -31,7 +32,37 @@ export class WorldSimulation {
   static Procedures = {
     InitalLoad,
     SaveAllSectors,
+    BuildOnly,
   };
+
+  static logTasks() {
+    return {
+      loading: [
+        WorldSimulationTasks.worldLoadTasks.getTotal(0),
+        WorldSimulationTasks.worldLoadTasks.getTotalWaitingFor(0),
+      ],
+      generating: [
+        WorldSimulationTasks.worldGenTasks.getTotal(0),
+        WorldSimulationTasks.worldGenTasks.getTotalWaitingFor(0),
+      ],
+      propagating: [
+        WorldSimulationTasks.worldPropagationTasks.getTotal(0),
+        WorldSimulationTasks.worldPropagationTasks.getTotalWaitingFor(0),
+      ],
+      sun: [
+        WorldSimulationTasks.worldSunTasks.getTotal(0),
+        WorldSimulationTasks.worldSunTasks.getTotalWaitingFor(0),
+      ],
+      building: [
+        WorldSimulationTasks.buildTasks.getTotal(0),
+        WorldSimulationTasks.buildTasks.getTotalWaitingFor(0),
+      ],
+      unbuilding: [
+        WorldSimulationTasks.unbuildTasks.getTotal(0),
+        WorldSimulationTasks.unbuildTasks.getTotalWaitingFor(0),
+      ],
+    };
+  }
 
   static init(data: WorldSimulationInitData) {
     initalized = true;
@@ -111,7 +142,7 @@ export class WorldSimulation {
     WorldSimulationTasks.worldDecorateTasks.runTask();
     WorldSimulationTasks.worldSunTasks.runTask();
     WorldSimulationTasks.worldPropagationTasks.runTask();
-/*    console.log(
+    /*    console.log(
       "total ticks",
       total,
       "building",

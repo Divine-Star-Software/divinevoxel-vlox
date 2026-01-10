@@ -1,5 +1,5 @@
 import { GeoemtryNode } from "../../GeometryNode";
-import { VoxelCustomGeomtryNode } from "../../../../../../Voxels/Models/VoxelModel.types";
+import { VoxelCustomGeomtryNode } from "../../../../../../Voxels/Geomtry/VoxelGeomtry.types";
 import { CompassAngles } from "@amodx/math";
 import { Quad } from "../../../../../Geomtry/Primitives/Quad";
 import {

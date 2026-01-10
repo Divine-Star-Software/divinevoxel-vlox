@@ -1,4 +1,5 @@
-import { VoxelGeometryData, VoxelModelData } from "../VoxelModel.types";
+import {  VoxelModelData } from "../VoxelModel.types";
+import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
 export type LiquidVoxelModelArgs = {
   stillTexture: number;
   flowTexture: number;

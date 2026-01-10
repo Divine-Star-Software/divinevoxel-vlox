@@ -1,27 +1,28 @@
-import { CompiledVoxelGeometrySyncData } from "../../../../Voxels/Models/CompiledVoxelModel.types";
 import { QuadVoxelGometryNode } from "./Default/QuadVoxelGeometryNode";
 import { TriangleVoxelGeometryNode } from "./Default/TriangleVoxelGeometryNode";
 import { GeoemtryNode } from "./GeometryNode";
 import { VoxelModelConstructorRegister } from "../VoxelModelConstructorRegister";
-import { CullingProcedureData } from "../../../../Voxels/Models/VoxelModel.types";
+import { CullingProcedureData } from "../../../../Voxels/Geomtry/VoxelGeomtry.types";
+import { GeomtryLUT } from "../../../../Voxels/Data/GeomtryLUT";
 
 export class VoxelGeometryConstructor {
   nodes: GeoemtryNode<any, any>[] = [];
   cullingProcedure: CullingProcedureData;
-  constructor(
-    public geometryPaletteId: number,
-    data: CompiledVoxelGeometrySyncData
-  ) {
-    this.cullingProcedure = data.cullingProcedure;
-    for (const node of data.nodes) {
+  constructor(public geometryPaletteId: number) {
+    this.cullingProcedure =
+      GeomtryLUT.geomtryCullingProcedures[
+        GeomtryLUT.geomtryCullingProceduresIndex[geometryPaletteId]
+      ];
+
+    const nodes = GeomtryLUT.compiledGeomtry[geometryPaletteId];
+
+    for (const node of nodes) {
       if (node.type == "custom") {
         const nodeClass = VoxelModelConstructorRegister.getCustomNode(node.id);
         const newNode = new nodeClass(geometryPaletteId, this, node);
         newNode.init();
         this.nodes.push(newNode);
       }
-    }
-    for (const node of data.nodes) {
       if (node.type == "quad") {
         const newNode = new QuadVoxelGometryNode(geometryPaletteId, this, node);
         newNode.init();

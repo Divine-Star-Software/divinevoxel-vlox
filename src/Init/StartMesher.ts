@@ -27,7 +27,8 @@ export async function StartMesher(data: {} = {}) {
 
   InitDataSync({
     onSync(data) {
-      InitMesher(data.voxels.materials.palette, data.voxels.models);
+     // InitMesher(data.voxels.materials.palette, data.voxels.models);
+      InitMesher();
       ready = true;
     },
   });

@@ -64,13 +64,19 @@ Quads[VoxelFaces.North].setUVs(Quad.FullUVs as any);
 Quads[VoxelFaces.South].setUVs(Quad.FullUVs as any);
 
 const tool = new ItemModelBuilder("dve_item");
-export function MeshTexture(textureId: number, textureData: number[]) {
+export function MeshTexture(
+  textureId: number,
+  textureData: number[],
+  origin = Vector3Like.Create(),
+  thickness: number | null = null
+) {
   const width = Math.sqrt(textureData.length / 4);
   const height = Math.sqrt(textureData.length / 4);
-  const factor = 1 / width;
+  const factor = 1/width;
 
   const data = new TextureVoxelData(width, height, textureData);
 
+  tool.origin = origin;
   {
     //south face
     tool.vars.textureIndex = textureId;

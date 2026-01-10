@@ -1,5 +1,5 @@
 import { VoxelBehaviorsRegister } from "../VoxelBehaviorsRegister";
-
+import { VoxelSchemas } from "../../../../Voxels/State/VoxelSchemas";
 VoxelBehaviorsRegister.register({
   type: "dve_crop",
   onTick(simulation, voxel, x, y, z) {
@@ -12,13 +12,14 @@ VoxelBehaviorsRegister.register({
       const waterLevel = downVoxel.getLevel();
 
       if (waterLevel <= 0) return;
+      const schema = VoxelSchemas.getStateSchema(voxel.getStringId())!;
 
-      const plantLevel = voxel.schema.state
+      const plantLevel = schema
         .startEncoding(voxel.getState())
         .getNumber("level");
       if (plantLevel >= 7) return;
       voxel.setState(
-        voxel.schema.state
+        schema
           .startEncoding()
           .setNumber("level", plantLevel + 1)
           .getEncoded()

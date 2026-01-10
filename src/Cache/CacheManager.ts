@@ -2,7 +2,7 @@ import { TextureData } from "Textures/Texture.types";
 import {
   CacheData,
   CachedDisplayIndex,
-  CachedVoxelModelData,
+  
 } from "./Cache.types";
 
 export class CacheManager {
@@ -11,7 +11,7 @@ export class CacheManager {
 
   static cachedData: CacheData | null = null;
 
-  static cachedModelData: CachedVoxelModelData | null = null;
+
   static cachedTextureData: TextureData[] | null = null;
   static cachedDisplayData: CachedDisplayIndex | null = null;
 
@@ -19,7 +19,6 @@ export class CacheManager {
     if (!this.cacheStoreEnabled)
       throw new Error(`cacheStoreEnabled must be set to true`);
     return {
-      models: this.cachedModelData!,
       textures: this.cachedTextureData!,
       displayIndex: this.cachedDisplayData!,
     };

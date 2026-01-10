@@ -17,6 +17,7 @@ export class Generator {
   _dimension = 0;
   _building = true;
 
+  _generating = true;
   _isNew = true;
   _dirty = true;
   _waitingForCull = false;

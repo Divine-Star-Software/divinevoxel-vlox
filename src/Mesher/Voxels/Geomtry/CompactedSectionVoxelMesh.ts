@@ -1,6 +1,6 @@
 import { Vec3Array } from "@amodx/math";
 import { LocationData } from "../../../Math";
-import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { VoxelMeshVertexStructCursor } from "./VoxelMeshVertexStructCursor";
 
 export class CompactedMeshData {
@@ -103,7 +103,7 @@ export class CompactedSectionVoxelMesh {
     //material index
     this.data.setUint8(
       startByte,
-      VoxelPalettesRegister.material.getNumberId(material)
+      VoxelLUT.material.getNumberId(material)
     );
     startByte++;
     //min bounds
@@ -139,7 +139,7 @@ export class CompactedSectionVoxelMesh {
 
     // material index
     mesh.material = this.data.getUint8(startByte);
-    mesh.materialId = VoxelPalettesRegister.material.getStringId(mesh.material);
+    mesh.materialId = VoxelLUT.material.getStringId(mesh.material);
     startByte++;
 
     // min bounds

@@ -163,4 +163,8 @@ export class BinarySchema {
   getEncoded() {
     return this._value;
   }
+
+  getSchema() {
+    return this.nodes.map((_) => _.data);
+  }
 }

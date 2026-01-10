@@ -1,6 +1,6 @@
 import { Vec3Array, Vector3Like, Vector4Like } from "@amodx/math";
 import type { Quad } from "../../../../Geomtry";
-import { VoxelModelBuilder } from "Mesher/Voxels/Models/VoxelModelBuilder";
+import { VoxelModelBuilder } from "../../../Models/VoxelModelBuilder";
 import {
   TextureProcedure,
   BaseVoxelGeomtryTextureProcedureData,

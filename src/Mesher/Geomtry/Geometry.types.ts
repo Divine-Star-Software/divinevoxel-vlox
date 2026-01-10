@@ -6,6 +6,7 @@ export interface VoxelGeometryTransform {
   rotationPivot?: Vec3Array;
   lockUVs?: true;
   flip?: [flipX: 0 | 1, flipY: 0 | 1, flipZ: 0 | 1];
+  divisor?: Vec3Array;
 }
 
 export type QuadVertexVec3Data = [Vec3Array, Vec3Array, Vec3Array, Vec3Array];

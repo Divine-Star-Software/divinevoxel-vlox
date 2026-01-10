@@ -1,12 +1,13 @@
-import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Models/Indexing/VoxelRelativeCubeIndex";
+import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
+import { GeomtryLUT } from "../../../../../Voxels/Data/GeomtryLUT";
+import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Geomtry/VoxelRelativeCubeIndex";
 import { VoxelModelBuilder } from "../../VoxelModelBuilder";
-import { VoxelModelConstructorRegister } from "../../VoxelModelConstructorRegister";
 
 export function CullRulledFace(
   builder: VoxelModelBuilder,
   trueFaceIndex: number
 ) {
-  const faceIndexes = VoxelModelConstructorRegister.faceCullMap![trueFaceIndex];
+  const faceIndexes = GeomtryLUT.faceCullMap![trueFaceIndex];
   if (!faceIndexes) return true;
 
   for (let i = 0; i < faceIndexes.length; i++) {
@@ -19,23 +20,32 @@ export function CullRulledFace(
       builder.position.z + p[2]
     );
     if (builder.space.foundHash[hashed] < 2) continue;
-    const constructor = builder.space.getConstructor(hashed)!;
-    const offsetBaseGometry = builder.space.getGeomtry(hashed);
 
+    const voxelStringId = VoxelLUT.voxelIds.getStringId(
+      builder.space.trueVoxelCache[hashed]
+    );
+
+    const voxelId = builder.space.voxelCache[hashed];
+    const reltionalVoxelId = builder.space.reltionalVoxelCache[hashed];
+    const geomtryIndex = VoxelLUT.getGeomtryIndex(voxelId, reltionalVoxelId);
+    const offsetBaseGometry = GeomtryLUT.geomtryIndex[geomtryIndex];
     if (offsetBaseGometry) {
       for (let i = 0; i < offsetBaseGometry.length; i++) {
         const geoId = offsetBaseGometry[i];
-        if (VoxelModelConstructorRegister.rulesless[geoId]) continue;
+        if (GeomtryLUT.rulelessIndex[geoId]) continue;
         const cullingProcedure =
-          VoxelModelConstructorRegister.geometry[geoId].cullingProcedure;
+          GeomtryLUT.geomtryCullingProcedures[
+            GeomtryLUT.geomtryCullingProceduresIndex[geoId]
+          ];
+
         if (cullingProcedure.type == "transparent") {
-          if (constructor.id != builder.voxel.getStringId()) continue;
+          if (voxelStringId != builder.voxel.getStringId()) continue;
         } else {
           if (cullingProcedure.type != "default") continue;
         }
 
         if (
-          VoxelModelConstructorRegister.faceCullIndex.getValue(
+          GeomtryLUT.faceCullIndex.getValue(
             geoId,
             directionIndex,
             trueFaceIndex
@@ -46,25 +56,38 @@ export function CullRulledFace(
       }
     }
 
+    const trueVoxelId = builder.space.trueVoxelCache[hashed];
     const offsetConditonalGeometry =
-      builder.space.getConditionalGeomtry(hashed);
+      VoxelLUT.getConditionalGeomtryNodes(trueVoxelId);
 
     if (offsetConditonalGeometry) {
+      const modelState = VoxelLUT.voxelIdToModelState[voxelId];
+      const reltioanlModSeltate = builder.space.reltionalStateCache[hashed];
       for (let i = 0; i < offsetConditonalGeometry.length; i++) {
-        const cond = offsetConditonalGeometry[i];
-        for (let k = 0; k < cond.length; k++) {
-          const geoId = cond[k];
-          if (VoxelModelConstructorRegister.rulesless[geoId]) continue;
+        const [geoId, requiredModelState, requiredReltionalModelState] =
+          offsetConditonalGeometry[i];
+        if (
+          requiredModelState !== modelState ||
+          !requiredReltionalModelState[reltioanlModSeltate]
+        )
+          continue;
+
+        const geomerties = GeomtryLUT.geomtryIndex[geoId];
+        for (let k = 0; k < geomerties.length; k++) {
+          const geoId = geomerties[k];
+          if (GeomtryLUT.rulelessIndex[geoId]) continue;
           const cullingProcedure =
-            VoxelModelConstructorRegister.geometry[geoId].cullingProcedure;
+            GeomtryLUT.geomtryCullingProcedures[
+              GeomtryLUT.geomtryCullingProceduresIndex[geoId]
+            ];
           if (cullingProcedure.type == "transparent") {
-            if (constructor.id != builder.voxel.getStringId()) continue;
+            if (voxelStringId != builder.voxel.getStringId()) continue;
           } else {
             if (cullingProcedure.type != "default") continue;
           }
-          if (VoxelModelConstructorRegister.rulesless[geoId]) continue;
+          if (GeomtryLUT.rulelessIndex[geoId]) continue;
           if (
-            VoxelModelConstructorRegister.faceCullIndex.getValue(
+            GeomtryLUT.faceCullIndex.getValue(
               geoId,
               directionIndex,
               trueFaceIndex

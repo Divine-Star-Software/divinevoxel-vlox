@@ -5,7 +5,7 @@ import { WorldSimulationTools } from "../Internal/WorldSimulationTools";
 import { LocationData } from "../../Math";
 import { VoxelBehaviorsRegister } from "../Voxels/Behaviors";
 import { VoxelTagsRegister } from "../../Voxels/Data/VoxelTagsRegister";
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
 import { IVoxelTemplate } from "../../Templates/VoxelTemplates.types";
 import { VoxelUpdateData } from "../../Tasks/Tasks.types";
 import { VoxelPath } from "../../Templates/Path/VoxelPath";
@@ -40,7 +40,7 @@ export class SimulationBrush extends BrushTool {
     const z = this.z;
     const tags =
       VoxelTagsRegister.VoxelTags[
-        VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+        VoxelLUT.voxelIds.getNumberId(this.data.id)
       ];
 
     const behavior = VoxelBehaviorsRegister.get(
@@ -58,7 +58,7 @@ export class SimulationBrush extends BrushTool {
     const z = this.z;
     const tags =
       VoxelTagsRegister.VoxelTags[
-        VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+        VoxelLUT.voxelIds.getNumberId(this.data.id)
       ];
 
     const behavior = VoxelBehaviorsRegister.get(
@@ -98,7 +98,7 @@ export class SimulationBrush extends BrushTool {
           if (!voxel) continue;
           const tags =
             VoxelTagsRegister.VoxelTags[
-              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+              VoxelLUT.voxelIds.getNumberId(this.data.id)
             ];
 
           const behavior = VoxelBehaviorsRegister.get(
@@ -136,7 +136,7 @@ export class SimulationBrush extends BrushTool {
           if (!voxel) continue;
           const tags =
             VoxelTagsRegister.VoxelTags[
-              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+              VoxelLUT.voxelIds.getNumberId(this.data.id)
             ];
 
           const behavior = VoxelBehaviorsRegister.get(
@@ -218,7 +218,7 @@ export class SimulationBrush extends BrushTool {
           if (!voxel) continue;
           const tags =
             VoxelTagsRegister.VoxelTags[
-              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+              VoxelLUT.voxelIds.getNumberId(this.data.id)
             ];
 
           const behavior = VoxelBehaviorsRegister.get(
@@ -257,7 +257,7 @@ export class SimulationBrush extends BrushTool {
           if (!voxel) continue;
           const tags =
             VoxelTagsRegister.VoxelTags[
-              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+              VoxelLUT.voxelIds.getNumberId(this.data.id)
             ];
 
           const behavior = VoxelBehaviorsRegister.get(
@@ -293,7 +293,7 @@ export class SimulationBrush extends BrushTool {
           if (!voxel) continue;
           const tags =
             VoxelTagsRegister.VoxelTags[
-              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+              VoxelLUT.voxelIds.getNumberId(this.data.id)
             ];
 
           const behavior = VoxelBehaviorsRegister.get(
@@ -332,7 +332,7 @@ export class SimulationBrush extends BrushTool {
           if (!voxel) continue;
           const tags =
             VoxelTagsRegister.VoxelTags[
-              VoxelPalettesRegister.voxelIds.getNumberId(this.data.id)
+              VoxelLUT.voxelIds.getNumberId(this.data.id)
             ];
 
           const behavior = VoxelBehaviorsRegister.get(

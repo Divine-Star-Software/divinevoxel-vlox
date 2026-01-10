@@ -3,9 +3,9 @@ import { VoxelBuildSpace } from "../../VoxelBuildSpace";
 import { PaintVoxelData, RawVoxelData } from "../../../Voxels";
 import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
-import { SchemaRegister } from "../../../Voxels/State/SchemaRegister";
+import { VoxelSchemas } from "../../../Voxels/State/VoxelSchemas";
 import { VoxelBinaryStateSchemaNode } from "../../../Voxels/State/State.types";
-import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { BinarySchema } from "Voxels/State/Schema/BinarySchema";
 enum WrenchToolModes {
   Pick = "Pick",
@@ -95,34 +95,34 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
   updatePickedSchema(schema: WrenchToolSchemas) {
     if (!this._pickedResult) return;
     const trueVoxelId = this._pickedResult.voxel.getVoxelId();
+    const stringId = this._pickedResult.voxel.getStringId();
 
-    const voxelSchemas = SchemaRegister.getVoxelSchemas(
-      this._pickedResult.voxel.getStringId()
-    );
-    voxelSchemas.state.startEncoding(this._pickedResult.voxel.getState());
-    voxelSchemas.mod.startEncoding(this._pickedResult.voxel.getMod());
+    const stateSchema = VoxelSchemas.getStateSchema(stringId)!;
+    const modSchema = VoxelSchemas.mod.get(stringId)!;
+    stateSchema.startEncoding(this._pickedResult.voxel.getState());
+    modSchema.startEncoding(this._pickedResult.voxel.getMod());
 
     for (const node of schema.stateSchema) {
       if (node.type == "string") {
-        voxelSchemas.state.setValue(node.id, node.value);
+        stateSchema.setValue(node.id, node.value);
       } else {
-        voxelSchemas.state.setNumber(node.id, node.value);
+        stateSchema.setNumber(node.id, node.value);
       }
     }
     for (const node of schema.modSchema) {
       if (node.type == "string") {
-        voxelSchemas.mod.setValue(node.id, node.value);
+        modSchema.setValue(node.id, node.value);
       } else {
-        voxelSchemas.mod.setNumber(node.id, node.value);
+        modSchema.setNumber(node.id, node.value);
       }
     }
 
     const currentRaw = this._pickedResult.voxel.getRaw();
     const rawVoxelData: RawVoxelData = [
-      VoxelPalettesRegister.getVoxelId(
+      VoxelLUT.getVoxelId(
         trueVoxelId,
-        voxelSchemas.state.getEncoded(),
-        voxelSchemas.mod.getEncoded()
+        stateSchema.getEncoded(),
+        modSchema.getEncoded()
       ),
       currentRaw[1],
       currentRaw[2],
@@ -134,14 +134,18 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
 
   getPickedSchema(): WrenchToolSchemas | null {
     if (!this._pickedResult) return null;
-    const id = this._pickedResult.voxel.getStringId();
+    const stringId = this._pickedResult.voxel.getStringId();
 
-    const voxelSchemas = SchemaRegister.getVoxelSchemas(id);
-    voxelSchemas.state.startEncoding(this._pickedResult.voxel.getState());
-    voxelSchemas.mod.startEncoding(this._pickedResult.voxel.getMod());
+    const stateSchema = VoxelSchemas.getStateSchema(stringId)!;
+    const modSchema = VoxelSchemas.mod.get(stringId)!;
+    stateSchema.startEncoding(this._pickedResult.voxel.getState());
+    modSchema.startEncoding(this._pickedResult.voxel.getMod());
+
+    stateSchema.startEncoding(this._pickedResult.voxel.getState());
+    modSchema.startEncoding(this._pickedResult.voxel.getMod());
     return {
-      stateSchema: this.processSchema(voxelSchemas.state),
-      modSchema: this.processSchema(voxelSchemas.mod),
+      stateSchema: this.processSchema(stateSchema),
+      modSchema: this.processSchema(modSchema),
     };
   }
 
@@ -150,9 +154,9 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     if (!this._pickedResult) return null;
     const voxelStates: PaintVoxelData[] = [];
     const voxelId = this._pickedResult.voxel.id;
-    const [trueId, , mod] = VoxelPalettesRegister.voxels[voxelId];
+    const [trueId, , mod] = VoxelLUT.voxels[voxelId];
 
-    const stateArray = VoxelPalettesRegister.voxelRecord[trueId][mod];
+    const stateArray = VoxelLUT.voxelRecord[trueId][mod];
     const rawVoxelData: RawVoxelData = [0, 0, 0, 0];
     for (let i = 0; i < stateArray.length; i++) {
       const value = stateArray[i];
@@ -169,15 +173,15 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     if (!this._pickedResult) return null;
     const voxelStates: PaintVoxelData[] = [];
     const voxelId = this._pickedResult.voxel.id;
-    const [trueId, state] = VoxelPalettesRegister.voxels[voxelId];
-    const modArray = VoxelPalettesRegister.voxelRecord[trueId];
+    const [trueId, state] = VoxelLUT.voxels[voxelId];
+    const modArray = VoxelLUT.voxelRecord[trueId];
     const rawVoxelData: RawVoxelData = [0, 0, 0, 0];
     for (let i = 0; i < modArray.length; i++) {
       const stateArray = modArray[i];
       if (stateArray === undefined || !stateArray.length) continue;
       let id = -1;
       for (let j = 0; j < stateArray.length; j++) {
-        id = VoxelPalettesRegister.voxelRecord[trueId][i][state];
+        id = VoxelLUT.voxelRecord[trueId][i][state];
         if (id === undefined || id < 0) continue;
         rawVoxelData[0] = id;
         break;

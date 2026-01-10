@@ -26,7 +26,10 @@ export default function calculateFaceData(
           y + VoxelFaceDirections[face][1],
           z + VoxelFaceDirections[face][2]
         )
-        ?.getLight() || 0;
+        ?.getLight() || -1;
+    if (startLight <= 0) {
+      startLight = nVoxel.getVoxel(x, y, z)?.getLight() || 0;
+    }
   }
   if (startLight < 0) startLight = 0;
 

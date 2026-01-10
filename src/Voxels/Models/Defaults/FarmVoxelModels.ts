@@ -1,5 +1,5 @@
-import { VoxelGeometryData, VoxelModelData } from "../VoxelModel.types";
-
+import {  VoxelModelData } from "../VoxelModel.types";
+import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
 const farmlandGeomtry: VoxelGeometryData = {
   id: "dve_farmland",
   divisor: [16, 16, 16],

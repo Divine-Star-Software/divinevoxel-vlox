@@ -6,6 +6,8 @@ class GeomtryStats {
 class PaletteStats {
   /**The final voxel palette id size. */
   paletteSize = 0;
+  /**The final reltional voxel palette id size. */
+  reltionalPaletteSize = 0;
 }
 
 /**

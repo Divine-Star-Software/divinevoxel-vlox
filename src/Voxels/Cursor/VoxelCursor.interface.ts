@@ -7,10 +7,9 @@ import {
   VoxelTags,
 } from "../../Voxels/Data/VoxelTag.types";
 import { VoxelTagsRegister } from "../../Voxels/Data/VoxelTagsRegister";
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister";
+//import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
 import { VoxelLogicRegister } from "../../Voxels/Logic/VoxelLogicRegister";
-import { VoxelSchema } from "../../Voxels/State/Schema/VoxelSchema";
-import { SchemaRegister } from "../../Voxels/State/SchemaRegister";
 import { NumberArray } from "../../Util/Util.types";
 
 export abstract class VoxelCursorInterface {
@@ -19,7 +18,7 @@ export abstract class VoxelCursorInterface {
 
   secondaryId = 0;
 
-  schema: VoxelSchema;
+
   tags: VoxelTags = {} as any;
   substanceTags: VoxelSubstanceTags = {} as any;
   __readingSecondaryVoxel = false;
@@ -47,11 +46,11 @@ export abstract class VoxelCursorInterface {
     this.tags = VoxelTagsRegister.VoxelTags[this._voxelId];
 
     this.substanceTags =
-      VoxelTagsRegister.SubstanceStags[
-        VoxelPalettesRegister.substance.getNumberId(this.tags["dve_substance"]!)
+      VoxelTagsRegister.SubstanceTags[
+        VoxelLUT.substance.getNumberId(this.tags["dve_substance"]!)
       ];
 
-    this.schema = SchemaRegister.getVoxelSchemas(this.getStringId());
+
   }
 
   abstract loadIn(): void;
@@ -263,24 +262,24 @@ export abstract class VoxelCursorInterface {
     return this.getIndexData()[0];
   }
   setVoxelId(id: number, state = 0, mod = 0) {
-    return this.setId(VoxelPalettesRegister.getVoxelId(id, state, mod));
+    return this.setId(VoxelLUT.getVoxelId(id, state, mod));
   }
 
   setStringId(id: string, state = 0, mod = 0) {
     return this.setVoxelId(
-      VoxelPalettesRegister.voxelIds.getNumberId(id),
+      VoxelLUT.voxelIds.getNumberId(id),
       state,
       mod
     );
   }
   getStringId() {
-    return VoxelPalettesRegister.voxelIds.getStringId(this.getIndexData()[0]);
+    return VoxelLUT.voxelIds.getStringId(this.getIndexData()[0]);
   }
 
   setName(name: string, state = 0, mod = 0) {
     return this.setVoxelId(
-      VoxelPalettesRegister.voxelIds.getNumberId(
-        VoxelPalettesRegister.voxelNametoIdMap.get(name)!
+      VoxelLUT.voxelIds.getNumberId(
+        VoxelLUT.voxelNametoIdMap.get(name)!
       ),
       state,
       mod
@@ -288,21 +287,21 @@ export abstract class VoxelCursorInterface {
   }
 
   getName() {
-    return VoxelPalettesRegister.voxelIdToNameMap.get(this.getStringId())!;
+    return VoxelLUT.voxelIdToNameMap.get(this.getStringId())!;
   }
   getIndexData() {
     if (this.__readingSecondaryVoxel) {
-      return VoxelPalettesRegister.voxels[this.secondary[this._index]];
+      return VoxelLUT.voxels[this.secondary[this._index]];
     }
-    return VoxelPalettesRegister.voxels[this.ids[this._index]];
+    return VoxelLUT.voxels[this.ids[this._index]];
   }
 
   getMod() {
-    return VoxelPalettesRegister.voxels[this.ids[this._index]][2];
+    return VoxelLUT.voxels[this.ids[this._index]][2];
   }
   setMod(mod: number) {
-    const index = VoxelPalettesRegister.voxels[this.ids[this._index]];
-    this.setId(VoxelPalettesRegister.getVoxelId(index[0], index[1], mod));
+    const index = VoxelLUT.voxels[this.ids[this._index]];
+    this.setId(VoxelLUT.getVoxelId(index[0], index[1], mod));
     return this;
   }
   getState() {
@@ -310,7 +309,7 @@ export abstract class VoxelCursorInterface {
   }
   setState(state: number) {
     const index = this.getIndexData();
-    this.setId(VoxelPalettesRegister.getVoxelId(index[0], state, index[2]));
+    this.setId(VoxelLUT.getVoxelId(index[0], state, index[2]));
     return this;
   }
 

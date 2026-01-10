@@ -8,10 +8,10 @@ export class VoxelLogicStateType extends VoxelLogicType<VoxelLogicStateData> {
     this.keys = Object.keys(this.data.value);
   }
   run(voxel: VoxelCursorInterface) {
-    this.voxelLogic.schema.state.startEncoding(voxel.getState());
+    this.voxelLogic.schema.startEncoding(voxel.getState());
     for (let i = 0; i < this.keys.length; i++) {
       const key = this.keys[i];
-      if (this.data.value[key] !== this.voxelLogic.schema.state.get(key)) {
+      if (this.data.value[key] !== this.voxelLogic.schema.get(key)) {
         return false;
       }
     }

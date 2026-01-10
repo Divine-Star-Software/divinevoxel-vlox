@@ -3,45 +3,25 @@ import { DataSyncData } from "./DataSync.types";
 import { EngineSettings } from "../../../Settings/EngineSettings";
 
 //objects
-import { SchemaRegister } from "../../../Voxels/State/SchemaRegister";
-import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
 import { VoxelLogicRegister } from "../../../Voxels/Logic/VoxelLogicRegister";
+import { GeomtryLUT } from "../../../Voxels/Data/GeomtryLUT";
+import { VoxelSchemas } from "../../../Voxels/State/VoxelSchemas";
 
 export default function InitDataSync(props: {
   onSync(data: DataSyncData): void;
 }) {
   Threads.registerTask<DataSyncData>("sync-data", (data) => {
     EngineSettings.syncSettings(data.settings);
+    VoxelSchemas.import(data.schemas);
+    VoxelLUT.import(data.luts.voxel);
+    GeomtryLUT.import(data.luts.geometry);
+    VoxelTagsRegister.VoxelTags = data.tags.tags;
+    VoxelTagsRegister.SubstanceTags = data.tags.substanceTags;
 
-    VoxelPalettesRegister.voxelIds.load(data.voxels.data.idPalette);
-    VoxelTagsRegister.VoxelTags = data.voxels.data.tags;
-
-    VoxelPalettesRegister.voxelIdToNameMap = new Map(
-      data.voxels.data.idToNameMap
-    );
-    VoxelPalettesRegister.voxelNametoIdMap = new Map(
-      data.voxels.data.nameToIdMap
-    );
-
-    VoxelPalettesRegister.substance.load(data.voxels.substances.palette);
-    VoxelTagsRegister.SubstanceStags = data.voxels.substances.tags;
-    VoxelPalettesRegister.voxels = data.voxels.data.palette;
-    VoxelPalettesRegister.voxelRecord = data.voxels.data.record;
-
-    VoxelPalettesRegister.material.load(data.voxels.materials.palette);
-
-    const modelData = data.voxels.models;
-    for (const model of modelData.models) {
-      SchemaRegister.registerModel(model.id, model.schema);
-    }
-
-    for (const voxel of modelData.voxels) {
-      SchemaRegister.registerVoxel(voxel.id, voxel.modelId, voxel.modSchema);
-    }
-
-    for (const id in data.voxels.data.logic) {
-      VoxelLogicRegister.register(id, data.voxels.data.logic[id]);
+    for (const id in data.tags.logic) {
+      VoxelLogicRegister.register(id, data.tags.logic[id]);
     }
 
     props.onSync(data);

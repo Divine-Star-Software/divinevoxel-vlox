@@ -2,7 +2,7 @@ import { Flat3DIndex, Vec3Array, Vector3Like } from "@amodx/math";
 import { ArchivedVoxelTemplateData } from "./ArchivedVoxelTemplate.types";
 import type { RawVoxelData } from "../../Voxels/Types/Voxel.types";
 import { NumberPalette } from "../../Util/NumberPalette";
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
 import { VoxelTagsRegister } from "../../Voxels/Data/VoxelTagsRegister";
 import { IVoxelTemplate } from "../../Templates/VoxelTemplates.types";
 import {
@@ -50,7 +50,7 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
   }
 
   getId(index: number) {
-    return VoxelPalettesRegister.getVoxelIdFromString(
+    return VoxelLUT.getVoxelIdFromString(
       ...this.voxelPalette.getVoxelData(this.ids.getValue(index))
     );
   }
@@ -65,9 +65,9 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
 
   getSecondary(index: number) {
     const id = this.getId(index);
-    const trueId = VoxelPalettesRegister.voxels[id][0];
+    const trueId = VoxelLUT.voxels[id][0];
     if (VoxelTagsRegister.VoxelTags[trueId]["dve_can_have_secondary"]) {
-      return VoxelPalettesRegister.getVoxelIdFromString(
+      return VoxelLUT.getVoxelIdFromString(
         ...this.voxelPalette.getVoxelData(
           this.secondaryPalette.getValue(this.secondary.getValue(index))
         )

@@ -1,6 +1,6 @@
-import { GeneratorData } from "../Dimensions/Generator"
+import { GeneratorData } from "../Dimensions/Generator";
 import { WorldSimulation } from "../WorldSimulation";
-import { WorldSimulationDimensions } from "../Internal/WorldSimulationDimensions"
+import { WorldSimulationDimensions } from "../Internal/WorldSimulationDimensions";
 import { WorldSimulationTools } from "../Internal/WorldSimulationTools";
 import SaveAllSectors from "./SaveAllSectors";
 /**# InitalLoad
@@ -38,6 +38,9 @@ export async function InitalLoad(props: {
     update();
 
     const inte = setInterval(() => {
+      if (props.logTasks) {
+        console.log(WorldSimulation.logTasks());
+      }
       let allDone = true;
       for (const [key, task] of dimension.tasks) {
         if (!task.generationTask) continue;

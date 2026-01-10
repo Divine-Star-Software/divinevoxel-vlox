@@ -4,8 +4,8 @@ import {
   RawVoxelData,
   VoxelNamedStateData,
 } from "../Types/Voxel.types";
-import { SchemaRegister } from "../State/SchemaRegister";
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelSchemas } from "../State/VoxelSchemas";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
 export class VoxelNamedState {
   tags = new Map<string, any>();
 
@@ -19,27 +19,23 @@ export class VoxelNamedState {
     for (const key in data.properties) {
       this.tags.set(key, data.properties[key]);
     }
-    if (SchemaRegister.modSchemaData.has(this.voxelId)) {
-      const schema = SchemaRegister.getVoxelSchemas(this.voxelId);
-      if (this.data.state == "*") {
-        this.compiled.stateAny = true;
-      } else if (this.data.state) {
-        this.compiled.state = schema.state.readString(this.data.state);
-      }
 
-      if (this.data.mod == "*") {
-        this.compiled.modAny = true;
-      } else if (this.data.mod) {
-        this.compiled.mod = schema.mod.readString(this.data.mod);
-      }
-    } else {
-      this.compiled.modAny = true;
+    const stateSchema = VoxelSchemas.getStateSchema(this.voxelId);
+    if (this.data.state == "*") {
       this.compiled.stateAny = true;
+    } else if (this.data.state && stateSchema) {
+      this.compiled.state = stateSchema.readString(this.data.state);
+    }
+
+    const modSchema = VoxelSchemas.mod.get(voxelId);
+    if (this.data.mod == "*") {
+      this.compiled.modAny = true;
+    } else if (this.data.mod && modSchema) {
+      this.compiled.mod = modSchema.readString(this.data.mod);
     }
   }
 
   getPaintData(): PaintVoxelData {
-    const schema = SchemaRegister.getVoxelSchemas(this.voxelId);
     return PaintVoxelData.Create({
       id: this.voxelId,
       level: 0,
@@ -133,10 +129,8 @@ export class VoxelIndex {
 
   getStateFromRawData(data: RawVoxelData): VoxelNamedState | false {
     const [id, light, secondary] = data;
-    const [trueId, state, mod] = VoxelPalettesRegister.voxels[id];
-    const conatiner = this.states.get(
-      VoxelPalettesRegister.voxelIds.getStringId(trueId)
-    );
+    const [trueId, state, mod] = VoxelLUT.voxels[id];
+    const conatiner = this.states.get(VoxelLUT.voxelIds.getStringId(trueId));
     if (!conatiner) return false;
     return this.findState(conatiner, mod, state);
   }

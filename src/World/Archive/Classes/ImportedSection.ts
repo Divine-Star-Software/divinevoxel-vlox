@@ -6,7 +6,7 @@ import {
   BinaryBufferFormat,
 } from "../../../Util/BinaryBuffer/index";
 import { ImportedSector } from "./ImportedSector";
-import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import {
   lightSegments,
   lightSemgnetSet,
@@ -145,16 +145,16 @@ export class ImportedSection {
   getId(index: number): number {
     const value = this.buffers.ids.getValue(index);
     if (this.buffers.ids.isValue) {
-      return VoxelPalettesRegister.getVoxelIdFromString(
+      return VoxelLUT.getVoxelIdFromString(
         ...this.sector.voxels.getVoxelData(value)
       );
     }
     if (this.palettes.voxels) {
-      return VoxelPalettesRegister.getVoxelIdFromString(
+      return VoxelLUT.getVoxelIdFromString(
         ...this.sector.voxels.getVoxelData(this.palettes.voxels.getValue(value))
       );
     }
-    return VoxelPalettesRegister.getVoxelIdFromString(
+    return VoxelLUT.getVoxelIdFromString(
       ...this.sector.voxels.getVoxelData(value)
     );
   }
@@ -202,22 +202,22 @@ export class ImportedSection {
   }
 
   getSecondary(index: number) {
-    const trueVoxelId = VoxelPalettesRegister.voxels[this.getId(index)][0];
+    const trueVoxelId = VoxelLUT.voxels[this.getId(index)][0];
     const value = this.buffers.secondary.getValue(index);
     if (VoxelTagsRegister.VoxelTags[trueVoxelId]["dve_can_have_secondary"]) {
       if (this.buffers.ids.isValue) {
-        return VoxelPalettesRegister.getVoxelIdFromString(
+        return VoxelLUT.getVoxelIdFromString(
           ...this.sector.voxels.getVoxelData(value)
         );
       }
       if (this.palettes.secondaryVoxels) {
-        return VoxelPalettesRegister.getVoxelIdFromString(
+        return VoxelLUT.getVoxelIdFromString(
           ...this.sector.voxels.getVoxelData(
             this.palettes.secondaryVoxels.getValue(value)
           )
         );
       }
-      return VoxelPalettesRegister.getVoxelIdFromString(
+      return VoxelLUT.getVoxelIdFromString(
         ...this.sector.voxels.getVoxelData(value)
       );
     }

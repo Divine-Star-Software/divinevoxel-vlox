@@ -1,7 +1,7 @@
 import { QuadVerticies } from "../../../../Geomtry/Geometry.types";
 import { VoxelFaces, VoxelFacesArray } from "../../../../../Math";
 import { Vec4Array } from "@amodx/math";
-import { VoxelRelativeCubeIndex } from "../../../../../Voxels/Models/Indexing/VoxelRelativeCubeIndex";
+import { VoxelRelativeCubeIndex } from "../../../../../Voxels/Geomtry/VoxelRelativeCubeIndex";
 import { VoxelLightData } from "../../../../../Voxels/Cursor/VoxelLightData";
 
 export const GradientCheckSets: Record<

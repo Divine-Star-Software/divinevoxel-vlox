@@ -1,5 +1,5 @@
-import { VoxelGeometryData, VoxelModelData } from "../VoxelModel.types";
-
+import { VoxelModelData } from "../VoxelModel.types";
+import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
 export const chainGeometry: VoxelGeometryData = {
   id: "dve_chain",
   divisor: [16, 16, 16],
@@ -412,6 +412,26 @@ export const fenceNorthsouth: VoxelGeometryData = {
 export const fence: VoxelModelData = {
   id: "dve_fence",
   divisor: [16, 16, 16],
+  arguments: {
+    southTex: {
+      type: "texture",
+    },
+    northTex: {
+      type: "texture",
+    },
+    eastTex: {
+      type: "texture",
+    },
+    westTex: {
+      type: "texture",
+    },
+    upTex: {
+      type: "texture",
+    },
+    downTex: {
+      type: "texture",
+    },
+  },
   relationsSchema: [
     {
       name: "same-east",
@@ -451,28 +471,9 @@ export const fence: VoxelModelData = {
     },
   ],
   stateSchema: [],
-  arguments: {
-    southTex: {
-      type: "texture",
-    },
-    northTex: {
-      type: "texture",
-    },
-    eastTex: {
-      type: "texture",
-    },
-    westTex: {
-      type: "texture",
-    },
-    upTex: {
-      type: "texture",
-    },
-    downTex: {
-      type: "texture",
-    },
-  },
+
   conditonalNodes: {
-    "same-south=true": [
+    "*|same-south=true": [
       {
         geometryId: "dve_fence_north_south",
         inputs: {
@@ -485,7 +486,7 @@ export const fence: VoxelModelData = {
         },
       },
     ],
-    "same-north=true": [
+    "*|same-north=true": [
       {
         geometryId: "dve_fence_north_south",
         position: [0, 0, 10],
@@ -499,7 +500,7 @@ export const fence: VoxelModelData = {
         },
       },
     ],
-    "same-east=true": [
+    "*|same-east=true": [
       {
         position: [10, 0, 0],
         geometryId: "dve_fence_east_west",
@@ -513,7 +514,7 @@ export const fence: VoxelModelData = {
         },
       },
     ],
-    "same-west=true": [
+    "*|same-west=true": [
       {
         geometryId: "dve_fence_east_west",
         inputs: {
@@ -1198,7 +1199,7 @@ export const leverModel: VoxelModelData = {
       },
       {
         geometryId: "dve_lever_model",
-        position: [0, -8, -3],
+        position: [0, -2, -3],
         rotation: [-45, 0, 0],
         inputs: {
           texture: "@leverTexture",
@@ -1214,7 +1215,7 @@ export const leverModel: VoxelModelData = {
       },
       {
         geometryId: "dve_lever_model",
-        position: [0, -8, 3],
+        position: [0, -2, 3],
         rotation: [45, 0, 0],
         inputs: {
           texture: "@leverTexture",

@@ -25,9 +25,6 @@ function meshVoxel(
   let added = false;
   const constructor =
     VoxelModelConstructorRegister.constructorsPaltte[voxel.getVoxelId()];
-  constructor.schema.dataCursor = templateCursor;
-  constructor.schema.dataCursor = templateCursor;
-  constructor.schema.voxel = voxel;
   const builder = constructor.builder;
   builder.origin.x = x;
   builder.origin.y = y;

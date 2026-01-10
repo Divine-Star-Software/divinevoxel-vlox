@@ -102,7 +102,9 @@ export async function StartRenderer(initData: StartRendererProps) {
   InitRendererTasks();
   InitWorldDataSync(DVER.threads.world);
 
-  InitMesher(syncData.voxels.materials.palette, syncData.voxels.models);
+  InitMesher();
+
+  //  InitMesher(syncData.voxels.materials.palette, syncData.voxels.models);
 
   progress.completeWorkItems(1);
   progress.setStatus("Waiting For Threads");

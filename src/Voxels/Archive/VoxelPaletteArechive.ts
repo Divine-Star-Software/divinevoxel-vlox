@@ -1,8 +1,8 @@
 import { BinaryBufferFormat } from "../../Util/BinaryBuffer";
 import { BinaryBuffer } from "../../Util/BinaryBuffer/BinaryBuffer";
 import { StringPalette } from "../../Util/StringPalette";
-import { VoxelPalettesRegister } from "../Data/VoxelPalettesRegister";
-import { SchemaRegister } from "../State/SchemaRegister";
+import { VoxelLUT } from "../Data/VoxelLUT";
+import { VoxelSchemas } from "../State/VoxelSchemas";
 import { VoxelBinaryStateSchemaNode } from "../State/State.types";
 import {
   ArchivedVoxelDataForPalette,
@@ -44,16 +44,16 @@ export class VoxelArchivePalette {
   register(id: number) {
     if (this._voxelsRegistered.has(id)) return this._voxelsRegistered.get(id)!;
 
-    const stringId = VoxelPalettesRegister.voxelIds.getStringId(
-      VoxelPalettesRegister.voxels[id][0]
-    );
+    const stringId = VoxelLUT.voxelIds.getStringId(VoxelLUT.voxels[id][0]);
 
     let voxelId = 0;
     if (!this._ids.isRegistered(stringId)) {
       voxelId = this._ids.register(stringId);
-      const modelId = SchemaRegister.voxelModelMap.get(stringId)!;
-      const stateData = SchemaRegister.stateSchemaData.get(modelId);
-      const modData = SchemaRegister.modSchemaData.get(stringId);
+      const modelId = VoxelLUT.models.getStringId(
+        VoxelLUT.modelsIndex[VoxelLUT.voxelIds.getNumberId(stringId)]
+      );
+      const stateData = VoxelSchemas.getStateSchema(stringId)!.getSchema();
+      const modData = VoxelSchemas.mod.get(stringId)!.getSchema();
       if (stateData && stateData?.length) {
         this._stateShemas[modelId] = stateData;
       }
@@ -63,7 +63,7 @@ export class VoxelArchivePalette {
         ...(this._stateShemas[modelId] ? { stateSchemaId: modelId } : {}),
       };
 
-      const name = VoxelPalettesRegister.voxelNametoIdMap.get(stringId);
+      const name = VoxelLUT.voxelNametoIdMap.get(stringId);
       if (name !== undefined && name !== stringId) {
         voxelData.name = name;
       }
@@ -72,7 +72,7 @@ export class VoxelArchivePalette {
       voxelId = this._ids.getNumberId(stringId);
     }
 
-    const [, state, mod] = VoxelPalettesRegister.voxels[id];
+    const [, state, mod] = VoxelLUT.voxels[id];
     this._voxelPalette.push(voxelId, state, mod);
     const paletteId = this._voxelCount;
     this._voxelsRegistered.set(id, paletteId);

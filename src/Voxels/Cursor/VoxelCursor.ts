@@ -1,6 +1,6 @@
 import { VoxelCursorInterface } from "./VoxelCursor.interface";
 import { RawVoxelData } from "../Types/Voxel.types";
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
 import { VoxelLevelReader } from "./VoxelLevelReader";
 import { PaintVoxelData } from "../Types/PaintVoxelData";
 
@@ -12,17 +12,17 @@ export class VoxelCursor extends VoxelCursorInterface {
     let stringId = data.id
       ? data.id
       : data.name
-        ? VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!
+        ? VoxelLUT.voxelNametoIdMap.get(data.name)!
         : "dve_air";
     let secondaryStringId = data.id
       ? data.id
       : data.name
-        ? VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!
+        ? VoxelLUT.voxelNametoIdMap.get(data.name)!
         : "dve_air";
 
     const id =
       (stringId !== "dve_air" &&
-        VoxelPalettesRegister.getVoxelIdFromString(
+        VoxelLUT.getVoxelIdFromString(
           stringId,
           data.state || 0,
           data.mod || 0
@@ -30,7 +30,7 @@ export class VoxelCursor extends VoxelCursorInterface {
       0;
     const secondaryId =
       (secondaryStringId !== "dve_air" &&
-        VoxelPalettesRegister.getVoxelIdFromString(
+        VoxelLUT.getVoxelIdFromString(
           secondaryStringId,
           data.state || 0,
           data.mod || 0

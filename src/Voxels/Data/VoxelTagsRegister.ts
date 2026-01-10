@@ -42,6 +42,6 @@ export class VoxelTagsRegister {
   };
   static VoxelTags: VoxelTags[] = [];
 
-  static SubstanceStagDefaults: Record<string, any> = {};
-  static SubstanceStags: VoxelSubstanceTags[] = [];
+  static SubstanceTagDefaults: Record<string, any> = {};
+  static SubstanceTags: VoxelSubstanceTags[] = [];
 }

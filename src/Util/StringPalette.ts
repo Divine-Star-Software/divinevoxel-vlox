@@ -27,6 +27,7 @@ export class StringPalette {
   }
 
   register(string: string) {
+    if(this._map[string] !== undefined) return this._map[string];
     const id = this._count;
     this._count++;
     this._palette[id] = string;

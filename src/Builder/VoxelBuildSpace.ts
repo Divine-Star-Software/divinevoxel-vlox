@@ -6,7 +6,7 @@ import { IVoxelTemplateData } from "../Templates/VoxelTemplates.types";
 import { PaintVoxelData } from "../Voxels";
 import { VoxelPlacingStrategyRegister } from "../Voxels/Interaction/Placing/VoxelPlacingStrategyRegister";
 import { VoxelPickResult } from "../Voxels/Interaction/VoxelPickResult";
-import { SchemaRegister } from "../Voxels/State/SchemaRegister";
+import { VoxelSchemas } from "../Voxels/State/VoxelSchemas";
 import { RayProvider } from "./RayProvider";
 import { FullVoxelTemplate } from "../Templates/Full/FullVoxelTemplate";
 import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
@@ -207,8 +207,8 @@ export class VoxelBuildSpace {
       return data;
     }
 
-    const schema = SchemaRegister.getVoxelSchemas(data.id);
-    data.state = schema.state.readString(state);
+    const schema = VoxelSchemas.getStateSchema(data.id)!;
+    data.state = schema.readString(state);
   }
 
   async clear() {

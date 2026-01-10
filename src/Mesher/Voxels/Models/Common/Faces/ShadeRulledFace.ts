@@ -1,17 +1,17 @@
-import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Models/Indexing/VoxelRelativeCubeIndex";
+import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Geomtry/VoxelRelativeCubeIndex";
 import { VoxelModelBuilder } from "../../VoxelModelBuilder";
-import { VoxelModelConstructorRegister } from "../../VoxelModelConstructorRegister";
+import { GeomtryLUT } from "../../../../../Voxels/Data/GeomtryLUT";
 import { getInterpolationValue } from "../Calc/CalcConstants";
 import { Vec4Array } from "@amodx/math";
 import { QuadVerticies } from "../../../../Geomtry/Geometry.types";
+import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
 
 export function ShadeRulledFace(
   builder: VoxelModelBuilder,
   trueFaceIndex: number,
   lightData: Record<QuadVerticies, number>,
   vertexWeights: Vec4Array[],
-  vertexStride: number,
-
+  vertexStride: number
 ) {
   const noAO = builder.voxel.isLightSource() || builder.voxel.noAO();
 
@@ -28,8 +28,7 @@ export function ShadeRulledFace(
 
     if (noAO) continue;
 
-    const aoIndexes =
-      VoxelModelConstructorRegister.vertexHitMap![trueFaceIndex][v];
+    const aoIndexes = GeomtryLUT.aoVertexHitMap![trueFaceIndex][v];
 
     if (!aoIndexes) continue;
 
@@ -49,18 +48,18 @@ export function ShadeRulledFace(
         builder.space.noCastAO[hashed] === 1
       )
         continue;
-      const baseGeo = builder.space.getGeomtry(hashed);
-      const conditonalGeo = builder.space.getConditionalGeomtry(hashed);
 
-      if (!baseGeo && !conditonalGeo) continue;
+      const voxelId = builder.space.voxelCache[hashed];
+      const reltionalVoxelId = builder.space.reltionalVoxelCache[hashed];
+      const geomtryIndex = VoxelLUT.getGeomtryIndex(voxelId, reltionalVoxelId);
+      const baseGeo = GeomtryLUT.geomtryIndex[geomtryIndex];
 
-      let length = 0;
+      //  if (!baseGeo && !conditonalGeo) continue;
       let shaded = false;
       if (baseGeo) {
-        length = baseGeo.length;
-        for (let geoIndex = 0; geoIndex < length; geoIndex++) {
+        for (let geoIndex = 0; geoIndex < baseGeo.length; geoIndex++) {
           if (
-            VoxelModelConstructorRegister.aoIndex.getValue(
+            GeomtryLUT.aoIndex.getValue(
               baseGeo[geoIndex],
               directionIndex,
               trueFaceIndex,
@@ -75,24 +74,40 @@ export function ShadeRulledFace(
           }
         }
       }
-      if (!conditonalGeo || shaded) continue;
-      length = conditonalGeo.length;
+      if (shaded) continue;
 
-      for (let condtionsIndex = 0; condtionsIndex < length; condtionsIndex++) {
-        const condiotnalength = conditonalGeo[condtionsIndex].length;
-        for (let geoIndex = 0; geoIndex < condiotnalength; geoIndex++) {
+      const trueVoxelId = builder.space.trueVoxelCache[hashed];
+      const offsetConditonalGeometry =
+        VoxelLUT.getConditionalGeomtryNodes(trueVoxelId);
+
+      if (offsetConditonalGeometry) {
+        const modelState = VoxelLUT.voxelIdToModelState[voxelId];
+        const reltioanlModSeltate = builder.space.reltionalStateCache[hashed];
+        for (let i = 0; i < offsetConditonalGeometry.length; i++) {
+          const [geoId, requiredModelState, requiredReltionalModelState] =
+            offsetConditonalGeometry[i];
           if (
-            VoxelModelConstructorRegister.aoIndex.getValue(
-              conditonalGeo[condtionsIndex][geoIndex],
-              directionIndex,
-              trueFaceIndex,
-              v
-            )
-          ) {
-            worldAO.vertices[v]++;
-            if (worldAO.vertices[v] >= 3) {
-              shaded = true;
-              break;
+            requiredModelState !== modelState ||
+            !requiredReltionalModelState[reltioanlModSeltate]
+          )
+            continue;
+
+          const geomerties = GeomtryLUT.geomtryIndex[geoId];
+          for (let geoIndex = 0; geoIndex < geomerties.length; geoIndex++) {
+            const geoId = geomerties[geoIndex];
+            if (
+              GeomtryLUT.aoIndex.getValue(
+                geoId,
+                directionIndex,
+                trueFaceIndex,
+                v
+              )
+            ) {
+              worldAO.vertices[v]++;
+              if (worldAO.vertices[v] >= 3) {
+                shaded = true;
+                break;
+              }
             }
           }
         }

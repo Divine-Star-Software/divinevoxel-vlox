@@ -1,20 +1,20 @@
-import { VoxelSchema } from "../../State/Schema/VoxelSchema";
 import { VoxelCursorInterface } from "../../Cursor/VoxelCursor.interface";
 import { VoxelLogicData } from "../VoxelLogic.types";
 import { VoxelLogicRegister } from "../VoxelLogicRegister";
 import { VoxelLogicType } from "./VoxelLogicType";
-import { SchemaRegister } from "../../State/SchemaRegister";
+import { VoxelSchemas } from "../../State/VoxelSchemas";
+import { BinarySchema } from "../../State/Schema/BinarySchema";
 
 export class VoxelLogic {
   types: VoxelLogicType<any>[] = [];
   effectedTags = new Map<string, VoxelLogicType<any>[]>();
 
-  schema: VoxelSchema;
+  schema: BinarySchema;
   constructor(
     public voxelId: string,
     data: VoxelLogicData[]
   ) {
-    this.schema = SchemaRegister.getVoxelSchemas(voxelId);
+    this.schema = VoxelSchemas.getStateSchema(voxelId)!;
     for (const logicData of data) {
       const LogicTypeClass = VoxelLogicRegister.get(logicData.type);
       const newLogicType = new LogicTypeClass(this, logicData);

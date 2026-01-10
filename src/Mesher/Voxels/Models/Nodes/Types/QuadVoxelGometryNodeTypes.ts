@@ -4,7 +4,7 @@ import { VoxelFaces } from "../../../../../Math";
 export type QuadVoxelGometryArgs = [
   //upp
   enabled: boolean,
-  texture: number,
+  texture: any,
   rotation: number,
   doubleSided: boolean,
   uvs: QuadUVData,

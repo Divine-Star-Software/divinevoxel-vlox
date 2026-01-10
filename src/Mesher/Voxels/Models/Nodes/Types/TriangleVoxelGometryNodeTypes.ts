@@ -3,7 +3,7 @@ import { VoxelFaces } from "../../../../../Math";
 export type TriangleVoxelGometryArgs = [
   //upp
   enabled: boolean,
-  texture: number,
+  texture: any,
   rotation: number,
   doubleSided: boolean,
   uvs: [v1: Vec2Array, v2: Vec2Array, v3: Vec2Array],

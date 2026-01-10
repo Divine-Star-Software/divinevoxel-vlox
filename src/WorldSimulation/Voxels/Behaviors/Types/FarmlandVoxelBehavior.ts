@@ -1,5 +1,6 @@
 import { Vec3Array } from "@amodx/math";
 import { VoxelBehaviorsRegister } from "../VoxelBehaviorsRegister";
+import { VoxelSchemas } from "../../../../Voxels/State/VoxelSchemas";
 const levelChecks: Vec3Array[] = [
   [1, 0, 0],
   [-1, 0, 0],
@@ -53,8 +54,9 @@ VoxelBehaviorsRegister.register({
       }
       const newLevel = currentLevel - 1;
       if (newLevel == 0) {
+        const schema = VoxelSchemas.getStateSchema(voxel.getStringId())!;
         voxel.setState(
-          voxel.schema.state
+          schema
             .startEncoding(voxel.getState())
             .setValue("moist", "false")
             .getEncoded()
@@ -71,8 +73,9 @@ VoxelBehaviorsRegister.register({
       if (currentLevel < maxLevel) {
         const newLevel = currentLevel + 1;
         if (currentLevel == 0) {
+          const schema = VoxelSchemas.getStateSchema(voxel.getStringId())!;
           voxel.setState(
-            voxel.schema.state
+            schema
               .startEncoding(voxel.getState())
               .setValue("moist", "true")
               .getEncoded()

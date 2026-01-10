@@ -1,4 +1,4 @@
-import { VoxelPalettesRegister } from "../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
 import { VoxelLogic } from "./Classes/VoxelLogic";
 import { VoxelLogicData } from "./VoxelLogic.types";
 import { VoxelLogicTypeConstructor } from "./Classes/VoxelLogicType";
@@ -18,7 +18,7 @@ export class VoxelLogicRegister {
   }
 
   static register(id: string, logicData: VoxelLogicData[]) {
-    const voxelId = VoxelPalettesRegister.voxelIds.getNumberId(id);
+    const voxelId = VoxelLUT.voxelIds.getNumberId(id);
     this.voxels[voxelId] = new VoxelLogic(id, logicData);
   }
 

@@ -1,12 +1,11 @@
 import { VoxelConstructor } from "./VoxelConstructor";
-import { StateTreeReader } from "../../../Voxels/State/StateTreeReader";
-import { Vec3Array, Vector3Like } from "@amodx/math";
+import {  Vector3Like } from "@amodx/math";
 
 export class VoxelModelEffect {
-  effects: { id: string; reader: StateTreeReader; palette: Vec3Array[][] }[] =
-    [];
+/*   effects: { id: string; reader: StateTreeReader; palette: Vec3Array[][] }[] =
+    []; */
   constructor(public model: VoxelConstructor) {
-    for (const effect of model.data.effects) {
+  /*   for (const effect of model.data.effects) {
       if (effect.type == "fx-points") {
         this.effects.push({
           id: effect.effectId,
@@ -14,7 +13,7 @@ export class VoxelModelEffect {
           palette: effect.treePalette,
         });
       }
-    }
+    } */
   }
 
   addEffects(
@@ -22,7 +21,7 @@ export class VoxelModelEffect {
     origin: Vector3Like,
     effects: Record<string, number[]>
   ) {
-    if (!this.effects.length) return;
+/*     if (!this.effects.length) return;
     for (let i = 0; i < this.effects.length; i++) {
       const e = this.effects[i];
       let array = effects[e.id];
@@ -42,6 +41,6 @@ export class VoxelModelEffect {
         array[start + 2] = origin.z + point[2];
         start += 3;
       }
-    }
+    } */
   }
 }

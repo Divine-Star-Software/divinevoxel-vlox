@@ -5,6 +5,7 @@ import { CompactTemplateMesh } from "./Base/CompactTemplateMesh.js";
 import { VoxelModelConstructorRegister } from "./Models/VoxelModelConstructorRegister.js";
 import { RawVoxelData } from "../../Voxels/Types/Voxel.types.js";
 import { CompactMeshData } from "../Types/index.js";
+import { VoxelTagsRegister } from "../../Voxels/Data/VoxelTagsRegister.js";
 const template = new FullVoxelTemplate(
   FullVoxelTemplate.CreateNew([3, 3, 3], 0xf)
 );
@@ -15,6 +16,7 @@ const space = new VoxelGeometryBuilderCacheSpace({ x: 3, y: 3, z: 3 });
 export function MeshVoxel(
   rawVoxelData: RawVoxelData
 ): [mesh: CompactMeshData, tranfers: any[]] | false {
+
   const index = template.getIndex(1, 1, 1);
   template.ids[index] = rawVoxelData[0];
   template.level[index] = rawVoxelData[2];
@@ -31,8 +33,7 @@ export function MeshVoxel(
       `Could not find constructor for voxel [id:${voxel.getStringId()} name:${voxel.getName()}] `
     );
   }
-  constructor.schema.dataCursor = templateCursor;
-  constructor.schema.voxel = voxel;
+
   const builder = constructor.builder;
   if (!builder) {
     console.error(builder, constructor.id, constructor);

@@ -1,5 +1,4 @@
-import { VoxelGeometryData } from "../VoxelModel.types";
-
+import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
 export const cube: VoxelGeometryData = {
   id: "dve_cube",
   arguments: {

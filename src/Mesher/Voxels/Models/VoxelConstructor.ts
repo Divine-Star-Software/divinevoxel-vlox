@@ -1,57 +1,15 @@
 import { VoxelModelBuilder } from "./VoxelModelBuilder";
-import {
-  CompiledVoxelModelInputData,
-  CompiledVoxelModelData,
-} from "../../../Voxels/Models/CompiledVoxelModel.types";
 import { VoxelModelConstructorRegister } from "./VoxelModelConstructorRegister";
-import { StateSchema } from "../../../Voxels/State/Schema/StateSchema";
-import { StateTreeReader } from "../../../Voxels/State/StateTreeReader";
-import { VoxelModelEffect } from "./VoxelModelEffect";
-import { CondtionalTreeReader } from "../../../Voxels/State/CondiotnalTreeReader";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
+import { GeomtryLUT } from "../../../Voxels/Data/GeomtryLUT";
 
 export class VoxelConstructor {
   isModel: true = true;
 
-  geometries: number[][] = [];
+  // effects: VoxelModelEffect;
 
-  modSchema: StateSchema;
-  modTree: StateTreeReader;
-
-  baseInputMap: any[];
-  conditonalInputMap: any[];
-
-  schema: StateSchema;
-  effects: VoxelModelEffect;
-  stateTree: StateTreeReader;
-
-  condtioanlShapeStateTree: CondtionalTreeReader;
-
-  constructor(
-    public id: string,
-    public builder: VoxelModelBuilder,
-    public data: CompiledVoxelModelData,
-    voxleData: CompiledVoxelModelInputData
-  ) {
-    this.baseInputMap = voxleData.baseGeometryInputMap;
-    this.conditonalInputMap = voxleData.condiotnalGeometryInputMap;
-
-    this.schema = new StateSchema(data.schema);
-    this.stateTree = new StateTreeReader(this.schema, 0, data.stateTree);
-
-    this.condtioanlShapeStateTree = new CondtionalTreeReader(
-      this.schema,
-      data.condiotnalStatements,
-      data.condiotnalStateTree
-    );
-
-    this.modSchema = new StateSchema(voxleData.modSchema);
-    this.modTree = new StateTreeReader(
-      this.modSchema,
-      0,
-      voxleData.modStateTree
-    );
-
-    this.effects = new VoxelModelEffect(this);
+  constructor(public id: string, public builder: VoxelModelBuilder) {
+    //  this.effects = new VoxelModelEffect(this);
   }
 
   process(): boolean {
@@ -64,18 +22,29 @@ export class VoxelConstructor {
       builder.position.z
     );
 
-    const treeState = builder.space!.stateCache[hashed];
-    const modState = builder.space!!.modCache[hashed];
+    const trueVoxelId = builder.voxel.getVoxelId();
+    const voxelId = builder.space!.voxelCache[hashed];
+    const reltionalVoxelId = builder.space!.reltionalVoxelCache[hashed];
+    {
+      const geomtriesIndex = VoxelLUT.getGeomtryIndex(
+        voxelId,
+        reltionalVoxelId
+      );
+      const geomtries = GeomtryLUT.geomtryIndex[geomtriesIndex];
 
-    if (treeState > -1) {
-      const geoLinks = this.data.stateMap[treeState];
-      const geometries = this.data.stateGeometryMap[treeState];
-      const geometriesLength = geoLinks.length;
-      const inputs = this.baseInputMap[modState][treeState];
+      const inputsIndex = VoxelLUT.getGeomtryInputIndex(
+        voxelId,
+        reltionalVoxelId
+      );
+      const inputs = GeomtryLUT.geomtryInputsIndex[inputsIndex];
+
+      const geometriesLength = geomtries.length;
+
       for (let i = 0; i < geometriesLength; i++) {
-        const nodeId = geoLinks[i];
-        const geoInputs = inputs[nodeId];
-        const geomtry = VoxelModelConstructorRegister.geometry[geometries[i]];
+        const nodeId = geomtries[i];
+        const inputsIndex = inputs[i];
+        const geoInputs = GeomtryLUT.geomtryInputs[inputsIndex];
+        const geomtry = VoxelModelConstructorRegister.geometry[nodeId];
         const nodesLength = geomtry.nodes.length;
         for (let k = 0; k < nodesLength; k++) {
           const geo = geomtry.nodes[k];
@@ -86,22 +55,54 @@ export class VoxelConstructor {
       }
     }
 
-    const conditonalTreeState = builder!.space!.conditonalStateCache[hashed];
+    const conditioanlNodes = VoxelLUT.getConditionalGeomtryNodes(trueVoxelId);
+    if (conditioanlNodes) {
+      const modelState = VoxelLUT.voxelIdToModelState[voxelId];
+      const reltionalState = builder.space!.reltionalStateCache[hashed];
+      const nodesLength = conditioanlNodes.length;
 
-    if (conditonalTreeState > -1) {
-      const condiotnalNodes =
-        this.data.condiotnalShapeStateMap[conditonalTreeState];
+      for (let i = 0; i < nodesLength; i++) {
+        const [geoId, requiredModelState, requiredModelReltionalState] =
+          conditioanlNodes[i];
+        if (
+          requiredModelState !== modelState ||
+          !requiredModelReltionalState[reltionalState]
+        )
+          continue;
 
-      const condiotnalNodesLength = condiotnalNodes.length;
+        const geomtries = GeomtryLUT.geomtryIndex[geoId];
+        const inputsIndex = VoxelLUT.getConditionalGeomtryInputIndex(
+          geoId,
+          voxelId,
+          reltionalVoxelId
+        );
 
-      for (let c = 0; c < condiotnalNodesLength; c++) {
-        const geometries = condiotnalNodes[c];
-        const geometriesLength = geometries.length;
-        const inputs = this.conditonalInputMap[modState][c];
+        const inputs = GeomtryLUT.geomtryInputsIndex[inputsIndex];
+        if (!inputs) {
+          console.error(
+            this.id,
+            {
+              inputsIndex,
+              inputs,
+              voxelId,
+              reltionalVoxelId,
+              vid: builder.voxel.getId(),
+              trueVoxelId,
+              geoId
+            },
+            VoxelLUT.conditionalGeomtryInputIndex,
+            VoxelLUT.conditionalGeomtryInputIndex[geoId],
+            VoxelLUT.conditionalGeomtryInputIndex[geoId][voxelId]
+          );
+          throw new Error(`Could not find geomtries`);
+        }
+        const geometriesLength = geomtries.length;
 
         for (let i = 0; i < geometriesLength; i++) {
-          const geoInputs = inputs[i];
-          const geomtry = VoxelModelConstructorRegister.geometry[geometries[i]];
+          const nodeId = geomtries[i];
+          const inputsIndex = inputs[i];
+          const geoInputs = GeomtryLUT.geomtryInputs[inputsIndex];
+          const geomtry = VoxelModelConstructorRegister.geometry[nodeId];
           const nodesLength = geomtry.nodes.length;
           for (let k = 0; k < nodesLength; k++) {
             const geo = geomtry.nodes[k];
@@ -113,11 +114,11 @@ export class VoxelConstructor {
       }
     }
 
-    this.effects.addEffects(
+    /*     this.effects.addEffects(
       builder.voxel.getState(),
       builder.origin,
       builder.effects
-    );
+    ); */
 
     builder.clearCalculatedData();
 

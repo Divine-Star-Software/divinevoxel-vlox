@@ -1,7 +1,7 @@
-import { VoxelPalettesRegister } from "../Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../Data/VoxelLUT";
 import { RawVoxelData } from "./Voxel.types";
 import { VoxelLevelReader } from "../Cursor/VoxelLevelReader";
-import { SchemaRegister } from "../../Voxels/State/SchemaRegister";
+import { VoxelSchemas } from "../../Voxels/State/VoxelSchemas";
 
 export class PaintVoxelData {
   static Create(data: Partial<PaintVoxelData> = {}) {
@@ -25,23 +25,19 @@ export class PaintVoxelData {
 
   /**Transforms numeric voxel data into a PaintVoxelData object */
   static FromRaw(data: RawVoxelData, paintData = PaintVoxelData.Create()) {
-    const [trueVoxelId, state, mod] = VoxelPalettesRegister.voxels[data[0]];
-    paintData.id = VoxelPalettesRegister.voxelIds.getStringId(trueVoxelId);
+    const [trueVoxelId, state, mod] = VoxelLUT.voxels[data[0]];
+    paintData.id = VoxelLUT.voxelIds.getStringId(trueVoxelId);
     paintData.state = state;
     paintData.mod = mod;
-    paintData.name =
-      VoxelPalettesRegister.voxelIdToNameMap.get(paintData.id) || "";
+    paintData.name = VoxelLUT.voxelIdToNameMap.get(paintData.id) || "";
 
     if (data[3] !== 0) {
-      const [trueVoxelId, state, mod] = VoxelPalettesRegister.voxels[data[3]];
-      paintData.secondaryVoxelId =
-        VoxelPalettesRegister.voxelIds.getStringId(trueVoxelId);
+      const [trueVoxelId, state, mod] = VoxelLUT.voxels[data[3]];
+      paintData.secondaryVoxelId = VoxelLUT.voxelIds.getStringId(trueVoxelId);
       paintData.secondaryState = state;
       paintData.secondaryMod = mod;
       paintData.secondaryName =
-        VoxelPalettesRegister.voxelIdToNameMap.get(
-          paintData.secondaryVoxelId
-        ) || "";
+        VoxelLUT.voxelIdToNameMap.get(paintData.secondaryVoxelId) || "";
     }
     paintData.level = VoxelLevelReader.getLevel(data[2]);
     paintData.levelState = VoxelLevelReader.getLevel(data[2]);
@@ -53,48 +49,60 @@ export class PaintVoxelData {
     let stringId = data.id
       ? data.id
       : data.name
-      ? VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!
+      ? VoxelLUT.voxelNametoIdMap.get(data.name)!
       : "dve_air";
     let secondaryStringId = data.secondaryName
       ? data.secondaryVoxelId
       : data.secondaryName
-      ? VoxelPalettesRegister.voxelNametoIdMap.get(data.secondaryName)!
+      ? VoxelLUT.voxelNametoIdMap.get(data.secondaryName)!
       : "dve_air";
 
     let state = data.state || 0;
     let mod = data.mod || 0;
     let secondaryState = data.secondaryState || 0;
     let secondaryMod = data.secondaryMod || 0;
-    if (SchemaRegister.hasVoxelSchema(stringId)) {
-      const schema = SchemaRegister.getVoxelSchemas(stringId);
-      if (data.stateString && data.stateString !== "") {
-        state = schema.state.readString(data.stateString);
-      }
-      if (data.modString && data.modString !== "") {
-        mod = schema.mod.readString(data.modString);
-      }
+    const trueId = VoxelLUT.voxelIds.getNumberId(stringId);
+    const stateSchema = VoxelSchemas.state.get(
+      VoxelLUT.models.getStringId(VoxelLUT.modelsIndex[trueId])
+    );
+    if (stateSchema && data.stateString && data.stateString !== "") {
+      state = stateSchema.readString(data.stateString);
     }
-    if (secondaryStringId && SchemaRegister.hasVoxelSchema(secondaryStringId)) {
-      const schema = SchemaRegister.getVoxelSchemas(secondaryStringId);
-      if (data.secondaryStateString && data.secondaryStateString !== "") {
-        secondaryState = schema.state.readString(data.secondaryStateString);
+
+    const modSchema = VoxelSchemas.mod.get(stringId);
+    if (modSchema && data.modString && data.modString !== "") {
+      mod = modSchema.readString(data.modString);
+    }
+
+    if (secondaryStringId) {
+      const trueId = VoxelLUT.voxelIds.getNumberId(secondaryStringId);
+      const stateSchema = VoxelSchemas.state.get(
+        VoxelLUT.models.getStringId(VoxelLUT.modelsIndex[trueId])
+      );
+      if (
+        stateSchema &&
+        data.secondaryStateString &&
+        data.secondaryStateString !== ""
+      ) {
+        secondaryState = stateSchema.readString(data.secondaryStateString);
       }
-      if (data.secondaryModString && data.secondaryModString !== "") {
-        secondaryMod = schema.mod.readString(data.secondaryModString);
+      const modSchema = VoxelSchemas.mod.get(secondaryStringId);
+      if (
+        modSchema &&
+        data.secondaryModString &&
+        data.secondaryModString !== ""
+      ) {
+        secondaryMod = modSchema.readString(data.secondaryModString);
       }
     }
     const id =
       stringId !== "dve_air"
-        ? VoxelPalettesRegister.getVoxelIdFromString(
-            stringId,
-            state || 0,
-            mod || 0
-          )
+        ? VoxelLUT.getVoxelIdFromString(stringId, state || 0, mod || 0)
         : 0;
     const secondaryId =
       secondaryStringId !== "dve_air"
         ? secondaryStringId
-          ? VoxelPalettesRegister.getVoxelIdFromString(
+          ? VoxelLUT.getVoxelIdFromString(
               secondaryStringId,
               secondaryState || 0,
               secondaryMod || 0
@@ -164,16 +172,16 @@ export class PaintVoxelData {
     let stringId = data.id
       ? data.id
       : data.name
-      ? VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!
+      ? VoxelLUT.voxelNametoIdMap.get(data.name)!
       : "dve_air";
     let secondaryStringId = data.secondaryName
       ? data.secondaryVoxelId
       : data.secondaryName
-      ? VoxelPalettesRegister.voxelNametoIdMap.get(data.secondaryName)!
+      ? VoxelLUT.voxelNametoIdMap.get(data.secondaryName)!
       : "dve_air";
 
     if (data.name && !data.id) {
-      data.id = VoxelPalettesRegister.voxelNametoIdMap.get(data.name)!;
+      data.id = VoxelLUT.voxelNametoIdMap.get(data.name)!;
     }
     if (!data.name && !data.id) {
       data.id = "dve_air";
@@ -183,14 +191,17 @@ export class PaintVoxelData {
     let state = data.state || 0;
     let mod = data.mod || 0;
 
-    if (SchemaRegister.hasVoxelSchema(stringId)) {
-      const schema = SchemaRegister.getVoxelSchemas(stringId);
-      if (data.stateString && data.stateString !== "") {
-        state = schema.state.readString(data.stateString);
-      }
-      if (data.modString && data.modString !== "") {
-        mod = schema.mod.readString(data.modString);
-      }
+    const trueId = VoxelLUT.voxelIds.getNumberId(stringId);
+
+    const stateSchema = VoxelSchemas.state.get(
+      VoxelLUT.models.getStringId(VoxelLUT.modelsIndex[trueId])
+    );
+    if (stateSchema && data.stateString && data.stateString !== "") {
+      state = stateSchema.readString(data.stateString);
+    }
+    const modSchema = VoxelSchemas.mod.get(stringId);
+    if (modSchema && data.modString && data.modString !== "") {
+      mod = modSchema.readString(data.modString);
     }
 
     data.state = state;
@@ -201,13 +212,26 @@ export class PaintVoxelData {
     let secondaryState = data.secondaryState || 0;
     let secondaryMod = data.secondaryMod || 0;
 
-    if (secondaryStringId && SchemaRegister.hasVoxelSchema(secondaryStringId)) {
-      const schema = SchemaRegister.getVoxelSchemas(secondaryStringId);
-      if (data.secondaryStateString && data.secondaryStateString !== "") {
-        secondaryState = schema.state.readString(data.secondaryStateString);
+    if (secondaryStringId) {
+      const trueId = VoxelLUT.voxelIds.getNumberId(secondaryStringId);
+
+      const stateSchema = VoxelSchemas.state.get(
+        VoxelLUT.models.getStringId(VoxelLUT.modelsIndex[trueId])
+      );
+      if (
+        stateSchema &&
+        data.secondaryStateString &&
+        data.secondaryStateString !== ""
+      ) {
+        secondaryState = stateSchema.readString(data.secondaryStateString);
       }
-      if (data.secondaryModString && data.secondaryModString !== "") {
-        secondaryMod = schema.mod.readString(data.secondaryModString);
+      const modSchema = VoxelSchemas.mod.get(secondaryStringId);
+      if (
+        modSchema &&
+        data.secondaryModString &&
+        data.secondaryModString !== ""
+      ) {
+        secondaryMod = modSchema.readString(data.secondaryModString);
       }
     }
 

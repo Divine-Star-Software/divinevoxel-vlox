@@ -1,34 +1,12 @@
-import { StringPalette } from "../../../Util/StringPalette";
-import {
-  CompiledVoxelGeometrySyncData,
-  CompiledVoxelModelData,
-} from "../../../Voxels/Models/CompiledVoxelModel.types";
 import { GeoemtryNodeConstructor } from "./Nodes/GeometryNode";
 import { VoxelConstructor } from "./VoxelConstructor";
 import { VoxelGeometryConstructor } from "./Nodes/VoxelGeometryConstructor";
-import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
-import { AOOcclusionFaceIndex } from "../../../Voxels/Models/Indexing/AOOcclusionFaceIndex";
-import { CulledOcclusionFaceIndex } from "../../../Voxels/Models/Indexing/CulledOcclusionFaceIndex";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
+import { GeomtryLUT } from "../../../Voxels/Data/GeomtryLUT";
 
 export class VoxelModelConstructorRegister {
-  static geometryPalette: StringPalette;
   static geometry: VoxelGeometryConstructor[] = [];
-
-  static rulesless: boolean[] = [];
-  static aoIndex: AOOcclusionFaceIndex;
-  static faceCullIndex: CulledOcclusionFaceIndex;
-  static vertexHitMap: number[][][];
-  static faceCullMap: number[][];
-  static setGeometryPalette(palette: string[]) {
-    this.geometryPalette = new StringPalette(palette);
-  }
-
-  static modelData = new Map<string, CompiledVoxelModelData>();
   static customNodes = new Map<string, GeoemtryNodeConstructor<any, any>>();
-
-  static registerModels(models: CompiledVoxelModelData[]) {
-    models.forEach((_) => this.modelData.set(_.id, _));
-  }
   static registerCustomNode(
     id: string,
     node: GeoemtryNodeConstructor<any, any>
@@ -51,25 +29,20 @@ export class VoxelModelConstructorRegister {
       for (const vox of voxel) {
         this.constructors.set(vox.id, vox);
         this.constructorsPaltte[
-          VoxelPalettesRegister.voxelIds.getNumberId(vox.id)
+          VoxelLUT.voxelIds.getNumberId(vox.id)
         ] = vox;
       }
       return;
     }
     this.constructorsPaltte[
-      VoxelPalettesRegister.voxelIds.getNumberId(voxel.id)
+      VoxelLUT.voxelIds.getNumberId(voxel.id)
     ] = voxel;
     this.constructors.set(voxel.id, voxel);
   }
 
-  static registerGeometry(geometries: CompiledVoxelGeometrySyncData[]) {
-    for (const geometry of geometries) {
-      const paletteId = this.geometryPalette.getNumberId(geometry.id);
-
-      this.geometry[paletteId] = new VoxelGeometryConstructor(
-        paletteId,
-        geometry
-      );
+  static init() {
+    for (let i = 0; i < GeomtryLUT.compiledGeomtry.length; i++) {
+      this.geometry[i] = new VoxelGeometryConstructor(i);
     }
   }
 }

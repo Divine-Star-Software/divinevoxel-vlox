@@ -9,7 +9,7 @@ import {
 } from "../../../Util/BinaryBuffer/index";
 import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArechive";
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
-import { VoxelPalettesRegister } from "../../../Voxels/Data/VoxelPalettesRegister";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
 import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
 import { EngineSettings } from "../../../Settings/EngineSettings";
@@ -74,7 +74,7 @@ export default function CreateArchivedTemplate(
         let voxelSecondary = 0;
         if (
           VoxelTagsRegister.VoxelTags[
-            VoxelPalettesRegister.voxels[rawData[0]][0]
+            VoxelLUT.voxels[rawData[0]][0]
           ]["dve_can_have_secondary"]
         ) {
           voxelSecondary = voxelPalette.register(rawData[3]);
