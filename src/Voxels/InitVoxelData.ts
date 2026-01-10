@@ -243,6 +243,7 @@ export function InitVoxelData(data: InitVoxelDataProps): CompiledvVxelTags {
 
   const voxelData = BuildTagData({
     voxels,
+    models,
     voxelsOverrides: {
       [VoxelTagIds.lightValue]: (value) => {
         const v = <number[]>value;

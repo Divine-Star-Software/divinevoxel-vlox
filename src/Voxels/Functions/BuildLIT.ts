@@ -357,6 +357,7 @@ export function BuildLUT(
     const reltionalModSchema = VoxelSchemas.reltioanlMod.get(voxel.id);
     const inputs = finalVoxelStateInputMap.get(voxel.id)!;
     const conditonalInputs = finalVoxelConditionalInputMap.get(voxel.id)!;
+
     for (const modKey in voxelModelData.inputs) {
       const [modString, modReltionalString] = modKey.split("|");
       const modValue = modSchema ? modSchema.readString(modString) : 0;
@@ -375,12 +376,14 @@ export function BuildLUT(
             ? reltionalStateSchema.readString(reltionalString)
             : 0;
 
+    
         const voxelId = VoxelLUT.getVoxelId(trueVoxelId, stateValue, modValue);
         const reltionalVoxelId = VoxelLUT.getReltionalVoxelId(
           trueVoxelId,
           reltionalStateValue,
           reltionalModValue
         );
+
         VoxelLUT.geomtryIndex[voxelId] ??= [];
         VoxelLUT.geomtryInputsIndex[voxelId] ??= [];
         const totalReltionalStates = reltionalStateSchema
@@ -461,7 +464,10 @@ export function BuildLUT(
       const stateValue = stateSchema ? stateSchema.readString(stateString) : 0;
 
       const totalReltionalStates = reltionalStateSchema
-        ? Math.pow(2, reltionalStateSchema.nodes.length)
+        ? Math.pow(2, reltionalStateSchema.nodes.length) *
+          (reltionalModSchema
+            ? Math.pow(2, reltionalModSchema.nodes.length)
+            : 1)
         : 0;
 
       const enabledArray: boolean[] = new Array(totalReltionalStates || 1).fill(

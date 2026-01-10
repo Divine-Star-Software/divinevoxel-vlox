@@ -25,33 +25,29 @@ export class VoxelConstructor {
     const trueVoxelId = builder.voxel.getVoxelId();
     const voxelId = builder.space!.voxelCache[hashed];
     const reltionalVoxelId = builder.space!.reltionalVoxelCache[hashed];
-    {
-      const geomtriesIndex = VoxelLUT.getGeomtryIndex(
-        voxelId,
-        reltionalVoxelId
-      );
-      const geomtries = GeomtryLUT.geomtryIndex[geomtriesIndex];
 
-      const inputsIndex = VoxelLUT.getGeomtryInputIndex(
-        voxelId,
-        reltionalVoxelId
-      );
-      const inputs = GeomtryLUT.geomtryInputsIndex[inputsIndex];
+    const geomtriesIndex = VoxelLUT.getGeomtryIndex(voxelId, reltionalVoxelId);
+    const geomtries = GeomtryLUT.geomtryIndex[geomtriesIndex];
 
-      const geometriesLength = geomtries.length;
+    const inputsIndex = VoxelLUT.getGeomtryInputIndex(
+      voxelId,
+      reltionalVoxelId
+    );
+    const inputs = GeomtryLUT.geomtryInputsIndex[inputsIndex];
 
-      for (let i = 0; i < geometriesLength; i++) {
-        const nodeId = geomtries[i];
-        const inputsIndex = inputs[i];
-        const geoInputs = GeomtryLUT.geomtryInputs[inputsIndex];
-        const geomtry = VoxelModelConstructorRegister.geometry[nodeId];
-        const nodesLength = geomtry.nodes.length;
-        for (let k = 0; k < nodesLength; k++) {
-          const geo = geomtry.nodes[k];
-          geo.builder = this.builder;
-          const addedGeo = geo.add(geoInputs[k]);
-          if (addedGeo) added = true;
-        }
+    const geometriesLength = geomtries.length;
+
+    for (let i = 0; i < geometriesLength; i++) {
+      const nodeId = geomtries[i];
+      const inputsIndex = inputs[i];
+      const geoInputs = GeomtryLUT.geomtryInputs[inputsIndex];
+      const geomtry = VoxelModelConstructorRegister.geometry[nodeId];
+      const nodesLength = geomtry.nodes.length;
+      for (let k = 0; k < nodesLength; k++) {
+        const geo = geomtry.nodes[k];
+        geo.builder = this.builder;
+        const addedGeo = geo.add(geoInputs[k]);
+        if (addedGeo) added = true;
       }
     }
 
@@ -78,24 +74,7 @@ export class VoxelConstructor {
         );
 
         const inputs = GeomtryLUT.geomtryInputsIndex[inputsIndex];
-        if (!inputs) {
-          console.error(
-            this.id,
-            {
-              inputsIndex,
-              inputs,
-              voxelId,
-              reltionalVoxelId,
-              vid: builder.voxel.getId(),
-              trueVoxelId,
-              geoId
-            },
-            VoxelLUT.conditionalGeomtryInputIndex,
-            VoxelLUT.conditionalGeomtryInputIndex[geoId],
-            VoxelLUT.conditionalGeomtryInputIndex[geoId][voxelId]
-          );
-          throw new Error(`Could not find geomtries`);
-        }
+
         const geometriesLength = geomtries.length;
 
         for (let i = 0; i < geometriesLength; i++) {

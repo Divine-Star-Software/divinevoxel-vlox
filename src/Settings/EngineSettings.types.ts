@@ -1,4 +1,4 @@
-import { Vector3Like } from "@amodx/math";
+import { Vec2Array, Vector3Like } from "@amodx/math";
 export interface MesherSettingsData {}
 export class MesherSettingsData {
   /**Tell the mesher to shade voxel faces with sun light data. Disable if you are using a custom renderering pipeline. */
@@ -15,6 +15,7 @@ export class RenderSettingsData {
   cpuBound = false;
   /* Single buffer mode will store vertex and indicies in single big buffer. While multi will store a buffer for each section mesh.*/
   bufferMode: "single" | "multi" = "multi";
+  textureSize: Vec2Array = [16, 16];
 }
 export interface UpdatingSettings {}
 export class UpdatingSettings {

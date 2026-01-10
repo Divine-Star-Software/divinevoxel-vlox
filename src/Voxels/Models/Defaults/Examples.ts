@@ -867,11 +867,11 @@ export const candlesModel: VoxelModelData = {
     {
       name: "num_candles",
       bitIndex: 0,
-      bitSize: 3,
+      bitSize: 2,
     },
     {
       name: "lit",
-      bitIndex: 3,
+      bitIndex: 2,
       bitSize: 1,
       values: ["false", "true"],
     },

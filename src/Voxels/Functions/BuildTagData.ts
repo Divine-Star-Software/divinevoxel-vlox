@@ -8,9 +8,11 @@ import { VoxelLogicData } from "../Logic/VoxelLogic.types";
 import { VoxelPropertiesRegister } from "../Data/VoxelPropertiesRegister";
 import { VoxelPlacingStrategyRegister } from "../../Voxels/Interaction/Placing/VoxelPlacingStrategyRegister";
 import { VoxelLUT } from "../../Voxels/Data/VoxelLUT";
+import { VoxelModelData } from "../../Voxels/Models/VoxelModel.types";
 
 export type BuildTagDataProps = {
   voxels: VoxelData[];
+  models: VoxelModelData[];
   voxelsOverrides?: Record<string, (value: any) => any>;
   substances: VoxelSubstanceData[];
   substancesOverrides?: Record<string, (value: any) => any>;
@@ -21,7 +23,9 @@ export function BuildTagAndPaletteData(
   props: BuildTagDataProps
 ): CompiledvVxelTags {
   const logic: Record<string, VoxelLogicData[]> = {};
-
+  const models = new Map<string, VoxelModelData>(
+    props.models.map((_) => [_.id, _])
+  );
   for (const voxel of props.voxels) {
     const tags: VoxelTags = {} as any;
 
@@ -29,16 +33,14 @@ export function BuildTagAndPaletteData(
     VoxelPropertiesRegister.VoxelProperties[voxelId] = voxel.properties;
     if (voxel.properties["dve_model_data"]) {
       tags["dve_model_id"] = voxel.properties["dve_model_data"].id;
-      /**  
-      @TODO add tag orverrides from models 
-      const model = VoxelModelRuleBuilderRegister.models.get(
-        voxel.properties["dve_model_data"].id
-      );
-      if (model?.data.properties) {
-        for (const tagId in model.data.properties) {
-          voxel.properties[tagId] = (model.data.properties as any)[tagId];
+      const model = models.get(tags["dve_model_id"]);
+      if (model) {
+        if (model?.properties) {
+          for (const tagId in model.properties) {
+            voxel.properties[tagId] = (model.properties as any)[tagId];
+          }
         }
-      } */
+      }
     }
 
     if (voxel.properties["dve_placing_strategy"]) {
@@ -92,6 +94,6 @@ export function BuildTagAndPaletteData(
   return {
     logic,
     tags: VoxelTagsRegister.VoxelTags,
-    substanceTags: VoxelTagsRegister.SubstanceTags
+    substanceTags: VoxelTagsRegister.SubstanceTags,
   };
 }

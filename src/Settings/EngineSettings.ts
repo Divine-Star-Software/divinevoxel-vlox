@@ -1,7 +1,6 @@
 import { EngineSettingsData } from "./EngineSettings.types.js";
 import { Environment } from "../Util/Environment";
 import { TypedEventTarget } from "../Util/TypedEventTarget.js";
-import { Thread } from "@amodx/threads";
 type EngineSettingsEvents = {
   synced: { settings: EngineSettingsClass };
 };
