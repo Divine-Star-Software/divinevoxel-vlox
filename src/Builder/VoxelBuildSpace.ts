@@ -1,5 +1,5 @@
 import { Vec3Array, Vector3Like } from "@amodx/math";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import { DivineVoxelEngineRender } from "../Contexts/Render";
 import { VoxelPathData } from "../Templates/Path/VoxelPath.types";
 import { IVoxelTemplateData } from "../Templates/VoxelTemplates.types";
@@ -9,7 +9,7 @@ import { VoxelPickResult } from "../Voxels/Interaction/VoxelPickResult";
 import { VoxelSchemas } from "../Voxels/State/VoxelSchemas";
 import { RayProvider } from "./RayProvider";
 import { FullVoxelTemplate } from "../Templates/Full/FullVoxelTemplate";
-import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
+import { BoundsMinMaxData } from "@amodx/math/Geometry/Bounds/BoundsInterface";
 import { FullVoxelTemplateData } from "../Templates/Full/FullVoxelTemplate.types";
 import { LocationData } from "../Math";
 import type { VoxelSurfaceSelectionData } from "../Templates/Selection/VoxelSurfaceSelection";

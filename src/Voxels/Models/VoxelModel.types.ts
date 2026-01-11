@@ -14,7 +14,7 @@ import {
   VoxelGeometryIntArgument,
   VoxelGeometryBooleanArgument,
   VoxelGeometryFloatArgument,
-} from "../Geomtry/VoxelGeomtry.types";
+} from "../Geometry/VoxelGeometry.types";
 
 export interface VoxelGeometryLinkData {
   //  id: string;

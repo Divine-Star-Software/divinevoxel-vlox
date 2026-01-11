@@ -5,7 +5,7 @@ import {
   closestUnitNormal,
   closestVoxelFace,
 } from "../../../Math/UtilFunctions";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 const epsilon = 1e-5;
 const bounds = new BoundingBox();

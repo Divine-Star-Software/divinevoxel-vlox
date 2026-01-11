@@ -1,9 +1,9 @@
-import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Geomtry/VoxelRelativeCubeIndex";
+import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Geometry/VoxelRelativeCubeIndex";
 import { VoxelModelBuilder } from "../../VoxelModelBuilder";
-import { GeomtryLUT } from "../../../../../Voxels/Data/GeomtryLUT";
+import { GeometryLUT } from "../../../../../Voxels/Data/GeometryLUT";
 import { getInterpolationValue } from "../Calc/CalcConstants";
 import { Vec4Array } from "@amodx/math";
-import { QuadVerticies } from "../../../../Geomtry/Geometry.types";
+import { QuadVerticies } from "../../../../Geometry/Geometry.types";
 import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
 
 export function ShadeRulledFace(
@@ -28,7 +28,7 @@ export function ShadeRulledFace(
 
     if (noAO) continue;
 
-    const aoIndexes = GeomtryLUT.aoVertexHitMap![trueFaceIndex][v];
+    const aoIndexes = GeometryLUT.aoVertexHitMap![trueFaceIndex][v];
 
     if (!aoIndexes) continue;
 
@@ -51,15 +51,15 @@ export function ShadeRulledFace(
 
       const voxelId = builder.space.voxelCache[hashed];
       const reltionalVoxelId = builder.space.reltionalVoxelCache[hashed];
-      const geomtryIndex = VoxelLUT.getGeomtryIndex(voxelId, reltionalVoxelId);
-      const baseGeo = GeomtryLUT.geomtryIndex[geomtryIndex];
+      const geometryIndex = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
+      const baseGeo = GeometryLUT.geometryIndex[geometryIndex];
 
       //  if (!baseGeo && !conditonalGeo) continue;
       let shaded = false;
       if (baseGeo) {
         for (let geoIndex = 0; geoIndex < baseGeo.length; geoIndex++) {
           if (
-            GeomtryLUT.aoIndex.getValue(
+            GeometryLUT.aoIndex.getValue(
               baseGeo[geoIndex],
               directionIndex,
               trueFaceIndex,
@@ -78,7 +78,7 @@ export function ShadeRulledFace(
 
       const trueVoxelId = builder.space.trueVoxelCache[hashed];
       const offsetConditonalGeometry =
-        VoxelLUT.getConditionalGeomtryNodes(trueVoxelId);
+        VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
 
       if (offsetConditonalGeometry) {
         const modelState = VoxelLUT.voxelIdToModelState[voxelId];
@@ -92,11 +92,11 @@ export function ShadeRulledFace(
           )
             continue;
 
-          const geomerties = GeomtryLUT.geomtryIndex[geoId];
+          const geomerties = GeometryLUT.geometryIndex[geoId];
           for (let geoIndex = 0; geoIndex < geomerties.length; geoIndex++) {
             const geoId = geomerties[geoIndex];
             if (
-              GeomtryLUT.aoIndex.getValue(
+              GeometryLUT.aoIndex.getValue(
                 geoId,
                 directionIndex,
                 trueFaceIndex,

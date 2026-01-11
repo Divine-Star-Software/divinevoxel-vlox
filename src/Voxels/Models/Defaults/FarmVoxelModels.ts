@@ -1,6 +1,6 @@
 import {  VoxelModelData } from "../VoxelModel.types";
-import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
-const farmlandGeomtry: VoxelGeometryData = {
+import { VoxelGeometryData } from "../../Geometry/VoxelGeometry.types";
+const farmlandGeometry: VoxelGeometryData = {
   id: "dve_farmland",
   divisor: [16, 16, 16],
   arguments: {
@@ -158,7 +158,7 @@ const farmlandModel: VoxelModelData = {
   },
 };
 
-const cropGeomtry: VoxelGeometryData = {
+const cropGeometry: VoxelGeometryData = {
   id: "dve_crop",
   doNotBuildRules: true,
   cullingProcedure: {
@@ -354,5 +354,5 @@ const cropModel: VoxelModelData = {
   },
 };
 
-export const farmGeomtry = [farmlandGeomtry, cropGeomtry];
+export const farmGeometry = [farmlandGeometry, cropGeometry];
 export const farmModels = [farmlandModel, cropModel];

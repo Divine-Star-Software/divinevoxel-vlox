@@ -1,15 +1,15 @@
 import { VoxelModelData } from "../../..//Models/VoxelModel.types";
-import { VoxelModelInputs } from "../GeomtryLUT.types";
+import { VoxelModelInputs } from "../GeometryLUT.types";
 import {
   BaseVoxelQuadData,
   VoxelGeometryData,
-} from "../../../Geomtry/VoxelGeomtry.types";
+} from "../../../Geometry/VoxelGeometry.types";
 
 import { QuadVoxelGometryInputs } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
 import { cleanArgString, isArgString, processTexture } from "./BaseFunctions";
-import { BaseVoxelGeomtryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
+import { BaseVoxelGeometryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
 import { mapQuadUvs } from "../CalcFunctions";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
 import { Vec4Array } from "@amodx/math";
 
 export function BuildQuadInputs(
@@ -18,7 +18,7 @@ export function BuildQuadInputs(
   data: VoxelModelInputs,
   quad: BaseVoxelQuadData,
   model: VoxelModelData,
-  geomtry: VoxelGeometryData
+  geometry: VoxelGeometryData
 ) {
   const ArgIndexes = QuadVoxelGometryInputs.ArgIndexes;
   const inputs = QuadVoxelGometryInputs.CreateArgs();
@@ -26,22 +26,22 @@ export function BuildQuadInputs(
   let enabled = quad.enabled || true;
   inputs[ArgIndexes.Enabled] = enabled;
 
-  let texture: number | BaseVoxelGeomtryTextureProcedureData = 0;
+  let texture: number | BaseVoxelGeometryTextureProcedureData = 0;
   if (isArgString(quad.texture)) {
-    const geomtryInputId = cleanArgString(quad.texture);
-    let modelInput = data.modelInputs[geomtryInputId];
+    const geometryInputId = cleanArgString(quad.texture);
+    let modelInput = data.modelInputs[geometryInputId];
     if (!modelInput) {
       for (const argKey in data.modelInputs) {
-        const arg = geomtry.arguments[argKey];
+        const arg = geometry.arguments[argKey];
         if (!arg) continue;
-        if (arg.type == "arg-list" && arg.arguments.includes(geomtryInputId)) {
+        if (arg.type == "arg-list" && arg.arguments.includes(geometryInputId)) {
           modelInput = data.modelInputs[argKey];
         }
       }
     }
     if (!modelInput)
       throw new Error(
-        `Could not find input for ${quad.texture} on geomtry ${geomtry.id} model ${model.id}`
+        `Could not find input for ${quad.texture} on geometry ${geometry.id} model ${model.id}`
       );
 
     if (typeof modelInput == "string") {
@@ -49,7 +49,7 @@ export function BuildQuadInputs(
       texture = processTexture(data.voxelInputs[modelInputId]);
     }
     if (typeof modelInput == "object") {
-      const procedureData: BaseVoxelGeomtryTextureProcedureData = modelInput;
+      const procedureData: BaseVoxelGeometryTextureProcedureData = modelInput;
       if (
         typeof procedureData.texture == "string" &&
         isArgString(procedureData.texture)
@@ -107,7 +107,7 @@ export function BuildQuadInputs(
       quadUVs = data.voxelInputs[cleanArgString(modelInput)];
     } else {
       if (!modelInput) {
-        const input = geomtry.arguments[geoInput];
+        const input = geometry.arguments[geoInput];
         if (input.type == "uv") {
           quadUVs = input.default as any;
         }

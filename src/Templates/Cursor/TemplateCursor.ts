@@ -4,7 +4,7 @@ import { IVoxelTemplate } from "../../Templates/VoxelTemplates.types";
 import { TemplateProxy } from "./TemplateProxy";
 import { VoxelCursor } from "../../Voxels/Cursor/VoxelCursor";
 import { RawVoxelData } from "../../Voxels/Types/Voxel.types";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 const raw: RawVoxelData = [0, 0, 0, 0];
 export class TemplateCursor implements DataCursorInterface {
   _voxelIndex = 0;

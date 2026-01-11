@@ -1,7 +1,7 @@
 import { LocationData } from "Math/index.js";
 import { EngineSettingsData } from "../../../Settings/EngineSettings.types";
 import { VoxelLUTExport } from "../../../Voxels/Data/VoxelLUT";
-import { GeomtryLUTExport } from "../../../Voxels/Data/GeomtryLUT";
+import { GeometryLUTExport } from "../../../Voxels/Data/GeometryLUT";
 import { VoxelSchemasExport } from "../../../Voxels/State/VoxelSchemas";
 import { CompiledvVxelTags } from "Voxels/Types/VoxelModelCompiledData.types";
 export type DataSyncData = {
@@ -12,7 +12,7 @@ export type DataSyncData = {
   tags: CompiledvVxelTags;
   luts: {
     voxel: VoxelLUTExport;
-    geometry: GeomtryLUTExport;
+    geometry: GeometryLUTExport;
   };
   schemas: VoxelSchemasExport;
 };

@@ -1,6 +1,6 @@
 import { LocationData } from "../../Math";
 import { SectionSnapShot } from "./SectionSnapShot";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import { WorldSpaces } from "../WorldSpaces";
 import { Vector3Like } from "@amodx/math";
 

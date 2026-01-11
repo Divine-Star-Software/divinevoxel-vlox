@@ -1,16 +1,16 @@
 //tools
 //data
-import { QuadScalarVertexData } from "../../Geomtry/Primitives/QuadVertexData";
+import { QuadScalarVertexData } from "../../Geometry/Primitives/QuadVertexData";
 import { VoxelFaces, VoxelFacesArray } from "../../../Math";
-import { QuadVerticies } from "../../Geomtry/Geometry.types";
+import { QuadVerticies } from "../../Geometry/Geometry.types";
 import calculateFaceData from "./Common/Calc/FaceDataCalc.js";
-import { ProtoMesh } from "../../Geomtry/Proto/ProtoMesh";
-import { VoxelMeshBVHBuilder } from "../Geomtry/VoxelMeshBVHBuilder";
+import { ProtoMesh } from "../../Geometry/Proto/ProtoMesh";
+import { VoxelMeshBVHBuilder } from "../Geometry/VoxelMeshBVHBuilder";
 import { Vec3Array, Vector3Like, Vector4Like } from "@amodx/math";
 import { VoxelCursorInterface } from "../../../Voxels/Cursor/VoxelCursor.interface.js";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface.js";
 import { VoxelGeometryBuilderCacheSpace } from "./VoxelGeometryBuilderCacheSpace";
-import { VoxelMeshVertexStructCursor } from "../Geomtry/VoxelMeshVertexStructCursor";
+import { VoxelMeshVertexStructCursor } from "../Geometry/VoxelMeshVertexStructCursor";
 
 class VoxelVars {
   textureIndex = 0;

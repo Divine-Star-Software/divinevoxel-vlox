@@ -1,10 +1,10 @@
 import { Vec4Array } from "@amodx/math";
 import { VoxelFaces } from "../../../../../Math";
-import { Quad } from "../../../../Geomtry/Primitives/Quad";
-import { addVoxelQuad } from "../../../Geomtry/VoxelGeometryBuilder";
+import { Quad } from "../../../../Geometry/Primitives/Quad";
+import { addVoxelQuad } from "../../../Geometry/VoxelGeometryBuilder";
 import { GeoemtryNode } from "../GeometryNode";
 import {
-  CompiledQuadVoxelGeomtryNode,
+  CompiledQuadVoxelGeometryNode,
   QuadVoxelGometryArgs,
   QuadVoxelGometryInputs,
 } from "../Types/QuadVoxelGometryNodeTypes";
@@ -16,7 +16,7 @@ import { ShadeRulelessFace } from "../../Common/Faces/ShadeRulelessFace";
 const ArgIndexes = QuadVoxelGometryInputs.ArgIndexes;
 
 export class QuadVoxelGometryNode extends GeoemtryNode<
-  CompiledQuadVoxelGeomtryNode,
+  CompiledQuadVoxelGeometryNode,
   QuadVoxelGometryArgs
 > {
   quad: Quad;

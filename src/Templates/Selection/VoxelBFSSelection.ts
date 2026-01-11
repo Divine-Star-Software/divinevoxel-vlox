@@ -7,7 +7,7 @@ import {
   setBitArrayIndex,
 } from "../../Util/Binary/BinaryArrays";
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 export interface VoxelBFSSelectionData extends IVoxelSelectionData<"bfs"> {
   bitIndex: Uint8Array;

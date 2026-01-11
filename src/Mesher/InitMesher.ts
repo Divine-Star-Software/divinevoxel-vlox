@@ -1,6 +1,6 @@
 import { RenderedMaterials } from "./Voxels/Models/RenderedMaterials";
 import { VoxelModelConstructorRegister } from "./Voxels/Models/VoxelModelConstructorRegister.js";
-import { LiquidGeometryNode } from "./Voxels/Models/Nodes/Custom/Liquid/LiquidGeomtryNode.js";
+import { LiquidGeometryNode } from "./Voxels/Models/Nodes/Custom/Liquid/LiquidGeometryNode.js";
 import { VoxelConstructor } from "./Voxels/Models/VoxelConstructor.js";
 import { VoxelLUT } from "../Voxels/Data/VoxelLUT";
 

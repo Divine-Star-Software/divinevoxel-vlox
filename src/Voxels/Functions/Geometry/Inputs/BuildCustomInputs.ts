@@ -1,30 +1,30 @@
 import { VoxelModelData } from "../../..//Models/VoxelModel.types";
-import { VoxelModelInputs } from "../GeomtryLUT.types";
+import { VoxelModelInputs } from "../GeometryLUT.types";
 import {
-  VoxelCustomGeomtryNode,
+  VoxelCustomGeometryNode,
   VoxelGeometryData,
-} from "../../../Geomtry/VoxelGeomtry.types";
+} from "../../../Geometry/VoxelGeometry.types";
 
 import { cleanArgString, isArgString, processTexture } from "./BaseFunctions";
-import { BaseVoxelGeomtryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
+import { BaseVoxelGeometryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
 
 export function BuildCustomInputs(
   args: any[],
   transform: VoxelGeometryTransform,
   data: VoxelModelInputs,
-  custom: VoxelCustomGeomtryNode,
+  custom: VoxelCustomGeometryNode,
   model: VoxelModelData,
-  geomtry: VoxelGeometryData
+  geometry: VoxelGeometryData
 ) {
   const customArgs: Record<string, any> = {};
 
   for (const inputKey in custom.inputs) {
     const inputValue = custom.inputs[inputKey];
     if (isArgString(inputValue) && typeof inputValue == "string") {
-      const geomtryArgumentId = cleanArgString(inputValue);
+      const geometryArgumentId = cleanArgString(inputValue);
       if (
-        isArgString(data.modelInputs[geomtryArgumentId]) &&
+        isArgString(data.modelInputs[geometryArgumentId]) &&
         typeof inputValue == "string"
       ) {
         const modelArgumentId = cleanArgString(inputValue);
@@ -32,11 +32,11 @@ export function BuildCustomInputs(
         const voxelInputValue = data.voxelInputs[modelArgumentId];
         if (modelArgument.type == "texture") {
           if (typeof voxelInputValue == "string") {
-            customArgs[geomtryArgumentId] = processTexture(voxelInputValue);
+            customArgs[geometryArgumentId] = processTexture(voxelInputValue);
             continue;
           }
           if (typeof voxelInputValue == "object") {
-            const textureProcedure: BaseVoxelGeomtryTextureProcedureData =
+            const textureProcedure: BaseVoxelGeometryTextureProcedureData =
               voxelInputValue;
             if (typeof textureProcedure.texture == "string") {
               textureProcedure.texture = processTexture(
@@ -50,10 +50,10 @@ export function BuildCustomInputs(
                 ) as any;
               }
             }
-            customArgs[geomtryArgumentId] = textureProcedure;
+            customArgs[geometryArgumentId] = textureProcedure;
           }
         } else {
-          customArgs[geomtryArgumentId] = voxelInputValue;
+          customArgs[geometryArgumentId] = voxelInputValue;
         }
       }
     } else {

@@ -6,10 +6,10 @@ import { VoxelData } from "../../Types/Voxel.types";
 import {
   CullingProcedureData,
   VoxelGeometryData,
-} from "../../Geomtry/VoxelGeomtry.types";
+} from "../../Geometry/VoxelGeometry.types";
 import { StringPalette } from "../../../Util/StringPalette";
-import { GeomtryLUT } from "../../Data/GeomtryLUT";
-import { VoxelModelInputs } from "./GeomtryLUT.types";
+import { GeometryLUT } from "../../Data/GeometryLUT";
+import { VoxelModelInputs } from "./GeometryLUT.types";
 import { BuildInputs } from "./Inputs/BuldInputs";
 import { BuildCompiled } from "./Compile/BuildCompiled";
 import { BuildRules } from "./Rules/BuildRules";
@@ -45,17 +45,17 @@ const getVoxelModelInputId = (data: VoxelModelInputs) => {
   return baseId;
 };
 
-export function BuildGeomtryLUT(
+export function BuildGeomeetryLUT(
   voxels: VoxelData[],
   geomtries: VoxelGeometryData[],
   models: VoxelModelData[]
 ) {
-  const geomtryMap = new Map<string, VoxelGeometryData>();
-  for (const geomtry of geomtries) {
-    geomtryMap.set(geomtry.id, geomtry);
+  const geometryMap = new Map<string, VoxelGeometryData>();
+  for (const geometry of geomtries) {
+    geometryMap.set(geometry.id, geometry);
 
-    const divisor = geomtry.divisor;
-    for (const node of geomtry.nodes) {
+    const divisor = geometry.divisor;
+    for (const node of geometry.nodes) {
       if (node.type == "box") {
         let d = node.divisor ? node.divisor : divisor;
         if (!d) continue;
@@ -123,7 +123,7 @@ export function BuildGeomtryLUT(
         }
         if (node.divisor) node.divisor = undefined;
       }
-      if (geomtry.divisor) geomtry.divisor = undefined;
+      if (geometry.divisor) geometry.divisor = undefined;
     }
   }
 
@@ -160,8 +160,8 @@ export function BuildGeomtryLUT(
   const modelsProcessed = new Set<string>();
   const modelStateMap = new Map<string, Record<string, number[]>>();
   const modelConditionalMap = new Map<string, Record<string, number[]>>();
-  const geomtryLinkRecord: VoxelGeometryLinkData[] = [];
-  const geomtryLinkPalette = new StringPalette();
+  const geometryLinkRecord: VoxelGeometryLinkData[] = [];
+  const geometryLinkPalette = new StringPalette();
 
   const rulelessIndex: boolean[] = [];
 
@@ -183,7 +183,7 @@ export function BuildGeomtryLUT(
   for (const procedure of cullingProcedures) {
     cullProcedurePalette.register(procedure.type);
   }
-  GeomtryLUT.geomtryCullingProcedures = cullingProcedures;
+  GeometryLUT.geometryCullingProcedures = cullingProcedures;
   for (const voxel of voxels) {
     const voxelModelData = voxel.properties["dve_model_data"];
     if (!voxelModelData) continue;
@@ -198,18 +198,18 @@ export function BuildGeomtryLUT(
         const nodeIds: number[] = [];
         for (const node of nodes) {
           const getLinkId = getGeometryLinkId(node);
-          const getLinkPaletteId = geomtryLinkPalette.register(getLinkId);
-          geomtryLinkRecord[getLinkPaletteId] = node;
+          const getLinkPaletteId = geometryLinkPalette.register(getLinkId);
+          geometryLinkRecord[getLinkPaletteId] = node;
           nodeIds.push(getLinkPaletteId);
 
           const cullingProcedure = node.cullingProcedure
             ? node.cullingProcedure
-            : geomtryMap.get(node.geometryId)?.cullingProcedure ||
+            : geometryMap.get(node.geometryId)?.cullingProcedure ||
               cullingProcedures[0];
-          GeomtryLUT.geomtryCullingProceduresIndex[getLinkPaletteId] =
+          GeometryLUT.geometryCullingProceduresIndex[getLinkPaletteId] =
             cullProcedurePalette.getNumberId(cullingProcedure.type);
 
-          if (geomtryMap.get(node.geometryId)?.doNotBuildRules) {
+          if (geometryMap.get(node.geometryId)?.doNotBuildRules) {
             rulelessIndex[getLinkPaletteId] = true;
           } else {
             rulelessIndex[getLinkPaletteId] = false;
@@ -225,18 +225,18 @@ export function BuildGeomtryLUT(
         const nodeIds: number[] = [];
         for (const node of nodes) {
           const getLinkId = getGeometryLinkId(node);
-          const getLinkPaletteId = geomtryLinkPalette.register(getLinkId);
-          geomtryLinkRecord[getLinkPaletteId] = node;
+          const getLinkPaletteId = geometryLinkPalette.register(getLinkId);
+          geometryLinkRecord[getLinkPaletteId] = node;
           nodeIds.push(getLinkPaletteId);
 
           const cullingProcedure = node.cullingProcedure
             ? node.cullingProcedure
-            : geomtryMap.get(node.geometryId)?.cullingProcedure ||
+            : geometryMap.get(node.geometryId)?.cullingProcedure ||
               cullingProcedures[0];
-          GeomtryLUT.geomtryCullingProceduresIndex[getLinkPaletteId] =
+          GeometryLUT.geometryCullingProceduresIndex[getLinkPaletteId] =
             cullProcedurePalette.getNumberId(cullingProcedure.type);
 
-          if (geomtryMap.get(node.geometryId)?.doNotBuildRules) {
+          if (geometryMap.get(node.geometryId)?.doNotBuildRules) {
             rulelessIndex[getLinkPaletteId] = true;
           } else {
             rulelessIndex[getLinkPaletteId] = false;
@@ -258,7 +258,7 @@ export function BuildGeomtryLUT(
         const inputs: VoxelModelInputs[] = [];
         for (const node of nodes) {
           const getLinkId = getGeometryLinkId(node);
-          const getLinkPaletteId = geomtryLinkPalette.getNumberId(getLinkId);
+          const getLinkPaletteId = geometryLinkPalette.getNumberId(getLinkId);
 
           inputs.push({
             geoNodeId: getLinkPaletteId,
@@ -277,7 +277,7 @@ export function BuildGeomtryLUT(
         const inputs: VoxelModelInputs[] = [];
         for (const node of nodes) {
           const getLinkId = getGeometryLinkId(node);
-          const getLinkPaletteId = geomtryLinkPalette.getNumberId(getLinkId);
+          const getLinkPaletteId = geometryLinkPalette.getNumberId(getLinkId);
           inputs.push({
             geoNodeId: getLinkPaletteId,
             modelId: model.id,
@@ -300,16 +300,16 @@ export function BuildGeomtryLUT(
   const finalModelStateMap = new Map<string, Record<string, number>>();
   const finalModelConditionalMap = new Map<string, Record<string, number>>();
 
-  const geomtryIndex: number[][] = [];
-  const finalGeomtryPalette = new StringPalette();
+  const geometryIndex: number[][] = [];
+  const finalGeometryPalette = new StringPalette();
 
   for (const [model, values] of modelStateMap) {
     const finalStateMap: Record<string, number> = {};
     for (const state in values) {
       const geoIds = values[state];
       const geoIdsString = geoIds.toString();
-      const geoFinalId = finalGeomtryPalette.register(geoIdsString);
-      geomtryIndex[geoFinalId] = geoIds;
+      const geoFinalId = finalGeometryPalette.register(geoIdsString);
+      geometryIndex[geoFinalId] = geoIds;
       finalStateMap[state] = geoFinalId;
     }
     finalModelStateMap.set(model, finalStateMap);
@@ -320,8 +320,8 @@ export function BuildGeomtryLUT(
     for (const state in values) {
       const geoIds = values[state];
       const geoIdsString = geoIds.toString();
-      const geoFinalId = finalGeomtryPalette.register(geoIdsString);
-      geomtryIndex[geoFinalId] = geoIds;
+      const geoFinalId = finalGeometryPalette.register(geoIdsString);
+      geometryIndex[geoFinalId] = geoIds;
       finalStateMap[state] = geoFinalId;
     }
     finalModelConditionalMap.set(model, finalStateMap);
@@ -338,7 +338,7 @@ export function BuildGeomtryLUT(
   >();
 
   const inputRecord: VoxelModelInputs[] = [];
-  const finalGeomtryInputPalette = new StringPalette();
+  const finalGeometryInputPalette = new StringPalette();
 
   for (const [voxel, inputs] of inputMap) {
     const finalInputs: PreFinalMappedVoxelInputs = {};
@@ -350,7 +350,7 @@ export function BuildGeomtryLUT(
         const voxelInputs = states[state];
         for (const input of voxelInputs) {
           const inputId = getVoxelModelInputId(input);
-          const finalInputId = finalGeomtryInputPalette.register(inputId);
+          const finalInputId = finalGeometryInputPalette.register(inputId);
           inputs.push(finalInputId);
           inputRecord[finalInputId] = input;
         }
@@ -371,7 +371,7 @@ export function BuildGeomtryLUT(
         const voxelInputs = states[state];
         for (const input of voxelInputs) {
           const inputId = getVoxelModelInputId(input);
-          const finalInputId = finalGeomtryInputPalette.register(inputId);
+          const finalInputId = finalGeometryInputPalette.register(inputId);
           inputs.push(finalInputId);
           inputRecord[finalInputId] = input;
         }
@@ -424,35 +424,35 @@ export function BuildGeomtryLUT(
     finalVoxelConditionalInputMap.set(voxel, finalInputs);
   }
 
-  GeomtryLUT.geomtryIndex = geomtryIndex;
-  GeomtryLUT.geomtryInputsIndex = inputIndex;
+  GeometryLUT.geometryIndex = geometryIndex;
+  GeometryLUT.geometryInputsIndex = inputIndex;
 
-  //Build compiled geomtry
+  //Build compiled geometry
   const finalCompiledData: any[][] = [];
 
-  for (let i = 0; i < geomtryLinkRecord.length; i++) {
-    const geoLinkData = geomtryLinkRecord[i];
+  for (let i = 0; i < geometryLinkRecord.length; i++) {
+    const geoLinkData = geometryLinkRecord[i];
     finalCompiledData[i] = BuildCompiled(
       geoLinkData,
-      geomtryMap.get(geoLinkData.geometryId)!
+      geometryMap.get(geoLinkData.geometryId)!
     );
   }
-  GeomtryLUT.compiledGeomtry = finalCompiledData;
+  GeometryLUT.compiledGeometry = finalCompiledData;
 
-  //Build geomtry inputs
+  //Build geometry inputs
   const finalInputData: any[][] = [];
 
   for (let i = 0; i < inputRecord.length; i++) {
     const inputs = inputRecord[i];
-    const geoLinkData = geomtryLinkRecord[inputs.geoNodeId];
+    const geoLinkData = geometryLinkRecord[inputs.geoNodeId];
     finalInputData[i] = BuildInputs(
       geoLinkData,
       inputs,
       modelMap.get(inputs.modelId)!,
-      geomtryMap.get(inputs.geometryId)!
+      geometryMap.get(inputs.geometryId)!
     );
   }
-  GeomtryLUT.geomtryInputs = finalInputData;
+  GeometryLUT.geometryInputs = finalInputData;
 
   //Build Rules
   BuildRules();

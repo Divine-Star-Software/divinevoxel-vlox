@@ -1,9 +1,9 @@
 import { Vec3Array, Vec4Array } from "@amodx/math";
-import { Triangle } from "../../../../Mesher/Geomtry/Primitives/Triangle";
+import { Triangle } from "../../../../Mesher/Geometry/Primitives/Triangle";
 import { getVertexWeights } from "../CalcFunctions";
-import { TransformTriangle } from "../../../../Mesher/Geomtry/Transform/TransformTriangle";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
-import { CompiledTriangleVoxelGeomtryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
+import { TransformTriangle } from "../../../../Mesher/Geometry/Transform/TransformTriangle";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
+import { CompiledTriangleVoxelGeometryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
 import { OcclusionFaceRegister } from "../Rules/OcclusionFaceRegister";
 import { closestVoxelFace } from "../../../../Math/UtilFunctions";
 
@@ -11,7 +11,7 @@ export function BuildCompiledTri(
   buildRules: boolean,
   points: [Vec3Array, Vec3Array, Vec3Array],
   transform: VoxelGeometryTransform
-): CompiledTriangleVoxelGeomtryNode {
+): CompiledTriangleVoxelGeometryNode {
   const triangle = transform
     ? TransformTriangle(Triangle.Create(points), transform)
     : Triangle.Create(points);

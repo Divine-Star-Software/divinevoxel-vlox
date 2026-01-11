@@ -3,8 +3,8 @@ import { Vec2Array, Vec3Array } from "@amodx/math";
 import { VoxelFaceNames } from "../../Math";
 
 
-/**Define a custom geomtry node */
-export interface VoxelCustomGeomtryNode {
+/**Define a custom geometry node */
+export interface VoxelCustomGeometryNode {
   type: "custom";
   id: string;
   inputs: Record<string, any>;
@@ -94,7 +94,7 @@ export interface VoxelGeometryVector3Argument {
 }
 
 export type VoxelGeometryNodes =
-  | VoxelCustomGeomtryNode
+  | VoxelCustomGeometryNode
   | VoxelBoxGeometryNode
   | VoxelTriangleGeometryNode
   | VoxelQuadGeometryNode;
@@ -114,7 +114,7 @@ export type CullingProcedureData =
 export interface VoxelGeometryData {
   id: string;
   nodes: VoxelGeometryNodes[];
-  /* The divisor used for all the geomtry node values like positions and uvs.  */
+  /* The divisor used for all the geometry node values like positions and uvs.  */
   divisor?: Vec3Array;
   /**
    * If this is set the voxel geometry will not be included in the

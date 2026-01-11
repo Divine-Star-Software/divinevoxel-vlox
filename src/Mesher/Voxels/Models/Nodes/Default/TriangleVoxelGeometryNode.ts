@@ -1,14 +1,14 @@
 import { Vec4Array } from "@amodx/math";
 import { VoxelFaces } from "../../../../../Math";
-import { addVoxelTriangle } from "../../../Geomtry/VoxelGeometryBuilder";
+import { addVoxelTriangle } from "../../../Geometry/VoxelGeometryBuilder";
 import { GeoemtryNode } from "../GeometryNode";
 import { GetTexture } from "../../Common/GetTexture";
 import {
-  CompiledTriangleVoxelGeomtryNode,
+  CompiledTriangleVoxelGeometryNode,
   TriangleVoxelGometryArgs,
   TriangleVoxelGometryInputs,
 } from "../Types/TriangleVoxelGometryNodeTypes";
-import { Triangle } from "../../../../Geomtry/Primitives/Triangle";
+import { Triangle } from "../../../../Geometry/Primitives/Triangle";
 import { CullRulledFace } from "../../Common/Faces/CullRulledFace";
 import { ShadeRulledFace } from "../../Common/Faces/ShadeRulledFace";
 import { ShadeRulelessFace } from "../../Common/Faces/ShadeRulelessFace";
@@ -16,7 +16,7 @@ import { ShadeRulelessFace } from "../../Common/Faces/ShadeRulelessFace";
 const ArgIndexes = TriangleVoxelGometryInputs.ArgIndexes;
 
 export class TriangleVoxelGeometryNode extends GeoemtryNode<
-  CompiledTriangleVoxelGeomtryNode,
+  CompiledTriangleVoxelGeometryNode,
   TriangleVoxelGometryArgs
 > {
   triangle: Triangle;

@@ -6,7 +6,7 @@ import { EngineSettings } from "../../../Settings/EngineSettings";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
 import { VoxelLogicRegister } from "../../../Voxels/Logic/VoxelLogicRegister";
-import { GeomtryLUT } from "../../../Voxels/Data/GeomtryLUT";
+import { GeometryLUT } from "../../../Voxels/Data/GeometryLUT";
 import { VoxelSchemas } from "../../../Voxels/State/VoxelSchemas";
 
 export default function InitDataSync(props: {
@@ -16,7 +16,7 @@ export default function InitDataSync(props: {
     EngineSettings.syncSettings(data.settings);
     VoxelSchemas.import(data.schemas);
     VoxelLUT.import(data.luts.voxel);
-    GeomtryLUT.import(data.luts.geometry);
+    GeometryLUT.import(data.luts.geometry);
     VoxelTagsRegister.VoxelTags = data.tags.tags;
     VoxelTagsRegister.SubstanceTags = data.tags.substanceTags;
 

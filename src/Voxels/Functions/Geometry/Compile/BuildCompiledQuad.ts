@@ -1,9 +1,9 @@
 import { Vec3Array } from "@amodx/math";
-import { Quad } from "../../../../Mesher/Geomtry/Primitives/Quad";
+import { Quad } from "../../../../Mesher/Geometry/Primitives/Quad";
 import { getQuadWeights, mapQuadUvs } from "../CalcFunctions";
-import { TransformQuad } from "../../../../Mesher/Geomtry/Transform/TransformQuad";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
-import { CompiledQuadVoxelGeomtryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
+import { TransformQuad } from "../../../../Mesher/Geometry/Transform/TransformQuad";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
+import { CompiledQuadVoxelGeometryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
 import { OcclusionFaceRegister } from "../Rules/OcclusionFaceRegister";
 import { closestVoxelFace } from "../../../../Math/UtilFunctions";
 
@@ -11,7 +11,7 @@ export function BuildCompiledQuad(
   buildRules: boolean,
   points: [Vec3Array, Vec3Array, Vec3Array, Vec3Array],
   transform: VoxelGeometryTransform = {}
-): CompiledQuadVoxelGeomtryNode {
+): CompiledQuadVoxelGeometryNode {
   const quad = transform
     ? TransformQuad(Quad.Create(points), transform)
     : Quad.Create(points);

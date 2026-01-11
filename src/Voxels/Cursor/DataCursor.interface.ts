@@ -1,4 +1,4 @@
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import { VoxelPickResult } from "../Interaction/VoxelPickResult";
 import { VoxelCursorInterface } from "./VoxelCursor.interface";
 import { Vec3Array, Vector3Like } from "@amodx/math";

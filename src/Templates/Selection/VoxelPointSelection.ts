@@ -4,7 +4,7 @@ import { VoxelShapeTemplate } from "../Shapes/VoxelShapeTemplate";
 import { BoxVoxelShapeSelection } from "../Shapes/Selections/BoxVoxelShapeSelection";
 import { IVoxelshapeTemplateBaseData } from "../Shapes/VoxelShapeTemplate.types";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 export interface VoxelPointSelectionData extends IVoxelSelectionData<"point"> {}
 

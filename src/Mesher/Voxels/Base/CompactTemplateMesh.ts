@@ -1,6 +1,6 @@
 import { CompactMeshData, CompactSubMesh } from "../../Types/Mesher.types";
 import { VoxelModelBuilder } from "../Models/VoxelModelBuilder";
-import { VoxelMeshVertexStructCursor } from "../Geomtry/VoxelMeshVertexStructCursor";
+import { VoxelMeshVertexStructCursor } from "../Geometry/VoxelMeshVertexStructCursor";
 
 const structCursor = new VoxelMeshVertexStructCursor();
 /* 

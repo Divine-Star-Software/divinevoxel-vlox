@@ -1,9 +1,9 @@
 import { Vector4Like } from "@amodx/math";
-import { Quad, Triangle } from "../../../Geomtry";
+import { Quad, Triangle } from "../../../Geometry";
 import { VoxelModelBuilder } from "../VoxelModelBuilder";
 import { VoxelFaces } from "../../../../Math";
 import { TextureId } from "../../../../Textures";
-export interface BaseVoxelGeomtryTextureProcedureData {
+export interface BaseVoxelGeometryTextureProcedureData {
   type: string;
   texture?: TextureId | number;
   textureRecrod?: Record<string, TextureId | number>;

@@ -3,7 +3,7 @@ import { DataGeneratorData } from "./DataGenerator.types";
 import { EngineSettings } from "../../../Settings/EngineSettings";
 import { InitVoxelData } from "../../../Voxels/InitVoxelData";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
-import { GeomtryLUT } from "../../../Voxels/Data/GeomtryLUT";
+import { GeometryLUT } from "../../../Voxels/Data/GeometryLUT";
 import { VoxelSchemas } from "../../../Voxels/State/VoxelSchemas";
 
 export default function InitDataGenerator(
@@ -16,7 +16,7 @@ export default function InitDataGenerator(
     tags,
     luts: {
       voxel: VoxelLUT.export(),
-      geometry: GeomtryLUT.export(),
+      geometry: GeometryLUT.export(),
     },
     schemas: VoxelSchemas.export(),
   };

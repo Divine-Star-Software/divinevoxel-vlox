@@ -1,9 +1,9 @@
 import { Vector4Like } from "@amodx/math";
-import type { Quad } from "../../../../Geomtry";
+import type { Quad } from "../../../../Geometry";
 import { VoxelModelBuilder } from "../../../Models/VoxelModelBuilder";
 import {
   TextureProcedure,
-  BaseVoxelGeomtryTextureProcedureData,
+  BaseVoxelGeometryTextureProcedureData,
 } from "../TextureProcedure";
 
 import { TextureId } from "Textures";
@@ -11,7 +11,7 @@ import { TextureId } from "Textures";
 import { Vec3Array } from "@amodx/math";
 import { VoxelFaceDirections, VoxelFaces } from "../../../../../Math/index.js";
 export interface OutlinedTextureProcedureData
-  extends BaseVoxelGeomtryTextureProcedureData {
+  extends BaseVoxelGeometryTextureProcedureData {
   type: "outlined";
   texture: TextureId | number;
   textureRecrod: {

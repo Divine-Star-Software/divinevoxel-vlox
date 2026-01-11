@@ -1,9 +1,9 @@
 import { Vec3Array, Vector3Like, Vector4Like } from "@amodx/math";
-import type { Quad } from "../../../../Geomtry";
+import type { Quad } from "../../../../Geometry";
 import { VoxelModelBuilder } from "../../../Models/VoxelModelBuilder";
 import {
   TextureProcedure,
-  BaseVoxelGeomtryTextureProcedureData,
+  BaseVoxelGeometryTextureProcedureData,
 } from "../TextureProcedure";
 import { TextureId } from "Textures";
 import { WorldSpaces } from "../../../../../World/WorldSpaces";
@@ -15,7 +15,7 @@ import { VoxelFaces } from "Math";
  * the rotations we can choose from.
  */
 export interface ConsistentRotationTextureProcedureData
-  extends BaseVoxelGeomtryTextureProcedureData {
+  extends BaseVoxelGeometryTextureProcedureData {
   type: "consistent-rotation";
   texture: TextureId | number;
   /**

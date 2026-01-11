@@ -1,9 +1,9 @@
-import { QuadVerticies } from "../Geomtry/Geometry.types";
-import { Quad } from "../Geomtry/Primitives/Quad";
+import { QuadVerticies } from "../Geometry/Geometry.types";
+import { Quad } from "../Geometry/Primitives/Quad";
 import { ItemModelBuilder } from "./Models/ItemModelBuilder";
-import { addItemQuad } from "./Geomtry/ItemGeometryBuilder";
+import { addItemQuad } from "./Geometry/ItemGeometryBuilder";
 import { Flat2DIndex, Vec2Array, Vector3Like } from "@amodx/math";
-import { Box } from "../Geomtry/Shapes/Box";
+import { Box } from "../Geometry/Shapes/Box";
 import { VoxelFaces } from "../../Math";
 import { CompactItemMesh } from "./Base/CompactItemMesh";
 

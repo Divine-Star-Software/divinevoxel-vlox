@@ -2,10 +2,10 @@ import { Vector3Like, Vector2Like, Vector4Like } from "@amodx/math";
 import { VoxelShaderData } from "./VoxelShaderData";
 import { VoxelModelBuilder } from "../Models/VoxelModelBuilder";
 
-import { Quad } from "../../Geomtry/Primitives/Quad";
-import { QuadVerticies } from "../../Geomtry/Geometry.types";
+import { Quad } from "../../Geometry/Primitives/Quad";
+import { QuadVerticies } from "../../Geometry/Geometry.types";
 import { VoxelMeshVertexConstants } from "./VoxelMeshVertexStructCursor";
-import { Triangle } from "../../Geomtry/Primitives";
+import { Triangle } from "../../Geometry/Primitives";
 
 const vector1ShaderData = Vector4Like.Create();
 const vector2ShaderData = Vector4Like.Create();

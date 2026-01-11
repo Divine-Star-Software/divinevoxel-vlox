@@ -1,4 +1,4 @@
-import { BaseVoxelGeomtryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
+import { BaseVoxelGeometryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
 import { TextureManager } from "../../../../Textures/TextureManager";
 
 export function isArgString(data: any) {
@@ -10,7 +10,7 @@ export function cleanArgString(data: string) {
 }
 
 export function processTexture(
-  data: string | BaseVoxelGeomtryTextureProcedureData
+  data: string | BaseVoxelGeometryTextureProcedureData
 ) {
   if (typeof data == "string")
     return TextureManager.getTexture("dve_voxel")!.getTextureIndex(data);

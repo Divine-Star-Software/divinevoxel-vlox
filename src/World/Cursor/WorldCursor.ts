@@ -2,7 +2,7 @@ import { Vector3Like } from "@amodx/math";
 import { SectorCursor } from "./SectorCursor";
 import { WorldSpaces } from "../WorldSpaces";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 let cursorCache: SectorCursor[] = [];
 

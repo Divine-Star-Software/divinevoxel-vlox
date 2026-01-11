@@ -2,8 +2,8 @@ import {
   VoxelGeometryLinkData,
   VoxelModelData,
 } from "../../..//Models/VoxelModel.types";
-import { VoxelModelInputs } from "../GeomtryLUT.types";
-import { VoxelGeometryData } from "../../../Geomtry/VoxelGeomtry.types";
+import { VoxelModelInputs } from "../GeometryLUT.types";
+import { VoxelGeometryData } from "../../../Geometry/VoxelGeometry.types";
 
 import { BuildQuadInputs } from "./BuildQuadInputs";
 import { BuildBoxInputs } from "./BuildBoxInputs";
@@ -14,21 +14,21 @@ export function BuildInputs(
   link: VoxelGeometryLinkData,
   data: VoxelModelInputs,
   model: VoxelModelData,
-  geomtry: VoxelGeometryData
+  geometry: VoxelGeometryData
 ) {
   const args: any[] = [];
-  for (const node of geomtry.nodes) {
+  for (const node of geometry.nodes) {
     if (node.type == "box") {
-      BuildBoxInputs(args, link, data, node, model, geomtry);
+      BuildBoxInputs(args, link, data, node, model, geometry);
     }
     if (node.type == "quad") {
-      BuildQuadInputs(args, link, data, node, model, geomtry);
+      BuildQuadInputs(args, link, data, node, model, geometry);
     }
     if (node.type == "triangle") {
-      BuildTriangleInputs(args, link, data, node, model, geomtry);
+      BuildTriangleInputs(args, link, data, node, model, geometry);
     }
     if (node.type == "custom") {
-      BuildCustomInputs(args, link, data, node, model, geomtry);
+      BuildCustomInputs(args, link, data, node, model, geometry);
     }
   }
 

@@ -10,7 +10,7 @@ import {
   BinaryBufferFormat,
 } from "../../Util/BinaryBuffer/index";
 import { VoxelPaletteArchiveReader } from "../../Voxels/Archive/VoxelPaletteArchiveReader";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 type TemplateCursor = { position: Vec3Array; raw: RawVoxelData };
 const point = Vector3Like.Create();

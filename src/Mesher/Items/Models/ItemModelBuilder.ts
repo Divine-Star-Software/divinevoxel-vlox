@@ -1,6 +1,6 @@
-import { ProtoMesh } from "../../Geomtry/Proto/ProtoMesh";
+import { ProtoMesh } from "../../Geometry/Proto/ProtoMesh";
 import { Vec3Array, Vector3Like, Vector4Like } from "@amodx/math";
-import { ItemMeshVertexStructCursor } from "../Geomtry/ItemMeshVertexStructCursor";
+import { ItemMeshVertexStructCursor } from "../Geometry/ItemMeshVertexStructCursor";
 
 class ItemVars {
   textureIndex = 0;

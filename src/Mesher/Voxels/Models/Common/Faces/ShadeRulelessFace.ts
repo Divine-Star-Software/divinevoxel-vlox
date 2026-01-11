@@ -1,4 +1,4 @@
-import { QuadVerticies } from "../../../../Geomtry/Geometry.types";
+import { QuadVerticies } from "../../../../Geometry/Geometry.types";
 import { VoxelModelBuilder } from "../../../Models/VoxelModelBuilder";
 import { getInterpolationValue } from "../Calc/CalcConstants";
 import { Vec4Array } from "@amodx/math";

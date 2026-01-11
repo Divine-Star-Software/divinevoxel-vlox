@@ -1,23 +1,25 @@
 import { Vec3Array, Vector3Like, Vec3ArrayLike } from "@amodx/math";
-import { Triangle } from "../../../../Mesher/Geomtry/Primitives/Triangle";
+import { Quad } from "../../../../Mesher/Geometry/Primitives/Quad";
 import { IOcclusionFace } from "./OcclusionFace";
 
-export class OcclusionTriangleFace extends IOcclusionFace {
+export class OcclusionQuadFace extends IOcclusionFace {
   normals: Vec3Array[];
 
-  public points: [Vec3Array, Vec3Array, Vec3Array] = [
+  public points: [Vec3Array, Vec3Array, Vec3Array, Vec3Array] = [
+    [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
   ];
-  private _points: [Vec3Array, Vec3Array, Vec3Array];
+  private _points: [Vec3Array, Vec3Array, Vec3Array, Vec3Array];
 
-  setPoints(points: [Vec3Array, Vec3Array, Vec3Array]) {
+  setPoints(points: [Vec3Array, Vec3Array, Vec3Array, Vec3Array]) {
     this._points = points;
-    this.normals = Triangle.GetNormalLeftHanded(
+    this.normals = Quad.GetNormalLeftHanded(
       points[0],
       points[1],
-      points[2]
+      points[2],
+      points[3]
     );
 
     const averageNormal: Vec3Array = [0, 0, 0];
@@ -93,11 +95,19 @@ export class OcclusionTriangleFace extends IOcclusionFace {
   }
 
   isPointInBounds(point: Vec3Array): boolean {
-    return this.isPointInTriangle(
-      point,
-      this.points[0],
-      this.points[1],
-      this.points[2]
+    return (
+      this.isPointInTriangle(
+        point,
+        this.points[0],
+        this.points[1],
+        this.points[2]
+      ) ||
+      this.isPointInTriangle(
+        point,
+        this.points[0],
+        this.points[2],
+        this.points[3]
+      )
     );
   }
 
@@ -116,9 +126,11 @@ export class OcclusionTriangleFace extends IOcclusionFace {
   }
 
   doesCoverFace(face: IOcclusionFace): boolean {
+    // Normalize normals
     const n1Norm = this.normal;
     const n2Norm = face.normal;
 
+    // Compute dot product of normals
     const dotNormals = Vec3ArrayLike.Dot(n1Norm, n2Norm);
     if (Math.abs(Math.abs(dotNormals) - 1) > Number.EPSILON) {
       // Normals are not parallel

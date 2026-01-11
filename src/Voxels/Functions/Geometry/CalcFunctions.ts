@@ -1,10 +1,10 @@
 import { VoxelFaces } from "../../../Math";
-import { Quad } from "../../../Mesher/Geomtry";
+import { Quad } from "../../../Mesher/Geometry";
 import {
   QuadUVData,
   QuadVerticiesArray,
   VoxelGeometryTransform,
-} from "../../../Mesher/Geomtry/Geometry.types";
+} from "../../../Mesher/Geometry/Geometry.types";
 import {
   Matrix2x2Like,
   Vec2ArrayLike,

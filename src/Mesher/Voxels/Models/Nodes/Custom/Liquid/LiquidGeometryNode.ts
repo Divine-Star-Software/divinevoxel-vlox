@@ -1,19 +1,19 @@
 import { GeoemtryNode } from "../../GeometryNode";
-import { VoxelCustomGeomtryNode } from "../../../../../../Voxels/Geomtry/VoxelGeomtry.types";
+import { VoxelCustomGeometryNode } from "../../../../../../Voxels/Geometry/VoxelGeometry.types";
 import { CompassAngles } from "@amodx/math";
-import { Quad } from "../../../../../Geomtry/Primitives/Quad";
+import { Quad } from "../../../../../Geometry/Primitives/Quad";
 import {
   QuadUVData,
   QuadVerticies,
-} from "../../../../../Geomtry/Geometry.types";
-import { QuadScalarVertexData } from "../../../../../Geomtry/Primitives/QuadVertexData";
+} from "../../../../../Geometry/Geometry.types";
+import { QuadScalarVertexData } from "../../../../../Geometry/Primitives/QuadVertexData";
 import { VoxelFaceDirections, VoxelFaces } from "../../../../../../Math";
 import type { LiquidVoxelModelArgs } from "../../../../../../Voxels/Models/Defaults/LiquidVoxelModel";
 import { getFlowAngle, getFlowGradient, FlowVerticies } from "./FlowGradient";
 import { VoxelLightData } from "../../../../../../Voxels/Cursor/VoxelLightData";
-import { addVoxelQuad } from "../../../../Geomtry/VoxelGeometryBuilder";
+import { addVoxelQuad } from "../../../../Geometry/VoxelGeometryBuilder";
 import { GetTexture } from "../../../Common/GetTexture";
-import { Box } from "../../../../../Geomtry/Shapes/Box";
+import { Box } from "../../../../../Geometry/Shapes/Box";
 const vertexValue = new QuadScalarVertexData();
 const vertexLevel = new QuadScalarVertexData();
 
@@ -60,7 +60,7 @@ Quads[VoxelFaces.Up].setUVs(uvs);
 Quads[VoxelFaces.Down].setUVs(uvs);
 
 export class LiquidGeometryNode extends GeoemtryNode<
-  VoxelCustomGeomtryNode,
+  VoxelCustomGeometryNode,
   LiquidVoxelModelArgs
 > {
   init(): void {}

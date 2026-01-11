@@ -1,5 +1,5 @@
 import { Flat3DIndex, Vector3Like } from "@amodx/math";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import { RawVoxelData } from "../Voxels/Types/Voxel.types";
 
 export interface IVoxelTemplate<

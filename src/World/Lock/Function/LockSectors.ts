@@ -1,5 +1,5 @@
 import { Vector3Like } from "@amodx/math";
-import { BoundsInterface } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
+import { BoundsInterface } from "@amodx/math/Geometry/Bounds/BoundsInterface";
 import { WorldSpaces } from "../../WorldSpaces";
 import { Sector } from "../../Sector";
 import { WorldRegister } from "../../WorldRegister";

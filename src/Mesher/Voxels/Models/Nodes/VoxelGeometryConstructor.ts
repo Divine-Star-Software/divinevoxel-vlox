@@ -2,19 +2,19 @@ import { QuadVoxelGometryNode } from "./Default/QuadVoxelGeometryNode";
 import { TriangleVoxelGeometryNode } from "./Default/TriangleVoxelGeometryNode";
 import { GeoemtryNode } from "./GeometryNode";
 import { VoxelModelConstructorRegister } from "../VoxelModelConstructorRegister";
-import { CullingProcedureData } from "../../../../Voxels/Geomtry/VoxelGeomtry.types";
-import { GeomtryLUT } from "../../../../Voxels/Data/GeomtryLUT";
+import { CullingProcedureData } from "../../../../Voxels/Geometry/VoxelGeometry.types";
+import { GeometryLUT } from "../../../../Voxels/Data/GeometryLUT";
 
 export class VoxelGeometryConstructor {
   nodes: GeoemtryNode<any, any>[] = [];
   cullingProcedure: CullingProcedureData;
   constructor(public geometryPaletteId: number) {
     this.cullingProcedure =
-      GeomtryLUT.geomtryCullingProcedures[
-        GeomtryLUT.geomtryCullingProceduresIndex[geometryPaletteId]
+      GeometryLUT.geometryCullingProcedures[
+        GeometryLUT.geometryCullingProceduresIndex[geometryPaletteId]
       ];
 
-    const nodes = GeomtryLUT.compiledGeomtry[geometryPaletteId];
+    const nodes = GeometryLUT.compiledGeometry[geometryPaletteId];
 
     for (const node of nodes) {
       if (node.type == "custom") {

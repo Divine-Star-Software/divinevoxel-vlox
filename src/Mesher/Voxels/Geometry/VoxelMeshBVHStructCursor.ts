@@ -44,7 +44,7 @@ export class VoxelMeshBVHStructCursor {
   setInnerNode() {
     this.data[this.trueIndex + 7] = 1;
   }
-  setGeomtryNode() {
+  setGeometryNode() {
     this.data[this.trueIndex + 7] = 2;
   }
   updateMin(x: number, y: number, z: number) {

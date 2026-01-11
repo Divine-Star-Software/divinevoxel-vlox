@@ -8,7 +8,7 @@ import { SectionCursor } from "../../../World/Cursor/SectionCursor.js";
 import { VoxelModelBuilder } from "../Models/VoxelModelBuilder.js";
 import { VoxelModelConstructorRegister } from "../Models/VoxelModelConstructorRegister.js";
 import { WorldVoxelCursor } from "../../../World/Cursor/WorldVoxelCursor";
-import { VoxelMeshBVHBuilder } from "../Geomtry/VoxelMeshBVHBuilder";
+import { VoxelMeshBVHBuilder } from "../Geometry/VoxelMeshBVHBuilder";
 import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "../Models/RenderedMaterials";
 import { CompactVoxelSectionMesh } from "./CompactVoxelSectionMesh";

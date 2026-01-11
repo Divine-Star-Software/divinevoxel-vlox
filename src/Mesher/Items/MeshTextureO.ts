@@ -1,4 +1,4 @@
-import { Quad } from "../Geomtry/Primitives/Quad"
+import { Quad } from "../Geometry/Primitives/Quad"
 
 const Quads = {
   north: Quad.Create(

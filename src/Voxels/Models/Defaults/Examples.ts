@@ -1,5 +1,5 @@
 import { VoxelModelData } from "../VoxelModel.types";
-import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
+import { VoxelGeometryData } from "../../Geometry/VoxelGeometry.types";
 export const chainGeometry: VoxelGeometryData = {
   id: "dve_chain",
   divisor: [16, 16, 16],

@@ -1,20 +1,20 @@
 import { VoxelFaces } from "../../../../Math";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
-import { TransformBox } from "../../../../Mesher/Geomtry/Transform/TransformBox";
-import { CompiledQuadVoxelGeomtryNode } from "Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
+import { TransformBox } from "../../../../Mesher/Geometry/Transform/TransformBox";
+import { CompiledQuadVoxelGeometryNode } from "Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
 import { BuildCompiledQuad } from "./BuildCompiledQuad";
-import { VoxelBoxGeometryNode } from "../../../Geomtry/VoxelGeomtry.types";
-import { Box } from "../../../../Mesher/Geomtry/Shapes/Box";
+import { VoxelBoxGeometryNode } from "../../../Geometry/VoxelGeometry.types";
+import { Box } from "../../../../Mesher/Geometry/Shapes/Box";
 
 export function BuildCompiledBox(
   buildRules: boolean,
   data: VoxelBoxGeometryNode,
   transform: VoxelGeometryTransform
-): CompiledQuadVoxelGeomtryNode[] {
+): CompiledQuadVoxelGeometryNode[] {
   const box = Box.Create(data.points);
   TransformBox(box, transform);
   const blankTransform: VoxelGeometryTransform ={};
-  const compiled: CompiledQuadVoxelGeomtryNode[] = [];
+  const compiled: CompiledQuadVoxelGeometryNode[] = [];
   for (let i = 0 as VoxelFaces; i < 6; i++) {
     compiled.push(
       BuildCompiledQuad(

@@ -1,4 +1,4 @@
-import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
+import { BoundsMinMaxData } from "@amodx/math/Geometry/Bounds/BoundsInterface";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
 import { FullVoxelTemplate } from "../FullVoxelTemplate";
 import { Flat3DIndex } from "@amodx/math";

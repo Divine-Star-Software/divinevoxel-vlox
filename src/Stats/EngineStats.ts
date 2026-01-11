@@ -1,5 +1,5 @@
-class GeomtryStats {
-  /**The total geomtry faces */
+class GeometryStats {
+  /**The total geometry faces */
   faces = 0;
 }
 
@@ -15,16 +15,16 @@ class PaletteStats {
  */
 export class EngineStats {
   /** Stats to do with the vlox model system. */
-  static geomtry = new GeomtryStats();
+  static geometry = new GeometryStats();
   /** Stats to do with the vloxel palette system. */
   static palette = new PaletteStats();
 
   static log() {
     let output = "DVE Stats\n";
 
-    //geomtry
-    output += "Geomtry\n";
-    output += `Faces: ${this.geomtry.faces}\n`;
+    //geometry
+    output += "Geometry\n";
+    output += `Faces: ${this.geometry.faces}\n`;
 
     //palettes
     output += "Palette\n";

@@ -16,7 +16,7 @@ enum ArgIndexes {
   DoubleSided,
   UVs,
 }
-export type CompiledTriangleVoxelGeomtryNode = {
+export type CompiledTriangleVoxelGeometryNode = {
   type: "triangle";
   positions: [Vec3Array, Vec3Array, Vec3Array];
   weights: [Vec4Array, Vec4Array, Vec4Array];

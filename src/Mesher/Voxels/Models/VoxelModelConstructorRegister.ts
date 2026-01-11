@@ -2,7 +2,7 @@ import { GeoemtryNodeConstructor } from "./Nodes/GeometryNode";
 import { VoxelConstructor } from "./VoxelConstructor";
 import { VoxelGeometryConstructor } from "./Nodes/VoxelGeometryConstructor";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
-import { GeomtryLUT } from "../../../Voxels/Data/GeomtryLUT";
+import { GeometryLUT } from "../../../Voxels/Data/GeometryLUT";
 
 export class VoxelModelConstructorRegister {
   static geometry: VoxelGeometryConstructor[] = [];
@@ -41,7 +41,7 @@ export class VoxelModelConstructorRegister {
   }
 
   static init() {
-    for (let i = 0; i < GeomtryLUT.compiledGeomtry.length; i++) {
+    for (let i = 0; i < GeometryLUT.compiledGeometry.length; i++) {
       this.geometry[i] = new VoxelGeometryConstructor(i);
     }
   }

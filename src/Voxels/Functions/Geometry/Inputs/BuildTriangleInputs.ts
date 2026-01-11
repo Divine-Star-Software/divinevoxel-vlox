@@ -1,14 +1,14 @@
 import { VoxelModelData } from "../../..//Models/VoxelModel.types";
-import { VoxelModelInputs } from "../GeomtryLUT.types";
+import { VoxelModelInputs } from "../GeometryLUT.types";
 import {
   BaseVoxelTriangleData,
   VoxelGeometryData,
-} from "../../../Geomtry/VoxelGeomtry.types";
+} from "../../../Geometry/VoxelGeometry.types";
 
 import { TriangleVoxelGometryInputs } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
 import { cleanArgString, isArgString, processTexture } from "./BaseFunctions";
-import { BaseVoxelGeomtryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
+import { BaseVoxelGeometryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
 
 export function BuildTriangleInputs(
   args: any[],
@@ -16,29 +16,29 @@ export function BuildTriangleInputs(
   data: VoxelModelInputs,
   tri: BaseVoxelTriangleData,
   model: VoxelModelData,
-  geomtry: VoxelGeometryData
+  geometry: VoxelGeometryData
 ) {
   const ArgIndexes = TriangleVoxelGometryInputs.ArgIndexes;
   const inputs = TriangleVoxelGometryInputs.CreateArgs();
 
   inputs[ArgIndexes.Enabled] = true;
 
-  let texture: number | BaseVoxelGeomtryTextureProcedureData = 0;
+  let texture: number | BaseVoxelGeometryTextureProcedureData = 0;
   if (isArgString(tri.texture)) {
-    const geomtryInputId = cleanArgString(tri.texture);
-    let modelInput = data.modelInputs[geomtryInputId];
+    const geometryInputId = cleanArgString(tri.texture);
+    let modelInput = data.modelInputs[geometryInputId];
     if (!modelInput) {
       for (const argKey in data.modelInputs) {
-        const arg = geomtry.arguments[argKey];
+        const arg = geometry.arguments[argKey];
         if (!arg) continue;
-        if (arg.type == "arg-list" && arg.arguments.includes(geomtryInputId)) {
+        if (arg.type == "arg-list" && arg.arguments.includes(geometryInputId)) {
           modelInput = data.modelInputs[argKey];
         }
       }
     }
     if (!modelInput)
       throw new Error(
-        `Could not find input for ${tri.texture} on geomtry ${geomtry.id} model ${model.id}`
+        `Could not find input for ${tri.texture} on geometry ${geometry.id} model ${model.id}`
       );
 
     if (typeof modelInput == "string") {
@@ -46,7 +46,7 @@ export function BuildTriangleInputs(
       texture = processTexture(data.voxelInputs[modelInputId]);
     }
     if (typeof modelInput == "object") {
-      const procedureData: BaseVoxelGeomtryTextureProcedureData = modelInput;
+      const procedureData: BaseVoxelGeometryTextureProcedureData = modelInput;
       if (
         typeof procedureData.texture == "string" &&
         isArgString(procedureData.texture)
@@ -104,7 +104,7 @@ export function BuildTriangleInputs(
       uvs = data.voxelInputs[cleanArgString(modelInput)];
     } else {
       if (!modelInput) {
-        const input = geomtry.arguments[geoInput];
+        const input = geometry.arguments[geoInput];
         if (input.type == "uv") {
           uvs = input.default as any;
         }

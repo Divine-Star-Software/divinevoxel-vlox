@@ -1,5 +1,5 @@
 import { Vector3Like } from "@amodx/math";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 export interface IVoxelSelection<
   Type extends string = "",

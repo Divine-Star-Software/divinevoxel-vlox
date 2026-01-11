@@ -14,14 +14,14 @@ export type VoxelLUTExport = {
   totalMods: number[];
   totalReltionalStates: number[];
   totalReltionalMods: number[];
-  geomtryIndex: number[][];
-  geomtryInputsIndex: number[][];
-  conditionalGeomtryIndex: [
+  geometryIndex: number[][];
+  geometryInputsIndex: number[][];
+  conditionalGeometryIndex: [
     geometryId: number,
     modelState: number,
     modelReltionalState: boolean[]
   ][][];
-  conditionalGeomtryInputIndex: number[][][];
+  conditionalGeometryInputIndex: number[][][];
   voxels: [voxelId: number, state: number, mod: number][];
   voxelRecord: number[][][];
   voxelIdToModelState: number[];
@@ -61,18 +61,18 @@ export class VoxelLUT {
   //maps true voxel ids to the total number of reltional mod states
   static totalReltionalMods: number[] = [];
 
-  //maps [voxel id x reltional voxel id] to the geomtry index
-  static geomtryIndex: number[][] = [];
-  //maps [voxel id x reltional voxel id] to the geomtry inputs index
-  static geomtryInputsIndex: number[][] = [];
+  //maps [voxel id x reltional voxel id] to the geometry index
+  static geometryIndex: number[][] = [];
+  //maps [voxel id x reltional voxel id] to the geometry inputs index
+  static geometryInputsIndex: number[][] = [];
   //maps voxel id to its conditional nodes and the needed voxel id and reltional voxel id
-  static conditionalGeomtryIndex: [
+  static conditionalGeometryIndex: [
     geometryId: number,
     modelState: number,
     modelReltionalState: boolean[]
   ][][] = [];
-  //maps [geomtry id x voxel id x reltional voxel id] to the geomtry index
-  static conditionalGeomtryInputIndex: number[][][] = [];
+  //maps [geometry id x voxel id x reltional voxel id] to the geometry index
+  static conditionalGeometryInputIndex: number[][][] = [];
 
   /**Palette of voxel ids to their tree id, state, and mod value */
   static voxels: [voxelId: number, state: number, mod: number][] = [];
@@ -112,33 +112,33 @@ export class VoxelLUT {
     return this.reltionalVoxelRecord[id][reltioanlMod][reltioanlState];
   }
 
-  static getGeomtryIndex(voxelId: number = 0, reltioanlId: number = 0): number {
-    return this.geomtryIndex[voxelId][reltioanlId];
+  static getGeometryIndex(voxelId: number = 0, reltioanlId: number = 0): number {
+    return this.geometryIndex[voxelId][reltioanlId];
   }
 
-  static getGeomtryInputIndex(
+  static getGeometryInputIndex(
     voxelId: number = 0,
     reltioanlId: number = 0
   ): number {
-    return this.geomtryInputsIndex[voxelId][reltioanlId];
+    return this.geometryInputsIndex[voxelId][reltioanlId];
   }
 
-  static getConditionalGeomtryNodes(
+  static getConditionalGeometryNodes(
     trueVoxelId: number
   ): [
     geometryId: number,
     modelState: number,
     modelReltionalState: boolean[]
   ][] {
-    return this.conditionalGeomtryIndex[trueVoxelId];
+    return this.conditionalGeometryIndex[trueVoxelId];
   }
 
-  static getConditionalGeomtryInputIndex(
+  static getConditionalGeometryInputIndex(
     getIndex: number,
     voxelId: number = 0,
     reltioanlId: number = 0
   ): number {
-    return this.conditionalGeomtryInputIndex[getIndex][voxelId][reltioanlId];
+    return this.conditionalGeometryInputIndex[getIndex][voxelId][reltioanlId];
   }
 
   static export(): VoxelLUTExport {
@@ -156,10 +156,10 @@ export class VoxelLUT {
       totalMods: this.totalMods,
       totalReltionalStates: this.totalReltionalStates,
       totalReltionalMods: this.totalReltionalMods,
-      geomtryIndex: this.geomtryIndex,
-      geomtryInputsIndex: this.geomtryInputsIndex,
-      conditionalGeomtryIndex: this.conditionalGeomtryIndex,
-      conditionalGeomtryInputIndex: this.conditionalGeomtryInputIndex,
+      geometryIndex: this.geometryIndex,
+      geometryInputsIndex: this.geometryInputsIndex,
+      conditionalGeometryIndex: this.conditionalGeometryIndex,
+      conditionalGeometryInputIndex: this.conditionalGeometryInputIndex,
       voxels: this.voxels,
       voxelRecord: this.voxelRecord,
       voxelIdToModelState: this.voxelIdToModelState,
@@ -182,10 +182,10 @@ export class VoxelLUT {
     this.totalMods = exported.totalMods;
     this.totalReltionalStates = exported.totalReltionalStates;
     this.totalReltionalMods = exported.totalReltionalMods;
-    this.geomtryIndex = exported.geomtryIndex;
-    this.geomtryInputsIndex = exported.geomtryInputsIndex;
-    this.conditionalGeomtryIndex = exported.conditionalGeomtryIndex;
-    this.conditionalGeomtryInputIndex = exported.conditionalGeomtryInputIndex;
+    this.geometryIndex = exported.geometryIndex;
+    this.geometryInputsIndex = exported.geometryInputsIndex;
+    this.conditionalGeometryIndex = exported.conditionalGeometryIndex;
+    this.conditionalGeometryInputIndex = exported.conditionalGeometryInputIndex;
     this.voxels = exported.voxels;
     this.voxelRecord = exported.voxelRecord;
     this.voxelIdToModelState = exported.voxelIdToModelState;

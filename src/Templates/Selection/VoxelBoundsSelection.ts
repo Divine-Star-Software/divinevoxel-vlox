@@ -4,7 +4,7 @@ import { VoxelShapeTemplate } from "../Shapes/VoxelShapeTemplate";
 import { BoxVoxelShapeSelection } from "../Shapes/Selections/BoxVoxelShapeSelection";
 import { IVoxelshapeTemplateBaseData } from "../Shapes/VoxelShapeTemplate.types";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 const getMinMax = (...points: Vec3Array[]): [Vec3Array, Vec3Array] => {
   if (points.length === 0) {
     throw new Error("At least one point is required to calculate min/max.");

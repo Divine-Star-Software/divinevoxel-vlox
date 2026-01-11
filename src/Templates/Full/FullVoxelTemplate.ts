@@ -5,7 +5,7 @@ import { RawVoxelData } from "../../Voxels/Types/Voxel.types";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import { getBitArrayIndex } from "../../Util/Binary/BinaryArrays";
 import { EngineSettings } from "../../Settings/EngineSettings";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 const point = Vector3Like.Create();
 export class FullVoxelTemplate implements IVoxelTemplate<"full"> {

@@ -5,7 +5,7 @@ import { SectionSnapShot } from "./SectionSnapShot";
 import { Sector } from "../Sector";
 import { SectorCursor } from "../Cursor/SectorCursor";
 import { SectionCursor } from "../Cursor/SectionCursor";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 const tempPosition = Vector3Like.Create();
 export class SectionSnapshotCursor implements DataCursorInterface {

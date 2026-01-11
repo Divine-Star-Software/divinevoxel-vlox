@@ -8,7 +8,7 @@ import { WorldSpaces } from "../WorldSpaces";
 import { Vector3Like } from "@amodx/math";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import { WorldSectionCursorInterface } from "./WorldSectionCursor.interface";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 const point = Vector3Like.Create();
 export class SectorCursor

@@ -44,7 +44,7 @@ import {
   liquidModel,
 } from "./Models/Defaults/LiquidVoxelModel";
 import { VoxelModelData } from "./Models/VoxelModel.types";
-import { VoxelGeometryData } from "./Geomtry/VoxelGeomtry.types";
+import { VoxelGeometryData } from "./Geometry/VoxelGeometry.types";
 import { VoxelData } from "./Types/Voxel.types";
 import {
   simpleCrossedPannel,
@@ -59,7 +59,7 @@ import { VoxelSubstanceData } from "./Types/VoxelSubstances.types";
 import { VoxelTagIds } from "./Data/VoxelTag.types";
 import { BuildTagAndPaletteData as BuildTagData } from "./Functions/BuildTagData";
 import { VoxelLogicRegister } from "./Logic/VoxelLogicRegister";
-import { farmGeomtry, farmModels } from "./Models/Defaults/FarmVoxelModels";
+import { farmGeometry, farmModels } from "./Models/Defaults/FarmVoxelModels";
 
 import { BuildLUTs } from "./Functions/BuildLUTs";
 import { CompiledvVxelTags } from "./Types/VoxelModelCompiledData.types";
@@ -72,7 +72,7 @@ export type InitVoxelDataProps = {
   substances?: VoxelSubstanceData[];
 };
 
-const geomtry = [
+const geometry = [
   cube,
   halfDownCube,
   halfSouthCube,
@@ -103,7 +103,7 @@ const geomtry = [
 
   ...leverGeometry,
 
-  ...farmGeomtry,
+  ...farmGeometry,
 ];
 
 const models = [
@@ -239,7 +239,7 @@ export function InitVoxelData(data: InitVoxelDataProps): CompiledvVxelTags {
     ...data.voxels,
   ];
 
-  BuildLUTs(materials, substances, voxels, geomtry, models);
+  BuildLUTs(materials, substances, voxels, geometry, models);
 
   const voxelData = BuildTagData({
     voxels,

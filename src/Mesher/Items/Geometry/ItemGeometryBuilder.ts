@@ -1,10 +1,10 @@
 import { Vector3Like, Vector2Like } from "@amodx/math";
 import { ItemModelBuilder } from "../Models/ItemModelBuilder";
 
-import { Quad } from "../../Geomtry/Primitives/Quad";
-import { QuadVerticies } from "../../Geomtry/Geometry.types";
+import { Quad } from "../../Geometry/Primitives/Quad";
+import { QuadVerticies } from "../../Geometry/Geometry.types";
 import { ItemMeshVertexConstants } from "./ItemMeshVertexStructCursor";
-import { Triangle } from "../../Geomtry/Primitives";
+import { Triangle } from "../../Geometry/Primitives";
 
 export function addItemTriangle(builder: ItemModelBuilder, tri: Triangle) {
   if (!builder.mesh) return;

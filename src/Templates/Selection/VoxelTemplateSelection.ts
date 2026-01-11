@@ -1,7 +1,7 @@
 import { Vector3Like } from "@amodx/math";
 import { IVoxelSelection, IVoxelSelectionData } from "./VoxelSelection";
 import { IVoxelTemplate, IVoxelTemplateData } from "../VoxelTemplates.types";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import type { VoxelTemplateRegister } from "../VoxelTemplateRegister";
 
 export interface VoxelTemplateSelectionData

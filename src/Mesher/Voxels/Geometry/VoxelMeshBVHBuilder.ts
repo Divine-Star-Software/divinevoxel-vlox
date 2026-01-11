@@ -57,7 +57,7 @@ export class VoxelMeshBVHBuilder {
     this.structCursor.updateMin(minX, minY, minZ);
     this.structCursor.updateMax(maxX, maxY, maxZ);
     this.structCursor.setVoxelIndex(voxelIndex);
-    this.structCursor.setGeomtryNode();
+    this.structCursor.setGeometryNode();
     let current = leafIndex;
     for (let level = 1; level < 13; level++) {
       let parentNode = this.treeIndex.getParent(current);

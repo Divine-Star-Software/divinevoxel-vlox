@@ -1,19 +1,19 @@
 import { VoxelGeometryLinkData } from "../../..//Models/VoxelModel.types";
-import { VoxelGeometryTransform } from "../../../../Mesher/Geomtry/Geometry.types";
-import { VoxelGeometryData } from "../../../Geomtry/VoxelGeomtry.types";
-import { CompiledGeomtryNodes } from "../../../../Mesher/Voxels/Models/Nodes/Types/GeomtryNode.types";
+import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
+import { VoxelGeometryData } from "../../../Geometry/VoxelGeometry.types";
+import { CompiledGeometryNodes } from "../../../../Mesher/Voxels/Models/Nodes/Types/GeometryNode.types";
 import { BuildCompiledBox } from "./BuildCompiledBox";
 import { BuildCompiledQuad } from "./BuildCompiledQuad";
 import { BuildCompiledTri } from "./BuildCompiledTri";
 
 export function BuildCompiled(
   geoLink: VoxelGeometryLinkData,
-  geomtry: VoxelGeometryData
+  geometry: VoxelGeometryData
 ) {
-  const buildRules = geomtry.doNotBuildRules !== true;
+  const buildRules = geometry.doNotBuildRules !== true;
 
-  const compiled: CompiledGeomtryNodes[] = [];
-  for (const node of geomtry.nodes) {
+  const compiled: CompiledGeometryNodes[] = [];
+  for (const node of geometry.nodes) {
     if (node.type == "box") {
       compiled.push(...BuildCompiledBox(buildRules, node, geoLink));
     }

@@ -11,7 +11,7 @@ import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArechiv
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
-import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
+import { BoundsMinMaxData } from "@amodx/math/Geometry/Bounds/BoundsInterface";
 import { EngineSettings } from "../../../Settings/EngineSettings";
 import { VoxelPaletteArchiveReader } from "../../../Voxels/Archive/VoxelPaletteArchiveReader";
 

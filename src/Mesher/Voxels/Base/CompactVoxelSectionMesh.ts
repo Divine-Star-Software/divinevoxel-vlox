@@ -1,11 +1,11 @@
 import { SetSectionMeshTask } from "../../Types/Mesher.types";
 import { VoxelModelBuilder } from "../Models/VoxelModelBuilder";
-import { VoxelMeshVertexStructCursor } from "../Geomtry/VoxelMeshVertexStructCursor";
+import { VoxelMeshVertexStructCursor } from "../Geometry/VoxelMeshVertexStructCursor";
 import { LocationData } from "../../../Math";
 import {
   CompactedSectionVoxelMesh,
   CompactedMeshData,
-} from "../Geomtry/CompactedSectionVoxelMesh";
+} from "../Geometry/CompactedSectionVoxelMesh";
 
 const meshData = new CompactedMeshData();
 const compactedMesh = new CompactedSectionVoxelMesh();

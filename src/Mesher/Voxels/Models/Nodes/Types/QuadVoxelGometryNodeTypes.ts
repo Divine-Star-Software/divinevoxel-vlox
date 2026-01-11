@@ -1,5 +1,5 @@
 import { Vec2Array, Vec3Array, Vec4Array } from "@amodx/math";
-import { QuadUVData } from "../../../../Geomtry/Geometry.types";
+import { QuadUVData } from "../../../../Geometry/Geometry.types";
 import { VoxelFaces } from "../../../../../Math";
 export type QuadVoxelGometryArgs = [
   //upp
@@ -18,7 +18,7 @@ enum ArgIndexes {
   UVs,
 }
 
-export type CompiledQuadVoxelGeomtryNode = {
+export type CompiledQuadVoxelGeometryNode = {
   type: "quad";
   positions: [Vec3Array, Vec3Array, Vec3Array, Vec3Array];
   weights: [Vec4Array, Vec4Array, Vec4Array, Vec4Array];

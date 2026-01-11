@@ -1,9 +1,9 @@
 import { Vector4Like } from "@amodx/math";
-import type { Quad } from "../../../../Geomtry";
+import type { Quad } from "../../../../Geometry";
 import { VoxelModelBuilder } from "../../../Models/VoxelModelBuilder";
 import {
   TextureProcedure,
-  BaseVoxelGeomtryTextureProcedureData,
+  BaseVoxelGeometryTextureProcedureData,
 } from "../TextureProcedure";
 import { TextureId } from "../../../../../Textures";
 import { VoxelFaces } from "../../../../../Math";
@@ -14,7 +14,7 @@ import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
  * the rotations we can choose from.
  */
 export interface PillarTextureProcedureData
-  extends BaseVoxelGeomtryTextureProcedureData {
+  extends BaseVoxelGeometryTextureProcedureData {
   type: "pillar";
   texture: TextureId | number;
   textureRecrod: {

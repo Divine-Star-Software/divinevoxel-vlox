@@ -2,7 +2,7 @@ import type { SetSectionMeshTask } from "../Mesher/Types/Mesher.types";
 import { MeshRegister } from "./MeshRegister.js";
 import { LocationData } from "../Math/index.js";
 import { DVESectionMeshes } from "./Classes/DVESectionMeshes";
-import { CompactedSectionVoxelMesh } from "../Mesher/Voxels/Geomtry/CompactedSectionVoxelMesh";
+import { CompactedSectionVoxelMesh } from "../Mesher/Voxels/Geometry/CompactedSectionVoxelMesh";
 import { SectorMesh } from "./Classes/SectorMesh";
 import { SectionMesh } from "./Classes/SectionMesh";
 const added = new Set<string>();

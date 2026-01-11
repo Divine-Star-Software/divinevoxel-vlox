@@ -4,7 +4,7 @@ import {
   VoxelShapeTemplateData,
   VoxelShapeTemplateFillModes,
 } from "./VoxelShapeTemplate.types";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import { IVoxelTemplate, IVoxelTemplateData } from "../VoxelTemplates.types";
 import {
   IVoxelShapeSelection,

@@ -1,4 +1,4 @@
-import { VoxelGeometryData } from "../../Geomtry/VoxelGeomtry.types";
+import { VoxelGeometryData } from "../../Geometry/VoxelGeometry.types";
 export const diagonalFlatPanelWestEast: VoxelGeometryData = {
   id: "dve_diagonal_flat_panel_west_east",
   arguments: {

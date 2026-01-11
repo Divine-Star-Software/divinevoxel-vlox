@@ -1,5 +1,5 @@
 import type { VoxelModelBuilder } from "../../VoxelModelBuilder.js";
-import { QuadVerticies } from "../../../../Geomtry/Geometry.types.js";
+import { QuadVerticies } from "../../../../Geometry/Geometry.types.js";
 import { VoxelFaces, VoxelFaceDirections } from "../../../../../Math/index.js";
 import { GradientCheckSets } from "./CalcConstants.js";
 import { VoxelLightData } from "../../../../../Voxels/Cursor/VoxelLightData.js";

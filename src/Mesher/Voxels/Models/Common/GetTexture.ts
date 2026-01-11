@@ -1,13 +1,13 @@
-import { BaseVoxelGeomtryTextureProcedureData } from "../Procedures/TextureProcedure"
+import { BaseVoxelGeometryTextureProcedureData } from "../Procedures/TextureProcedure"
 import { VoxelModelBuilder } from "../VoxelModelBuilder";
 import { TextureProcedureRegister } from "../Procedures/TextureProcedureRegister";
-import { Quad } from "../../../Geomtry";
+import { Quad } from "../../../Geometry";
 import { VoxelFaces } from "../../../../Math";
-import { Triangle } from "../../../Geomtry";
+import { Triangle } from "../../../Geometry";
 
 export function GetTexture(
   builder: VoxelModelBuilder,
-  data: number | BaseVoxelGeomtryTextureProcedureData,
+  data: number | BaseVoxelGeometryTextureProcedureData,
   closestFace: VoxelFaces,
   primitive: Quad|Triangle
 ) {

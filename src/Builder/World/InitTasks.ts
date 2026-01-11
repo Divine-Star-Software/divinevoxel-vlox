@@ -13,11 +13,11 @@ import { WorldCursor } from "../../World";
 
 import LockSectors from "../../World/Lock/Function/LockSectors";
 import UnLockSectors from "../../World/Lock/Function/UnLockSectors";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 import { VoxelSurfaceSelection } from "../../Templates/Selection/VoxelSurfaceSelection";
 import { VoxelBFSSelection } from "../../Templates/Selection/VoxelBFSSelection";
 import CreateFullTemplate from "../../Templates/Full/Functions/CreateFullTemplate";
-import { BoundsMinMaxData } from "@amodx/math/Geomtry/Bounds/BoundsInterface";
+import { BoundsMinMaxData } from "@amodx/math/Geometry/Bounds/BoundsInterface";
 import { FullVoxelTemplateData } from "../../Templates/Full/FullVoxelTemplate.types";
 import { IVoxelSelectionData } from "../../Templates/Selection/VoxelSelection";
 import { ExtrudeSelection } from "../../Templates/Functions/ExtrudeSelection";

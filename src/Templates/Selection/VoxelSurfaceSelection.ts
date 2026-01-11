@@ -9,7 +9,7 @@ import {
 } from "../../Util/Binary/BinaryArrays";
 import { PaintVoxelData } from "../../Voxels/Types/PaintVoxelData";
 import { FullVoxelTemplate } from "../Full/FullVoxelTemplate";
-import { BoundingBox } from "@amodx/math/Geomtry/Bounds/BoundingBox";
+import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
 export interface VoxelSurfaceSelectionData
   extends IVoxelSelectionData<"surface"> {
