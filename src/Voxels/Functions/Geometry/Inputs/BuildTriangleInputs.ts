@@ -46,7 +46,7 @@ export function BuildTriangleInputs(
       texture = processTexture(data.voxelInputs[modelInputId]);
     }
     if (typeof modelInput == "object") {
-      const procedureData: BaseVoxelGeometryTextureProcedureData = modelInput;
+      const procedureData: BaseVoxelGeometryTextureProcedureData = structuredClone(modelInput);
       if (
         typeof procedureData.texture == "string" &&
         isArgString(procedureData.texture)

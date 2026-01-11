@@ -111,6 +111,8 @@ export class WorldSimulation {
     return false;
   }
 
+  static doTickUpdates = true;
+
   static tick(generationOnly = false) {
     let total = 0;
     for (const [, dimension] of WorldSimulationDimensions._dimensions) {
@@ -118,7 +120,7 @@ export class WorldSimulation {
 
       for (let i = 0; i < dimension.activeSectors._sectors.length; i++) {
         total += dimension.activeSectors._sectors[i].tickQueue.getTotalTicks();
-        dimension.activeSectors._sectors[i].tickUpdate();
+        dimension.activeSectors._sectors[i].tickUpdate(this.doTickUpdates);
         dimension.activeSectors._sectors[i].generateUpdate();
       }
     }

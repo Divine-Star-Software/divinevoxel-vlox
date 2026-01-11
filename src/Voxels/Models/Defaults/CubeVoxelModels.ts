@@ -32,6 +32,53 @@ export const simpleCube: VoxelModelData = {
   },
 };
 
+export const fullTextureCube: VoxelModelData = {
+  id: "dve_full_texture_cube",
+  relationsSchema: [],
+  stateSchema: [],
+  arguments: {
+    upTex: {
+      type: "texture",
+    },
+    downTex: {
+      type: "texture",
+    },
+    northTex: {
+      type: "texture",
+    },
+    southTex: {
+      type: "texture",
+    },
+    eastTex: {
+      type: "texture",
+    },
+    westTex: {
+      type: "texture",
+    },
+  },
+
+  conditonalNodes: {},
+  properties: {
+    dve_placing_strategy: "*",
+    dve_full_block: true,
+  },
+  stateNodes: {
+    "*": [
+      {
+        geometryId: "dve_cube",
+        inputs: {
+          upTex: "@upTex",
+          downTex: "@downTex",
+          northTex: "@northTex",
+          southTex: "@southTex",
+          eastTex: "@eastTex",
+          westTex: "@westTex",
+        },
+      },
+    ],
+  },
+};
+
 export const simpleTransparentCube: VoxelModelData = {
   id: "dve_transparent_simple_cube",
   relationsSchema: [],

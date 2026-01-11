@@ -117,7 +117,7 @@ export class SimulationSector {
     ]);
   }
 
-  tickUpdate() {
+  tickUpdate(doTickUpdate= true) {
     if (!this.fullNeighbors) return false;
     if (this.sector?.isCheckedOut()) {
       return false;
@@ -147,7 +147,7 @@ export class SimulationSector {
       this._rendered = true;
     }
 
-    if (this.ticking) {
+    if (this.ticking && doTickUpdate) {
       this.dimension.simulation.setOrigin(...this.position);
       this.dimension.simulation.bounds.start(this.dimension.id);
 

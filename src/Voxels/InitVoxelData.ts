@@ -32,6 +32,7 @@ import {
   simpleNoCulledCube,
   simpleHalfCube,
   simpleTransparentCube,
+  fullTextureCube,
 } from "./Models/Defaults/CubeVoxelModels";
 import {
   diagonalFlatPanelEastWest,
@@ -108,6 +109,7 @@ const geometry = [
 
 const models = [
   simpleCube,
+  fullTextureCube,
   simpleTransparentCube,
   simpleNoCulledCube,
   orientedCube,
