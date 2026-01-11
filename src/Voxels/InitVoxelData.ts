@@ -61,7 +61,7 @@ import { BuildTagAndPaletteData as BuildTagData } from "./Functions/BuildTagData
 import { VoxelLogicRegister } from "./Logic/VoxelLogicRegister";
 import { farmGeomtry, farmModels } from "./Models/Defaults/FarmVoxelModels";
 
-import { BuildLUT } from "./Functions/BuildLIT";
+import { BuildLUTs } from "./Functions/BuildLUTs";
 import { CompiledvVxelTags } from "./Types/VoxelModelCompiledData.types";
 
 export type InitVoxelDataProps = {
@@ -239,7 +239,7 @@ export function InitVoxelData(data: InitVoxelDataProps): CompiledvVxelTags {
     ...data.voxels,
   ];
 
-  BuildLUT(materials, substances, voxels, geomtry, models);
+  BuildLUTs(materials, substances, voxels, geomtry, models);
 
   const voxelData = BuildTagData({
     voxels,

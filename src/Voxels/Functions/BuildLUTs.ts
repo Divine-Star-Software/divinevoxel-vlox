@@ -318,7 +318,7 @@ function buildReltionalStatePalette(
   VoxelLUT.reltionalVoxelRecord = finalPaletteRecord;
 }
 
-export function BuildLUT(
+export function BuildLUTs(
   materials: VoxelMaterialData[],
   substances: VoxelSubstanceData[],
   voxels: VoxelData[],
