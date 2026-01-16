@@ -1,4 +1,4 @@
-import { VoxelGeometryLinkData } from "../../..//Models/VoxelModel.types";
+import { VoxelGeometryLinkData } from "../../../Models/VoxelModel.types";
 import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
 import { VoxelGeometryData } from "../../../Geometry/VoxelGeometry.types";
 import { CompiledGeometryNodes } from "../../../../Mesher/Voxels/Models/Nodes/Types/GeometryNode.types";

@@ -1,4 +1,4 @@
-import { VoxelModelData } from "../../..//Models/VoxelModel.types";
+import { VoxelModelData } from "../../../Models/VoxelModel.types";
 import { VoxelModelInputs } from "../GeometryLUT.types";
 import {
   VoxelCustomGeometryNode,
