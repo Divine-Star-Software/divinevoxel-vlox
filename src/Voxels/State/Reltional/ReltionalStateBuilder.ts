@@ -29,6 +29,7 @@ export class ReltionalStateBuilder {
   }
 
   buildState() {
+    if(!this.nodes.size) return 0;
     this.binarySchema.startEncoding(0);
     for (const [nodeId, conditions] of this.nodes) {
       let value = 1;

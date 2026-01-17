@@ -2,10 +2,11 @@ import { VoxelGeometryBuilderCacheSpace } from "./Models/VoxelGeometryBuilderCac
 import { TemplateCursor } from "../../Templates/Cursor/TemplateCursor.js";
 import { FullVoxelTemplate } from "../../Templates/Full/FullVoxelTemplate.js";
 import { CompactTemplateMesh } from "./Base/CompactTemplateMesh.js";
-import { VoxelModelConstructorRegister } from "./Models/VoxelModelConstructorRegister.js";
 import { RawVoxelData } from "../../Voxels/Types/Voxel.types.js";
 import { CompactMeshData } from "../Types/index.js";
-import { VoxelTagsRegister } from "../../Voxels/Data/VoxelTagsRegister.js";
+import { RenderedMaterials } from "./Models/RenderedMaterials.js";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT.js";
+import { BuildVoxel } from "./Base/BuildVoxel.js";
 const template = new FullVoxelTemplate(
   FullVoxelTemplate.CreateNew([3, 3, 3], 0xf)
 );
@@ -24,20 +25,9 @@ export function MeshVoxel(
   const voxel = templateCursor.getVoxel(1, 1, 1)!;
   if (!voxel.isRenderable()) return false;
 
-  const constructor = VoxelModelConstructorRegister.getConstructor(
-    voxel.getStringId()
-  );
+  const builder =
+    RenderedMaterials.meshers[VoxelLUT.materialMap[voxel.getVoxelId()]];
 
-  if (!constructor) {
-    throw new Error(
-      `Could not find constructor for voxel [id:${voxel.getStringId()} name:${voxel.getName()}] `
-    );
-  }
-
-  const builder = constructor.builder;
-  if (!builder) {
-    console.error(builder, constructor.id, constructor);
-  }
 
   builder.space = space;
   builder.bvhTool = null;
@@ -54,7 +44,8 @@ export function MeshVoxel(
 
   builder.voxel = voxel;
   builder.nVoxel = templateCursor;
-  constructor.process();
+
+  BuildVoxel(builder);
 
   const transfers: any[] = [];
   const compacted = CompactTemplateMesh([builder], transfers);

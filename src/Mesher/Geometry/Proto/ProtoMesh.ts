@@ -14,47 +14,47 @@ export class ProtoMesh {
   }
 
   create() {
-    const totalVerticies = this.vertexCount * this.vertexFloatSize;
-    const vertexArray = new Float32Array(totalVerticies);
+    const totalVertices = this.vertexCount * this.vertexFloatSize;
+    const vertexArray = new Float32Array(totalVertices);
     const vertexBuffers = this.buffer._buffers;
-    let start = 0;
-    let done = false;
-    for (let i = 0; i < vertexBuffers.length; i++) {
+
+    let offset = 0;
+    for (let i = 0; i < vertexBuffers.length && offset < totalVertices; i++) {
       const buffer = vertexBuffers[i];
-      for (let j = 0; j < buffer.length; j++) {
-        vertexArray[start] = buffer[j];
-        start++;
-        if (start > totalVerticies) {
-          done = true;
-          break;
-        }
+      const remaining = totalVertices - offset;
+      if (buffer.length <= remaining) {
+        vertexArray.set(buffer, offset);
+        offset += buffer.length;
+      } else {
+        vertexArray.set(buffer.subarray(0, remaining), offset);
+        break;
       }
-      if (done) break;
     }
+
     const indiciesArray =
       this.indicieCount > 65535
         ? new Uint32Array(this.indicieCount)
         : new Uint16Array(this.indicieCount);
 
     const indiceBuffers = this.indices._buffers;
-    start = 0;
-    done = false;
-    for (let i = 0; i < indiceBuffers.length; i++) {
+    offset = 0;
+    for (
+      let i = 0;
+      i < indiceBuffers.length && offset < this.indicieCount;
+      i++
+    ) {
       const buffer = indiceBuffers[i];
-      for (let j = 0; j < buffer.length; j++) {
-        indiciesArray[start] = buffer[j];
-        start++;
-        if (start > this.indicieCount) {
-          done = true;
-          break;
-        }
+      const remaining = this.indicieCount - offset;
+      if (buffer.length <= remaining) {
+        indiciesArray.set(buffer, offset);
+        offset += buffer.length;
+      } else {
+        indiciesArray.set(buffer.subarray(0, remaining), offset);
+        break;
       }
-      if (done) break;
     }
-    return {
-      vertexArray,
-      indiciesArray,
-    };
+
+    return { vertexArray, indiciesArray };
   }
 
   addVerticies(vertexCount: number, indicesCount: number) {

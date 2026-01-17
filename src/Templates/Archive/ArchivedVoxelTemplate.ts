@@ -65,7 +65,7 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
 
   getSecondary(index: number) {
     const id = this.getId(index);
-    const trueId = VoxelLUT.voxels[id][0];
+    const trueId = VoxelLUT.voxelIdToTrueId[id];
     if (VoxelTagsRegister.VoxelTags[trueId]["dve_can_have_secondary"]) {
       return VoxelLUT.getVoxelIdFromString(
         ...this.voxelPalette.getVoxelData(

@@ -1,5 +1,4 @@
 import { VoxelUpdateTask } from "../../VoxelUpdateTask";
-import { CardinalNeighbors3D } from "../../../Math/CardinalNeighbors";
 import {
   getMinusOneForRGB,
   isGreaterOrEqualThanForRGBRemove,
@@ -7,35 +6,103 @@ import {
   isLessThanForRGBRemove,
   removeRGBLight,
 } from "./CommonFunctions";
-//@todo change array to not use push and shift
+
 export function RGBUpdate(tasks: VoxelUpdateTask) {
   const queue = tasks.rgb.update;
-  while (queue.length) {
-    const x = queue.shift()!;
-    const y = queue.shift()!;
-    const z = queue.shift()!;
-    const voxel = tasks.sDataCursor.getVoxel(x, y, z);
+  const sDataCursor = tasks.sDataCursor;
+  const nDataCursor = tasks.nDataCursor;
+  const bounds = tasks.bounds;
+
+  let queueIndex = 0;
+
+  while (queueIndex < queue.length) {
+    const x = queue[queueIndex++];
+    const y = queue[queueIndex++];
+    const z = queue[queueIndex++];
+
+    const voxel = sDataCursor.getVoxel(x, y, z);
     if (!voxel) continue;
     const sl = voxel.getLight();
     if (sl <= 0) continue;
 
-    for (let i = 0; i < 6; i++) {
-      const nx = CardinalNeighbors3D[i][0] + x;
-      const ny = CardinalNeighbors3D[i][1] + y;
-      const nz = CardinalNeighbors3D[i][2] + z;
-      if (!tasks.nDataCursor.inBounds(nx, ny, nz)) continue;
-      const voxel = tasks.nDataCursor.getVoxel(nx, ny, nz);
+    let nx: number, ny: number, nz: number, nVoxel, nl: number;
 
-      if (!voxel) continue;
-      const nl = voxel.getLight();
-
-      if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
-        queue.push(nx, ny, nz);
-        voxel.setLight(getMinusOneForRGB(sl, nl));
+    nx = x + 1;
+    if (nDataCursor.inBounds(nx, y, z)) {
+      nVoxel = nDataCursor.getVoxel(nx, y, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
+          queue.push(nx, y, z);
+          nVoxel.setLight(getMinusOneForRGB(sl, nl));
+        }
       }
     }
-    tasks.bounds.updateDisplay(x, y, z);
+
+    nx = x - 1;
+    if (nDataCursor.inBounds(nx, y, z)) {
+      nVoxel = nDataCursor.getVoxel(nx, y, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
+          queue.push(nx, y, z);
+          nVoxel.setLight(getMinusOneForRGB(sl, nl));
+        }
+      }
+    }
+
+    ny = y + 1;
+    if (nDataCursor.inBounds(x, ny, z)) {
+      nVoxel = nDataCursor.getVoxel(x, ny, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
+          queue.push(x, ny, z);
+          nVoxel.setLight(getMinusOneForRGB(sl, nl));
+        }
+      }
+    }
+
+    ny = y - 1;
+    if (nDataCursor.inBounds(x, ny, z)) {
+      nVoxel = nDataCursor.getVoxel(x, ny, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
+          queue.push(x, ny, z);
+          nVoxel.setLight(getMinusOneForRGB(sl, nl));
+        }
+      }
+    }
+
+    nz = z + 1;
+    if (nDataCursor.inBounds(x, y, nz)) {
+      nVoxel = nDataCursor.getVoxel(x, y, nz);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
+          queue.push(x, y, nz);
+          nVoxel.setLight(getMinusOneForRGB(sl, nl));
+        }
+      }
+    }
+
+    nz = z - 1;
+    if (nDataCursor.inBounds(x, y, nz)) {
+      nVoxel = nDataCursor.getVoxel(x, y, nz);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        if (nl > -1 && isLessThanForRGBAdd(nl, sl)) {
+          queue.push(x, y, nz);
+          nVoxel.setLight(getMinusOneForRGB(sl, nl));
+        }
+      }
+    }
+
+    bounds.updateDisplay(x, y, z);
   }
+
+  queue.length = 0;
 }
 
 export function RGBRemove(tasks: VoxelUpdateTask) {
@@ -43,45 +110,139 @@ export function RGBRemove(tasks: VoxelUpdateTask) {
   const update = tasks.rgb.update;
   const removeMap = tasks.rgb.removeMap;
   const updateMap = tasks.rgb.updateMap;
-  while (remove.length) {
-    const x = remove.shift()!;
-    const y = remove.shift()!;
-    const z = remove.shift()!;
+  const sDataCursor = tasks.sDataCursor;
+  const nDataCursor = tasks.nDataCursor;
+  const bounds = tasks.bounds;
+
+  let removeIndex = 0;
+
+  while (removeIndex < remove.length) {
+    const x = remove[removeIndex++];
+    const y = remove[removeIndex++];
+    const z = remove[removeIndex++];
+
     if (removeMap.has(x, y, z)) continue;
     removeMap.add(x, y, z);
-    const voxel = tasks.sDataCursor.getVoxel(x, y, z);
+
+    const voxel = sDataCursor.getVoxel(x, y, z);
     if (!voxel) continue;
     const sl = voxel.getLight();
     if (sl <= 0) continue;
 
-    for (let i = 0; i < 6; i++) {
-      const nx = CardinalNeighbors3D[i][0] + x;
-      const ny = CardinalNeighbors3D[i][1] + y;
-      const nz = CardinalNeighbors3D[i][2] + z;
-      if (!tasks.nDataCursor.inBounds(nx, ny, nz)) continue;
-      const voxel = tasks.nDataCursor.getVoxel(nx, ny, nz);
-      if (!voxel) continue;
-      const nl = voxel.getLight();
-      const n1HasRGB = voxel.hasRGBLight();
-      if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
-        remove.push(nx, ny, nz);
-        if (voxel.isLightSource()) {
-          update.push(nx, ny, nz);
-        }
-      } else {
-        if (
-          n1HasRGB &&
-          isGreaterOrEqualThanForRGBRemove(nl, sl) &&
-          !updateMap.has(nx, ny, nz)
-        ) {
-          updateMap.add(nx, ny, nz);
-          update.push(nx, ny, nz);
+    let nx: number, ny: number, nz: number, nVoxel, nl: number, n1HasRGB: boolean;
+
+    nx = x + 1;
+    if (nDataCursor.inBounds(nx, y, z)) {
+      nVoxel = nDataCursor.getVoxel(nx, y, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        n1HasRGB = nVoxel.hasRGBLight();
+        if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
+          remove.push(nx, y, z);
+          if (nVoxel.isLightSource()) {
+            update.push(nx, y, z);
+          }
+        } else if (n1HasRGB && isGreaterOrEqualThanForRGBRemove(nl, sl) && !updateMap.has(nx, y, z)) {
+          updateMap.add(nx, y, z);
+          update.push(nx, y, z);
         }
       }
     }
 
-    tasks.bounds.updateDisplay(x, y, z);
+    nx = x - 1;
+    if (nDataCursor.inBounds(nx, y, z)) {
+      nVoxel = nDataCursor.getVoxel(nx, y, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        n1HasRGB = nVoxel.hasRGBLight();
+        if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
+          remove.push(nx, y, z);
+          if (nVoxel.isLightSource()) {
+            update.push(nx, y, z);
+          }
+        } else if (n1HasRGB && isGreaterOrEqualThanForRGBRemove(nl, sl) && !updateMap.has(nx, y, z)) {
+          updateMap.add(nx, y, z);
+          update.push(nx, y, z);
+        }
+      }
+    }
+
+    ny = y + 1;
+    if (nDataCursor.inBounds(x, ny, z)) {
+      nVoxel = nDataCursor.getVoxel(x, ny, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        n1HasRGB = nVoxel.hasRGBLight();
+        if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
+          remove.push(x, ny, z);
+          if (nVoxel.isLightSource()) {
+            update.push(x, ny, z);
+          }
+        } else if (n1HasRGB && isGreaterOrEqualThanForRGBRemove(nl, sl) && !updateMap.has(x, ny, z)) {
+          updateMap.add(x, ny, z);
+          update.push(x, ny, z);
+        }
+      }
+    }
+
+    ny = y - 1;
+    if (nDataCursor.inBounds(x, ny, z)) {
+      nVoxel = nDataCursor.getVoxel(x, ny, z);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        n1HasRGB = nVoxel.hasRGBLight();
+        if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
+          remove.push(x, ny, z);
+          if (nVoxel.isLightSource()) {
+            update.push(x, ny, z);
+          }
+        } else if (n1HasRGB && isGreaterOrEqualThanForRGBRemove(nl, sl) && !updateMap.has(x, ny, z)) {
+          updateMap.add(x, ny, z);
+          update.push(x, ny, z);
+        }
+      }
+    }
+
+    nz = z + 1;
+    if (nDataCursor.inBounds(x, y, nz)) {
+      nVoxel = nDataCursor.getVoxel(x, y, nz);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        n1HasRGB = nVoxel.hasRGBLight();
+        if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
+          remove.push(x, y, nz);
+          if (nVoxel.isLightSource()) {
+            update.push(x, y, nz);
+          }
+        } else if (n1HasRGB && isGreaterOrEqualThanForRGBRemove(nl, sl) && !updateMap.has(x, y, nz)) {
+          updateMap.add(x, y, nz);
+          update.push(x, y, nz);
+        }
+      }
+    }
+
+    nz = z - 1;
+    if (nDataCursor.inBounds(x, y, nz)) {
+      nVoxel = nDataCursor.getVoxel(x, y, nz);
+      if (nVoxel) {
+        nl = nVoxel.getLight();
+        n1HasRGB = nVoxel.hasRGBLight();
+        if (n1HasRGB && isLessThanForRGBRemove(nl, sl)) {
+          remove.push(x, y, nz);
+          if (nVoxel.isLightSource()) {
+            update.push(x, y, nz);
+          }
+        } else if (n1HasRGB && isGreaterOrEqualThanForRGBRemove(nl, sl) && !updateMap.has(x, y, nz)) {
+          updateMap.add(x, y, nz);
+          update.push(x, y, nz);
+        }
+      }
+    }
+
+    bounds.updateDisplay(x, y, z);
     voxel.setLight(removeRGBLight(sl));
   }
+
+  remove.length = 0;
   removeMap.clear();
 }

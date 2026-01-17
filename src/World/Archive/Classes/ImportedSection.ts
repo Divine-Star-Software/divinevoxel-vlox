@@ -202,7 +202,7 @@ export class ImportedSection {
   }
 
   getSecondary(index: number) {
-    const trueVoxelId = VoxelLUT.voxels[this.getId(index)][0];
+    const trueVoxelId = VoxelLUT.voxelIdToTrueId[this.getId(index)];
     const value = this.buffers.secondary.getValue(index);
     if (VoxelTagsRegister.VoxelTags[trueVoxelId]["dve_can_have_secondary"]) {
       if (this.buffers.ids.isValue) {

@@ -18,7 +18,6 @@ export abstract class VoxelCursorInterface {
 
   secondaryId = 0;
 
-
   tags: VoxelTags = {} as any;
   substanceTags: VoxelSubstanceTags = {} as any;
   __readingSecondaryVoxel = false;
@@ -49,8 +48,6 @@ export abstract class VoxelCursorInterface {
       VoxelTagsRegister.SubstanceTags[
         VoxelLUT.substance.getNumberId(this.tags["dve_substance"]!)
       ];
-
-
   }
 
   abstract loadIn(): void;
@@ -259,28 +256,25 @@ export abstract class VoxelCursorInterface {
   }
   /**Get the true voxel id. Meaning the numeric id for the string id of the voxel */
   getVoxelId() {
-    return this.getIndexData()[0];
+    if (this.__readingSecondaryVoxel) {
+      return VoxelLUT.voxelIdToTrueId[this.secondary[this._index]];
+    }
+    return VoxelLUT.voxelIdToTrueId[this.ids[this._index]];
   }
   setVoxelId(id: number, state = 0, mod = 0) {
     return this.setId(VoxelLUT.getVoxelId(id, state, mod));
   }
 
   setStringId(id: string, state = 0, mod = 0) {
-    return this.setVoxelId(
-      VoxelLUT.voxelIds.getNumberId(id),
-      state,
-      mod
-    );
+    return this.setVoxelId(VoxelLUT.voxelIds.getNumberId(id), state, mod);
   }
   getStringId() {
-    return VoxelLUT.voxelIds.getStringId(this.getIndexData()[0]);
+    return VoxelLUT.voxelIds.getStringId(this.getVoxelId());
   }
 
   setName(name: string, state = 0, mod = 0) {
     return this.setVoxelId(
-      VoxelLUT.voxelIds.getNumberId(
-        VoxelLUT.voxelNametoIdMap.get(name)!
-      ),
+      VoxelLUT.voxelIds.getNumberId(VoxelLUT.voxelNametoIdMap.get(name)!),
       state,
       mod
     );
@@ -289,32 +283,33 @@ export abstract class VoxelCursorInterface {
   getName() {
     return VoxelLUT.voxelIdToNameMap.get(this.getStringId())!;
   }
-  getIndexData() {
-    if (this.__readingSecondaryVoxel) {
-      return VoxelLUT.voxels[this.secondary[this._index]];
-    }
-    return VoxelLUT.voxels[this.ids[this._index]];
-  }
 
   getMod() {
-    return VoxelLUT.voxels[this.ids[this._index]][2];
+    if (this.__readingSecondaryVoxel) {
+      return VoxelLUT.voxelIdToMod[this.secondary[this._index]];
+    }
+    return VoxelLUT.voxelIdToMod[this.ids[this._index]];
   }
+
   setMod(mod: number) {
-    const index = VoxelLUT.voxels[this.ids[this._index]];
-    this.setId(VoxelLUT.getVoxelId(index[0], index[1], mod));
+    this.setId(VoxelLUT.getVoxelId(this.getVoxelId(), this.getState(), mod));
     return this;
   }
+
   getState() {
-    return this.getIndexData()[1];
+    if (this.__readingSecondaryVoxel) {
+      return VoxelLUT.voxelIdToState[this.secondary[this._index]];
+    }
+    return VoxelLUT.voxelIdToState[this.ids[this._index]];
   }
+
   setState(state: number) {
-    const index = this.getIndexData();
-    this.setId(VoxelLUT.getVoxelId(index[0], state, index[2]));
+    this.setId(VoxelLUT.getVoxelId(this.getVoxelId(), state, this.getMod()));
     return this;
   }
 
   isSameVoxel(voxel: VoxelCursorInterface) {
-    return this.getIndexData()[0] == voxel.getIndexData()[0];
+    return this.getVoxelId() == voxel.getVoxelId();
   }
   copy(cursor: VoxelCursorInterface) {
     this.ids[this._index] = cursor.ids[cursor._index];

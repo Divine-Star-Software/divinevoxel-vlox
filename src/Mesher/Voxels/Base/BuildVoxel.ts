@@ -1,20 +1,10 @@
-import { VoxelModelBuilder } from "./VoxelModelBuilder";
-import { VoxelModelConstructorRegister } from "./VoxelModelConstructorRegister";
+import { VoxelModelBuilder } from "../Models/VoxelModelBuilder";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { GeometryLUT } from "../../../Voxels/Data/GeometryLUT";
+import { VoxelGeometryConstructorRegister } from "../Models/VoxelGeometryConstructorRegister";
 
-export class VoxelConstructor {
-  isModel: true = true;
-
-  // effects: VoxelModelEffect;
-
-  constructor(public id: string, public builder: VoxelModelBuilder) {
-    //  this.effects = new VoxelModelEffect(this);
-  }
-
-  process(): boolean {
+  export function BuildVoxel(builder: VoxelModelBuilder): boolean {
     let added = false;
-    const builder = this.builder;
     const hashed = builder.space.getHash(
       builder.nVoxel,
       builder.position.x,
@@ -41,19 +31,19 @@ export class VoxelConstructor {
       const nodeId = geomtries[i];
       const inputsIndex = inputs[i];
       const geoInputs = GeometryLUT.geometryInputs[inputsIndex];
-      const geometry = VoxelModelConstructorRegister.geometry[nodeId];
+      const geometry = VoxelGeometryConstructorRegister.geometry[nodeId];
       const nodesLength = geometry.nodes.length;
       for (let k = 0; k < nodesLength; k++) {
         const geo = geometry.nodes[k];
-        geo.builder = this.builder;
+        geo.builder = builder;
         const addedGeo = geo.add(geoInputs[k]);
         if (addedGeo) added = true;
       }
     }
 
-    const conditioanlNodes = VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
+    const conditioanlNodes = VoxelLUT.getConditionalGeometryNodes(VoxelLUT.modelsIndex[trueVoxelId]);
     if (conditioanlNodes) {
-      const modelState = VoxelLUT.voxelIdToModelState[voxelId];
+      const modelState = VoxelLUT.voxelIdToState[voxelId];
       const reltionalState = builder.space!.reltionalStateCache[hashed];
       const nodesLength = conditioanlNodes.length;
 
@@ -81,11 +71,11 @@ export class VoxelConstructor {
           const nodeId = geomtries[i];
           const inputsIndex = inputs[i];
           const geoInputs = GeometryLUT.geometryInputs[inputsIndex];
-          const geometry = VoxelModelConstructorRegister.geometry[nodeId];
+          const geometry = VoxelGeometryConstructorRegister.geometry[nodeId];
           const nodesLength = geometry.nodes.length;
           for (let k = 0; k < nodesLength; k++) {
             const geo = geometry.nodes[k];
-            geo.builder = this.builder;
+            geo.builder = builder;
             const addedGeo = geo.add(geoInputs[k]);
             if (addedGeo) added = true;
           }
@@ -103,4 +93,3 @@ export class VoxelConstructor {
 
     return added;
   }
-}

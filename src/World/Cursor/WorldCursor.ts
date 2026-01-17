@@ -7,20 +7,41 @@ import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 let cursorCache: SectorCursor[] = [];
 
 const tempPosition = Vector3Like.Create();
+
 export class WorldCursor implements DataCursorInterface {
-  volumeBounds = new BoundingBox();
-  sectorCursors: Record<number, Record<number, SectorCursor | null>> = {};
+  sectorCursors: Map<number, Map<number, SectorCursor>> = new Map();
+  activeCursors: SectorCursor[] = [];
 
   origin = Vector3Like.Create();
   dimension = 0;
 
-  _lastPosition = Vector3Like.Create();
+  _sectorPowerX = 0;
+  _sectorPowerY = 0;
+  _sectorPowerZ = 0;
+  _minX = 0;
+  _minY = 0;
+  _minZ = 0;
+  _maxX = 0;
+  _maxY = 0;
+  _maxZ = 0;
+
+  volumeBounds = new BoundingBox();
 
   constructor() {
     this.updateBounds();
   }
 
   private updateBounds() {
+    const world = WorldSpaces.world.bounds;
+    this._minX = world.MinX;
+    this._minY = world.MinY;
+    this._minZ = world.MinZ;
+    this._maxX = world.MaxX;
+    this._maxY = world.MaxY;
+    this._maxZ = world.MaxZ;
+    this._sectorPowerX = WorldSpaces.sector.power2Axes.x;
+    this._sectorPowerY = WorldSpaces.sector.power2Axes.y;
+    this._sectorPowerZ = WorldSpaces.sector.power2Axes.z;
     this.volumeBounds.setMinMax(
       Vector3Like.Create(
         WorldSpaces.world.bounds.MinX,
@@ -36,58 +57,66 @@ export class WorldCursor implements DataCursorInterface {
   }
 
   setFocalPoint(dimension: number, x: number, y: number, z: number) {
-    const sectorPos = WorldSpaces.sector.getPosition(x, y, z, tempPosition);
+    const sectorPosX = (x >> this._sectorPowerX) << this._sectorPowerX;
+    const sectorPosY = (y >> this._sectorPowerY) << this._sectorPowerY;
+    const sectorPosZ = (z >> this._sectorPowerZ) << this._sectorPowerZ;
 
-    for (const row in this.sectorCursors) {
-      for (const col in this.sectorCursors[row]) {
-        const cursor = this.sectorCursors[row][col];
-        if (!cursor) continue;
+    this.sectorCursors.forEach((row) => {
+      row.forEach((cursor) => {
         cursorCache.push(cursor);
-        this.sectorCursors[row][col] = null;
-      }
-    }
+      });
+      row.clear();
+    });
+    this.sectorCursors.clear();
 
     this.dimension = dimension;
-    this.origin.x = sectorPos.x / WorldSpaces.sector.bounds.x;
-    this.origin.y = sectorPos.y / WorldSpaces.sector.bounds.y;
-    this.origin.z = sectorPos.z / WorldSpaces.sector.bounds.z;
+    this.origin.x = sectorPosX >> this._sectorPowerX;
+    this.origin.y = sectorPosY >> this._sectorPowerY;
+    this.origin.z = sectorPosZ >> this._sectorPowerZ;
 
     this.getSector(x, y, z);
   }
 
   inBounds(x: number, y: number, z: number) {
-    return WorldSpaces.world.inBounds(x, y, z);
+    return (
+      x >= this._minX &&
+      x <= this._maxX &&
+      y >= this._minY &&
+      y <= this._maxY &&
+      z >= this._minZ &&
+      z <= this._maxZ
+    );
   }
 
   getSector(x: number, y: number, z: number) {
     if (!this.inBounds(x, y, z)) return null;
-    const sectorPos = WorldSpaces.sector.getPosition(x, y, z, tempPosition);
 
-    const cx = sectorPos.x / WorldSpaces.sector.bounds.x - this.origin.x;
-    const cz = sectorPos.z / WorldSpaces.sector.bounds.z - this.origin.z;
+    const sectorPosX = (x >> this._sectorPowerX) << this._sectorPowerX;
+    const sectorPosY = (y >> this._sectorPowerY) << this._sectorPowerY;
+    const sectorPosZ = (z >> this._sectorPowerZ) << this._sectorPowerZ;
 
-    let cursor = this.sectorCursors[cx]?.[cz];
+    const cx = (sectorPosX >> this._sectorPowerX) - this.origin.x;
+    const cz = (sectorPosZ >> this._sectorPowerZ) - this.origin.z;
 
-    if (!cursor) {
-      cursor = cursorCache.length ? cursorCache.shift()! : new SectorCursor();
-
-      if (
-        !cursor.loadSector(
-          this.dimension,
-          sectorPos.x,
-          sectorPos.y,
-          sectorPos.z
-        )
-      ) {
-        cursorCache.push(cursor);
-        return null;
-      }
-
-      if (!this.sectorCursors[cx]) {
-        this.sectorCursors[cx] = {};
-      }
-      this.sectorCursors[cx][cz] = cursor;
+    let row = this.sectorCursors.get(cx);
+    if (row) {
+      const cursor = row.get(cz);
+      if (cursor) return cursor;
+    } else {
+      row = new Map();
+      this.sectorCursors.set(cx, row);
     }
+
+    const cursor = cursorCache.length ? cursorCache.pop()! : new SectorCursor();
+
+    if (
+      !cursor.loadSector(this.dimension, sectorPosX, sectorPosY, sectorPosZ)
+    ) {
+      cursorCache.push(cursor);
+      return null;
+    }
+
+    row.set(cz, cursor);
     return cursor;
   }
 

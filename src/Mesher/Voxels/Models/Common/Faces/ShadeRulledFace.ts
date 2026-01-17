@@ -81,14 +81,14 @@ export function ShadeRulledFace(
         VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
 
       if (offsetConditonalGeometry) {
-        const modelState = VoxelLUT.voxelIdToModelState[voxelId];
-        const reltioanlModSeltate = builder.space.reltionalStateCache[hashed];
+        const modelState = VoxelLUT.voxelIdToState[voxelId];
+        const relationalModSeltate = builder.space.reltionalStateCache[hashed];
         for (let i = 0; i < offsetConditonalGeometry.length; i++) {
           const [geoId, requiredModelState, requiredReltionalModelState] =
             offsetConditonalGeometry[i];
           if (
             requiredModelState !== modelState ||
-            !requiredReltionalModelState[reltioanlModSeltate]
+            !requiredReltionalModelState[relationalModSeltate]
           )
             continue;
 

@@ -70,10 +70,11 @@ export default function ArchiveSector(
         processedSection.palettes.voxels.register(voxelId);
 
       let voxelSecondary = 0;
+
       if (
-        VoxelTagsRegister.VoxelTags[
-          VoxelLUT.voxels[section.ids[i]][0]
-        ]["dve_can_have_secondary"]
+        VoxelTagsRegister.VoxelTags[VoxelLUT.voxelIdToTrueId[section.ids[i]]][
+          "dve_can_have_secondary"
+        ]
       ) {
         voxelSecondary = sectorPalettes.voxels.register(section.secondary[i]);
         if (
@@ -203,7 +204,7 @@ export default function ArchiveSector(
       let secondary = false;
       if (
         VoxelTagsRegister.VoxelTags[
-          VoxelLUT.voxels[archivedSection.original.ids[i]][0]
+          VoxelLUT.voxelIdToTrueId[archivedSection.original.ids[i]]
         ]["dve_can_have_secondary"] &&
         archivedSection.original.secondary[i] !== 0
       ) {

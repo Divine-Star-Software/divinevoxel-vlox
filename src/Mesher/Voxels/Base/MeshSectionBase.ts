@@ -6,13 +6,14 @@ import { WorldSpaces } from "../../../World/WorldSpaces.js";
 import { VoxelGeometryBuilderCacheSpace } from "../Models/VoxelGeometryBuilderCacheSpace.js";
 import { SectionCursor } from "../../../World/Cursor/SectionCursor.js";
 import { VoxelModelBuilder } from "../Models/VoxelModelBuilder.js";
-import { VoxelModelConstructorRegister } from "../Models/VoxelModelConstructorRegister.js";
 import { WorldVoxelCursor } from "../../../World/Cursor/WorldVoxelCursor";
 import { VoxelMeshBVHBuilder } from "../Geometry/VoxelMeshBVHBuilder";
 import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "../Models/RenderedMaterials";
 import { CompactVoxelSectionMesh } from "./CompactVoxelSectionMesh";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
+import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
+import { BuildVoxel } from "./BuildVoxel";
 
 let space: VoxelGeometryBuilderCacheSpace;
 const bvhTool = new VoxelMeshBVHBuilder();
@@ -26,9 +27,9 @@ function meshVoxel(
   sectionCursor: SectionCursor
 ): boolean {
   let added = false;
-  const constructor =
-    VoxelModelConstructorRegister.constructorsPaltte[voxel.getVoxelId()];
-  const builder = constructor.builder;
+
+  const builder =
+    RenderedMaterials.meshers[VoxelLUT.materialMap[voxel.getVoxelId()]];
   builder.origin.x = sectionCursor._voxelPosition.x;
   builder.origin.y = sectionCursor._voxelPosition.y;
   builder.origin.z = sectionCursor._voxelPosition.z;
@@ -39,7 +40,7 @@ function meshVoxel(
   builder.nVoxel = worldCursor;
 
   builder.startConstruction();
-  added = constructor.process();
+  added = BuildVoxel(builder);
   builder.endConstruction();
   return added;
 }
@@ -66,6 +67,7 @@ export function MeshSectionBase(
     section.setInProgress(false);
     return null;
   }
+
   space.start(cx - (padding.x - 1), cy - (padding.y - 1), cz - (padding.z - 1));
 
   bvhTool.reset();
@@ -78,7 +80,6 @@ export function MeshSectionBase(
   }
 
   const slice = WorldSpaces.section.bounds.x * WorldSpaces.section.bounds.z;
-
 
   const startY = minY * slice;
   const endY = (maxY + 1) * slice;
@@ -112,6 +113,7 @@ export function MeshSectionBase(
     section.setBuried(i, !addedVoxel);
   }
 
+
   const meshed: VoxelModelBuilder[] = [];
   for (let i = 0; i < RenderedMaterials.meshers.length; i++) {
     const mesher = RenderedMaterials.meshers[i];
@@ -139,6 +141,5 @@ export function MeshSectionBase(
   }
 
   section.setInProgress(false);
-
   return compactMesh;
 }

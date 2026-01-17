@@ -44,7 +44,9 @@ export class VoxelArchivePalette {
   register(id: number) {
     if (this._voxelsRegistered.has(id)) return this._voxelsRegistered.get(id)!;
 
-    const stringId = VoxelLUT.voxelIds.getStringId(VoxelLUT.voxels[id][0]);
+    const stringId = VoxelLUT.voxelIds.getStringId(
+      VoxelLUT.voxelIdToTrueId[id]
+    );
 
     let voxelId = 0;
     if (!this._ids.isRegistered(stringId)) {
@@ -72,7 +74,8 @@ export class VoxelArchivePalette {
       voxelId = this._ids.getNumberId(stringId);
     }
 
-    const [, state, mod] = VoxelLUT.voxels[id];
+    const state = VoxelLUT.voxelIdToState[id];
+    const mod = VoxelLUT.voxelIdToMod[id];
     this._voxelPalette.push(voxelId, state, mod);
     const paletteId = this._voxelCount;
     this._voxelsRegistered.set(id, paletteId);

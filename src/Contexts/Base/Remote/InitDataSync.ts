@@ -14,9 +14,9 @@ export default function InitDataSync(props: {
 }) {
   Threads.registerTask<DataSyncData>("sync-data", (data) => {
     EngineSettings.syncSettings(data.settings);
-    VoxelSchemas.import(data.schemas);
     VoxelLUT.import(data.luts.voxel);
     GeometryLUT.import(data.luts.geometry);
+    VoxelSchemas.import(data.schemas);
     VoxelTagsRegister.VoxelTags = data.tags.tags;
     VoxelTagsRegister.SubstanceTags = data.tags.substanceTags;
 

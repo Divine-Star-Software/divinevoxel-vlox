@@ -2,7 +2,6 @@ import { VoxelGeometryBuilderCacheSpace } from "./Models/VoxelGeometryBuilderCac
 import { TemplateCursor } from "../../Templates/Cursor/TemplateCursor.js";
 import { FullVoxelTemplate } from "../../Templates/Full/FullVoxelTemplate.js";
 import { CompactTemplateMesh } from "./Base/CompactTemplateMesh.js";
-import { VoxelModelConstructorRegister } from "./Models/VoxelModelConstructorRegister.js";
 import { CompactMeshData } from "../Types/index.js";
 import { FullVoxelTemplateData } from "../../Templates/Full/FullVoxelTemplate.types.js";
 import { TemplateVoxelCursor } from "../../Templates/Cursor/TemplateVoxelCursor.js";
@@ -10,6 +9,8 @@ import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "./Models/RenderedMaterials.js";
 import { VoxelLightData } from "../../Voxels/Cursor/VoxelLightData.js";
 import { VoxelModelBuilder } from "./Models/VoxelModelBuilder.js";
+import { BuildVoxel } from "./Base/BuildVoxel.js";
+import { VoxelLUT } from "../../Voxels/Data/VoxelLUT.js";
 const templateCursor = new TemplateCursor();
 const padding = Vector3Like.Create(5, 5, 5);
 const lightData = new VoxelLightData();
@@ -23,9 +24,9 @@ function meshVoxel(
   if (voxel.isAir() || !voxel.isRenderable()) return false;
 
   let added = false;
-  const constructor =
-    VoxelModelConstructorRegister.constructorsPaltte[voxel.getVoxelId()];
-  const builder = constructor.builder;
+
+  const builder =
+    RenderedMaterials.meshers[VoxelLUT.materialMap[voxel.getVoxelId()]];
   builder.origin.x = x;
   builder.origin.y = y;
   builder.origin.z = z;
@@ -36,7 +37,7 @@ function meshVoxel(
   builder.nVoxel = templateCursor;
 
   builder.startConstruction();
-  added = constructor.process();
+  added = BuildVoxel(builder);
   builder.endConstruction();
   return added;
 }

@@ -1,10 +1,9 @@
-import { VoxelConstructor } from "./VoxelConstructor";
 import {  Vector3Like } from "@amodx/math";
 
 export class VoxelModelEffect {
 /*   effects: { id: string; reader: StateTreeReader; palette: Vec3Array[][] }[] =
     []; */
-  constructor(public model: VoxelConstructor) {
+  constructor() {
   /*   for (const effect of model.data.effects) {
       if (effect.type == "fx-points") {
         this.effects.push({

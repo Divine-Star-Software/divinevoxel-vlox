@@ -167,4 +167,18 @@ export class BinarySchema {
   getSchema() {
     return this.nodes.map((_) => _.data);
   }
+
+  totalStates(): number {
+    if (this.nodes.length === 0) return 1;
+
+    let total = 1;
+    for (const node of this.nodes) {
+      if (node.data.values) {
+        total *= node.data.values.length;
+      } else {
+        total *= node.bitMask + 1;
+      }
+    }
+    return total;
+  }
 }

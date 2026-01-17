@@ -1,10 +1,13 @@
+import { Vec2Array } from "@amodx/math";
 import { WorkItemProgress } from "../Util/WorkItemProgress.js";
 import { CompiledTexture } from "./Classes/CompiledTexture.js";
 import {
   BuildTextureData,
   BuildTextureDataProps,
 } from "./Functions/BuildTextureData.js";
-import type { TextureData } from "./Texture.types";
+import { CreateCompactedTexture } from "./Functions/CreateCompactedTexture.js";
+import type { CompactedTextureData, TextureData } from "./Texture.types";
+import { ReadCompactedTexture } from "./Functions/ReadCompactedTexture.js";
 const missingTexture: TextureData = {
   id: "dve_missing",
   base64:
@@ -51,6 +54,25 @@ export class TextureManager {
       );
       this._compiledTextures.set(type, compiled);
     }
+  }
+
+  static async createCompactedTextures(
+    baseURL: string,
+    textureSize: Vec2Array
+  ): Promise<{ data: CompactedTextureData; image: HTMLImageElement }[]> {
+    const returnData = [];
+    for (const [type, data] of this._textureTypes) {
+      returnData.push(
+        await CreateCompactedTexture(type, baseURL, textureSize, data)
+      );
+    }
+
+    return returnData;
+  }
+
+  static async readCompactedTexture(data: CompactedTextureData, path: string) {
+    const textures = this._textureTypes.get(data.type)!;
+    await ReadCompactedTexture(data, textures, path);
   }
 }
 TextureManager.addTextureType("dve_item");

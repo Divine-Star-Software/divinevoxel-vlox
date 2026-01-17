@@ -1,7 +1,7 @@
 import { QuadVoxelGometryNode } from "./Default/QuadVoxelGeometryNode";
 import { TriangleVoxelGeometryNode } from "./Default/TriangleVoxelGeometryNode";
 import { GeoemtryNode } from "./GeometryNode";
-import { VoxelModelConstructorRegister } from "../VoxelModelConstructorRegister";
+import { VoxelGeometryConstructorRegister } from "../VoxelGeometryConstructorRegister";
 import { CullingProcedureData } from "../../../../Voxels/Geometry/VoxelGeometry.types";
 import { GeometryLUT } from "../../../../Voxels/Data/GeometryLUT";
 
@@ -18,7 +18,7 @@ export class VoxelGeometryConstructor {
 
     for (const node of nodes) {
       if (node.type == "custom") {
-        const nodeClass = VoxelModelConstructorRegister.getCustomNode(node.id);
+        const nodeClass = VoxelGeometryConstructorRegister.getCustomNode(node.id);
         const newNode = new nodeClass(geometryPaletteId, this, node);
         newNode.init();
         this.nodes.push(newNode);

@@ -1,4 +1,3 @@
-//types
 import { EngineSettings } from "../Settings/EngineSettings.js";
 import { Vec3Array, Vector3Like } from "@amodx/math";
 import {
@@ -7,8 +6,8 @@ import {
   GetYXZOrderArrayIndex,
   GetYXZOrderArrayPositionVec3,
   GetYXZOrderArrayPositionVec3Array,
-  IndexOrderingTypes,
-} from "../Math/Indexing.js";
+} from "../Math/WorldIndexing.js";
+import { IndexOrderingTypes } from "../Math/Indexing.js";
 
 export type WorldSpaceDataKey = {
   sector: {
@@ -28,6 +27,7 @@ export type WorldSpaceDataKey = {
 
 const tempPosition = Vector3Like.Create();
 const tempPosition2 = Vector3Like.Create();
+
 class WorldBounds {
   static bounds = {
     MinZ: -Number.MAX_SAFE_INTEGER,
@@ -48,7 +48,7 @@ class WorldBounds {
   ) {
     this.bounds.MinX = minX;
     this.bounds.MaxX = maxX;
-    this.bounds.MinX = minZ;
+    this.bounds.MinZ = minZ;
     this.bounds.MaxZ = maxZ;
     this.bounds.MinY = minY;
     this.bounds.MaxY = maxY;
@@ -88,12 +88,18 @@ class WorldBounds {
     };
   }
 }
+
 class SectorSpace {
   static power2Axes = Vector3Like.Create();
   static bounds = Vector3Like.Create();
   static volumne = 0;
   static sectionBounds = Vector3Like.Create();
+  static sectionPower2Axes = Vector3Like.Create();
+  static sectionXZPower = 0;
+  static sectionZMask = 0;
+  static sectionXMask = 0;
   static sectionVolumne = 0;
+
   static getPosition(
     x: number,
     y: number,
@@ -111,6 +117,7 @@ class SectorSpace {
     );
     return refPosition;
   }
+
   static transformPosition(position: Vector3Like): Vector3Like {
     CubeHashVec3(
       position.x,
@@ -123,6 +130,7 @@ class SectorSpace {
     );
     return position;
   }
+
   static getPositionVec3Array(
     x: number,
     y: number,
@@ -146,6 +154,10 @@ class SectionSpace {
   static power2Axes = Vector3Like.Create();
   static bounds = Vector3Like.Create();
   static volumne = 0;
+  static xzPower = 0;
+  static zMask = 0;
+  static xMask = 0;
+
   static getPosition(
     x: number,
     y: number,
@@ -163,6 +175,7 @@ class SectionSpace {
     );
     return refPosition;
   }
+
   static transformPosition(position: Vector3Like): Vector3Like {
     CubeHashVec3(
       position.x,
@@ -175,6 +188,7 @@ class SectionSpace {
     );
     return position;
   }
+
   static getPositionVec3Array(
     x: number,
     y: number,
@@ -185,47 +199,51 @@ class SectionSpace {
       x,
       y,
       z,
-      SectionSpace.bounds.x,
-      SectionSpace.bounds.y,
-      SectionSpace.bounds.z,
+      SectionSpace.power2Axes.x,
+      SectionSpace.power2Axes.y,
+      SectionSpace.power2Axes.z,
       refPosition
     );
     return refPosition;
   }
+
   static getIndex(x: number, y: number, z: number): number {
     SectionSpace.getPosition(x, y, z, tempPosition);
     SectorSpace.getPosition(x, y, z, tempPosition2);
 
     return GetYXZOrderArrayIndex(
-      (tempPosition.x - tempPosition2.x) / SectionSpace.bounds.x,
-      (tempPosition.y - tempPosition2.y) / SectionSpace.bounds.y,
-      (tempPosition.z - tempPosition2.z) / SectionSpace.bounds.z,
-      SectorSpace.sectionBounds.x,
-      SectorSpace.sectionBounds.y,
-      SectorSpace.sectionBounds.z
+      (tempPosition.x - tempPosition2.x) >> SectionSpace.power2Axes.x,
+      (tempPosition.y - tempPosition2.y) >> SectionSpace.power2Axes.y,
+      (tempPosition.z - tempPosition2.z) >> SectionSpace.power2Axes.z,
+      SectorSpace.sectionPower2Axes.z,
+      SectorSpace.sectionXZPower
     );
   }
+
   static getPositionFromIndex(
     index: number,
     refPosition = Vector3Like.Create()
   ) {
     return GetYXZOrderArrayPositionVec3(
       index,
-      SectorSpace.sectionBounds.x,
-      SectorSpace.sectionBounds.y,
-      SectorSpace.sectionBounds.z,
+      SectorSpace.sectionPower2Axes.z,
+      SectorSpace.sectionXZPower,
+      SectorSpace.sectionZMask,
+      SectorSpace.sectionXMask,
       refPosition
     );
   }
+
   static getPositionFromIndexVec3Array(
     index: number,
     refPosition: Vec3Array = [0, 0, 0]
   ) {
     return GetYXZOrderArrayPositionVec3Array(
       index,
-      SectorSpace.sectionBounds.x,
-      SectorSpace.sectionBounds.y,
-      SectorSpace.sectionBounds.z,
+      SectorSpace.sectionPower2Axes.z,
+      SectorSpace.sectionXZPower,
+      SectorSpace.sectionZMask,
+      SectorSpace.sectionXMask,
       refPosition
     );
   }
@@ -254,6 +272,7 @@ class VoxelSpace {
     refPosition.z = z - refPosition.z;
     return refPosition;
   }
+
   static getPositionVec3Array(
     x: number,
     y: number,
@@ -274,6 +293,7 @@ class VoxelSpace {
     refPosition[2] = z - refPosition[2];
     return refPosition;
   }
+
   static transformPosition(position: Vector3Like): Vector3Like {
     const { x, y, z } = position;
     CubeHashVec3(
@@ -290,37 +310,39 @@ class VoxelSpace {
     position.z = z - position.z;
     return position;
   }
+
   static getPositionFromIndex(
     index: number,
     refPosition = Vector3Like.Create()
   ) {
     return GetYXZOrderArrayPositionVec3(
       index,
-      SectionSpace.bounds.x,
-      SectionSpace.bounds.y,
-      SectionSpace.bounds.z,
+      SectionSpace.power2Axes.z,
+      SectionSpace.xzPower,
+      SectionSpace.zMask,
+      SectionSpace.xMask,
       refPosition
     );
   }
+
   static getIndex(x: number, y: number, z: number): number {
     const position = this.getPosition(x, y, z, tempPosition);
     return GetYXZOrderArrayIndex(
       position.x,
       position.y,
       position.z,
-      SectionSpace.bounds.x,
-      SectionSpace.bounds.y,
-      SectionSpace.bounds.z
+      SectionSpace.power2Axes.z,
+      SectionSpace.xzPower
     );
   }
+
   static getIndexFromPosition(x: number, y: number, z: number): number {
     return GetYXZOrderArrayIndex(
       x,
       y,
       z,
-      SectionSpace.bounds.x,
-      SectionSpace.bounds.y,
-      SectionSpace.bounds.z
+      SectionSpace.power2Axes.z,
+      SectionSpace.xzPower
     );
   }
 }
@@ -388,16 +410,30 @@ EngineSettings.addEventListener("synced", (event) => {
   SectionSpace.bounds.x = 1 << SectionSpace.power2Axes.x;
   SectionSpace.bounds.y = 1 << SectionSpace.power2Axes.y;
   SectionSpace.bounds.z = 1 << SectionSpace.power2Axes.z;
-
   SectionSpace.volumne =
     SectionSpace.bounds.x * SectionSpace.bounds.y * SectionSpace.bounds.z;
+  SectionSpace.xzPower = SectionSpace.power2Axes.x + SectionSpace.power2Axes.z;
+  SectionSpace.zMask = SectionSpace.bounds.z - 1;
+  SectionSpace.xMask = SectionSpace.bounds.x - 1;
 
-  SectorSpace.sectionBounds.x = SectorSpace.bounds.x / SectionSpace.bounds.x;
-  SectorSpace.sectionBounds.y = SectorSpace.bounds.y / SectionSpace.bounds.y;
-  SectorSpace.sectionBounds.z = SectorSpace.bounds.z / SectionSpace.bounds.z;
-
+  SectorSpace.sectionBounds.x =
+    SectorSpace.bounds.x >> SectionSpace.power2Axes.x;
+  SectorSpace.sectionBounds.y =
+    SectorSpace.bounds.y >> SectionSpace.power2Axes.y;
+  SectorSpace.sectionBounds.z =
+    SectorSpace.bounds.z >> SectionSpace.power2Axes.z;
   SectorSpace.sectionVolumne =
     SectorSpace.sectionBounds.x *
     SectorSpace.sectionBounds.y *
     SectorSpace.sectionBounds.z;
+  SectorSpace.sectionPower2Axes.x =
+    SectorSpace.power2Axes.x - SectionSpace.power2Axes.x;
+  SectorSpace.sectionPower2Axes.y =
+    SectorSpace.power2Axes.y - SectionSpace.power2Axes.y;
+  SectorSpace.sectionPower2Axes.z =
+    SectorSpace.power2Axes.z - SectionSpace.power2Axes.z;
+  SectorSpace.sectionXZPower =
+    SectorSpace.sectionPower2Axes.x + SectorSpace.sectionPower2Axes.z;
+  SectorSpace.sectionZMask = SectorSpace.sectionBounds.z - 1;
+  SectorSpace.sectionXMask = SectorSpace.sectionBounds.x - 1;
 });

@@ -144,14 +144,7 @@ export class WorldSimulation {
     WorldSimulationTasks.worldDecorateTasks.runTask();
     WorldSimulationTasks.worldSunTasks.runTask();
     WorldSimulationTasks.worldPropagationTasks.runTask();
-    /*    console.log(
-      "total ticks",
-      total,
-      "building",
-          "building",
-      WorldSimulationTasks.buildTasks.getTotalWaitingFor(0),
-      WorldSimulationTasks.buildTasks.getTotal(0)
-    ); */
+
     if (generationOnly) return;
     WorldSimulationTasks.buildTasks.runTask(32);
     WorldSimulationTasks.saveTasks.runTask(50);

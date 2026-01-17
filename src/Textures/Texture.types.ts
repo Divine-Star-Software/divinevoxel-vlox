@@ -14,7 +14,7 @@ export type TextureDataBase = {
    */
   id: string;
   /**
-   * Specify the base path to look for the texture in. 
+   * Specify the base path to look for the texture in.
    */
   basePath?: string;
   /**
@@ -69,3 +69,19 @@ export type TextureData = {
    */
   variations?: (string | TextureDataBase)[];
 } & TextureDataBase;
+
+export type CompactedTextureData = {
+  type: string;
+  size: [sizeX: number, sizeY: number];
+  textureSize: [sizeX: number, sizeY: number];
+  nodes: CompactedTextureNodeData[];
+};
+
+export type CompactedTextureNodeBaseData = {
+  id: string;
+  index: number | number[];
+  atlas?: [sizeX: number, sizeY: number];
+};
+export type CompactedTextureNodeData = {
+  variations?: CompactedTextureNodeBaseData[];
+} & CompactedTextureNodeBaseData;

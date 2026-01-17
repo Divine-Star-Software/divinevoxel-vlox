@@ -16,7 +16,6 @@ export class CompiledTexture {
     return position;
   };
 
-  originalImages: HTMLImageElement[] = [];
   images: HTMLImageElement[] = [];
   /**Maps texture ids to their atlas sizes  */
   atlasSizeMap: Record<string, [width: number, height: number]> = {};
@@ -78,7 +77,7 @@ export class CompiledTexture {
   }
 
   async getTextureData(id: TextureId): Promise<Uint8ClampedArray> {
-    const path = this.originalImages[this.getTextureIndex(id)].src;
+    const path = this.images[this.getTextureIndex(id)].src;
     const res = await fetch(path);
     if (!res.ok) throw new Error(`Failed to fetch texture: ${path}`);
 

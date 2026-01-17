@@ -102,3 +102,4 @@ export class SectorCursor
     return new SectorCursor();
   }
 }
+

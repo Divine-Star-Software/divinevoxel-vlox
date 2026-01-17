@@ -94,29 +94,27 @@ export class VoxelGeometryBuilderCacheSpace {
 
     this.voxelCursor.copy(voxel).process();
 
-    const reltioanlBuilder = VoxelSchemas.reltionalStateBuilder.get(
-      VoxelLUT.models.getStringId(VoxelLUT.modelsIndex[trueVoxelId])
-    )!;
-    reltioanlBuilder.position.x = x;
-    reltioanlBuilder.position.y = y;
-    reltioanlBuilder.position.z = z;
-    reltioanlBuilder.voxel = this.voxelCursor;
-    reltioanlBuilder.dataCursor = dataCursor;
-    const reltionalState = reltioanlBuilder.buildState();
+    const relationalBuilder =
+      VoxelSchemas.reltionalStateBuilderMap[VoxelLUT.modelsIndex[trueVoxelId]];
+    relationalBuilder.position.x = x;
+    relationalBuilder.position.y = y;
+    relationalBuilder.position.z = z;
+    relationalBuilder.voxel = this.voxelCursor;
+    relationalBuilder.dataCursor = dataCursor;
+    const reltionalState = relationalBuilder.buildState();
     this.reltionalStateCache[index] = reltionalState;
 
-    const reltioanlModBuilder = VoxelSchemas.reltionalModBuilder.get(
-      VoxelLUT.voxelIds.getStringId(trueVoxelId)
-    )!;
+    const relationalModBuilder =
+      VoxelSchemas.reltionalModBuilderMap[trueVoxelId];
 
     let reltionalMod = 0;
-    if (reltioanlModBuilder) {
-      reltioanlModBuilder.position.x = x;
-      reltioanlModBuilder.position.y = y;
-      reltioanlModBuilder.position.z = z;
-      reltioanlModBuilder.voxel = this.voxelCursor;
-      reltioanlModBuilder.dataCursor = dataCursor;
-      reltionalMod = reltioanlModBuilder.buildState();
+    if (relationalModBuilder) {
+      relationalModBuilder.position.x = x;
+      relationalModBuilder.position.y = y;
+      relationalModBuilder.position.z = z;
+      relationalModBuilder.voxel = this.voxelCursor;
+      relationalModBuilder.dataCursor = dataCursor;
+      reltionalMod = relationalModBuilder.buildState();
     } else {
       this.reltionalVoxelCache[index] = 0;
     }

@@ -154,15 +154,12 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     if (!this._pickedResult) return null;
     const voxelStates: PaintVoxelData[] = [];
     const voxelId = this._pickedResult.voxel.id;
-    const [trueId, , mod] = VoxelLUT.voxels[voxelId];
-
-    const stateArray = VoxelLUT.voxelRecord[trueId][mod];
+    const trueId = VoxelLUT.voxelIdToTrueId[voxelId];
+    const mod = VoxelLUT.voxelIdToMod[voxelId];
+    const stateMap = VoxelLUT.modelStateMaps[VoxelLUT.modelsIndex[trueId]];
     const rawVoxelData: RawVoxelData = [0, 0, 0, 0];
-    for (let i = 0; i < stateArray.length; i++) {
-      const value = stateArray[i];
-
-      if (value === undefined || value <= 0) continue;
-      rawVoxelData[0] = value;
+    for (const [state, index] of stateMap) {
+      rawVoxelData[0] = VoxelLUT.getVoxelId(trueId, state, mod);
       voxelStates.push(PaintVoxelData.FromRaw(rawVoxelData));
     }
     return voxelStates;
@@ -173,20 +170,12 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     if (!this._pickedResult) return null;
     const voxelStates: PaintVoxelData[] = [];
     const voxelId = this._pickedResult.voxel.id;
-    const [trueId, state] = VoxelLUT.voxels[voxelId];
-    const modArray = VoxelLUT.voxelRecord[trueId];
+    const trueId = VoxelLUT.voxelIdToTrueId[voxelId];
+    const state = VoxelLUT.voxelIdToState[voxelId];
     const rawVoxelData: RawVoxelData = [0, 0, 0, 0];
-    for (let i = 0; i < modArray.length; i++) {
-      const stateArray = modArray[i];
-      if (stateArray === undefined || !stateArray.length) continue;
-      let id = -1;
-      for (let j = 0; j < stateArray.length; j++) {
-        id = VoxelLUT.voxelRecord[trueId][i][state];
-        if (id === undefined || id < 0) continue;
-        rawVoxelData[0] = id;
-        break;
-      }
-      if (id === undefined || id < 0) continue;
+    const modMap = VoxelLUT.voxelModMaps[trueId];
+    for (const [mod, index] of modMap) {
+      rawVoxelData[0] = VoxelLUT.getVoxelId(trueId, state, mod);
       voxelStates.push(PaintVoxelData.FromRaw(rawVoxelData));
     }
     return voxelStates;

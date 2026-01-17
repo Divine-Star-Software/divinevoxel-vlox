@@ -11,6 +11,7 @@ import { WorldGeneration } from "./WorldGeneration.js";
 import { VoxelUpdateTask } from "../VoxelUpdateTask.js";
 import { RGBRemove, RGBUpdate } from "../Propagation/Illumanation/RGBUpdate.js";
 import { SunRemove, SunUpdate } from "../Propagation/Illumanation/SunUpdate.js";
+import { RawVoxelData } from "Voxels/index.js";
 
 const lightData = new VoxelLightData();
 export class WorldGenBrush extends BrushTool {
@@ -32,6 +33,46 @@ export class WorldGenBrush extends BrushTool {
     return this;
   }
 
+  paintRaw(raw: RawVoxelData) {
+    let voxel = this.dataCursor.getVoxel(this.x, this.y, this.z);
+    if (!voxel) {
+      if (this.requestsId != "") {
+        WorldGenRegister.addToRequest(
+          this.requestsId,
+          [this.dimension, this.x, this.y, this.z],
+          this.voxelCursor.getRaw()
+        );
+        return this;
+      }
+      throw new Error(
+        `Tried painting in an unloaded location ${[
+          this.dimension,
+          this.x,
+          this.y,
+          this.z,
+        ].toString()}`
+      );
+    }
+    const sl = voxel.getLight();
+    if (sl > 0 || !voxel.isAir()) {
+      this._erase();
+      voxel.setLight(sl < 0 ? 0 : sl);
+      if (lightData.hasRGBLight(sl)) {
+        this.tasks.rgb.remove.push(this.x, this.y, this.z);
+        RGBRemove(this.tasks);
+      }
+
+      if (lightData.hasSunLight(sl)) {
+        this.tasks.sun.remove.push(this.x, this.y, this.z);
+        SunRemove(this.tasks);
+      }
+    }
+
+    this._paintRaw(raw);
+    this.tasks.bounds.updateDisplay(this.x, this.y, this.z);
+
+    return this;
+  }
   paint() {
     let voxel = this.dataCursor.getVoxel(this.x, this.y, this.z);
     if (!voxel) {

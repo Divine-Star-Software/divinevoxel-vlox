@@ -9,7 +9,7 @@ import { VoxelPathData } from "../../Templates/Path/VoxelPath.types.js";
 import { IVoxelSelection } from "../../Templates/Selection/VoxelSelection.js";
 const air: RawVoxelData = [0, 0, 0, 0];
 const temp: RawVoxelData = [0, 0, 0, 0];
-PaintVoxelData.Set
+PaintVoxelData.Set;
 export class BrushTool {
   data = PaintVoxelData.Create();
 
@@ -96,8 +96,7 @@ export class BrushTool {
   }
   setSecondaryName(name: string) {
     if (name) {
-      this.data.secondaryVoxelId =
-        VoxelLUT.voxelNametoIdMap.get(name)!;
+      this.data.secondaryVoxelId = VoxelLUT.voxelNametoIdMap.get(name)!;
     } else {
       this.data.secondaryVoxelId = "";
     }
@@ -139,7 +138,7 @@ export class BrushTool {
     this.z = 0;
   }
 
-  _paint() {
+  protected _paint() {
     if (!this.dataCursor.inBounds(this.x, this.y, this.z)) return false;
 
     const voxel = this.dataCursor.getVoxel(this.x, this.y, this.z);
@@ -163,7 +162,25 @@ export class BrushTool {
     voxel.updateVoxel(0);
   }
 
-  _erase() {
+  protected _paintRaw(raw: RawVoxelData) {
+    if (!this.dataCursor.inBounds(this.x, this.y, this.z)) return false;
+
+    const voxel = this.dataCursor.getVoxel(this.x, this.y, this.z);
+    if (!voxel) return;
+    voxel.setId(raw[0]);
+    voxel.setLevel(raw[2]);
+    voxel.setSecondary(true);
+    voxel.setId(raw[3]);
+    voxel.setSecondary(false);
+    voxel.process();
+    if (voxel.isLightSource() && voxel.getLightSourceValue()) {
+      voxel.setLight(voxel.getLightSourceValue());
+    }
+
+    voxel.updateVoxel(0);
+  }
+
+  protected _erase() {
     const voxel = this.dataCursor.getVoxel(this.x, this.y, this.z);
     if (!voxel) return;
     voxel.setRaw(air).updateVoxel(1);

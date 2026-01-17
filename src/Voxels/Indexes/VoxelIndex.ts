@@ -129,7 +129,10 @@ export class VoxelIndex {
 
   getStateFromRawData(data: RawVoxelData): VoxelNamedState | false {
     const [id, light, secondary] = data;
-    const [trueId, state, mod] = VoxelLUT.voxels[id];
+    const trueId = VoxelLUT.voxelIdToTrueId[id];
+    const state = VoxelLUT.voxelIdToState[id];
+    const mod = VoxelLUT.voxelIdToMod[id];
+
     const conatiner = this.states.get(VoxelLUT.voxelIds.getStringId(trueId));
     if (!conatiner) return false;
     return this.findState(conatiner, mod, state);

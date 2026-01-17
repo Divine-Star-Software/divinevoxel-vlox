@@ -25,14 +25,19 @@ export class PaintVoxelData {
 
   /**Transforms numeric voxel data into a PaintVoxelData object */
   static FromRaw(data: RawVoxelData, paintData = PaintVoxelData.Create()) {
-    const [trueVoxelId, state, mod] = VoxelLUT.voxels[data[0]];
+    const trueVoxelId = VoxelLUT.voxelIdToTrueId[data[0]];
+    const state = VoxelLUT.voxelIdToState[data[0]];
+    const mod = VoxelLUT.voxelIdToMod[data[0]];
+
     paintData.id = VoxelLUT.voxelIds.getStringId(trueVoxelId);
     paintData.state = state;
     paintData.mod = mod;
     paintData.name = VoxelLUT.voxelIdToNameMap.get(paintData.id) || "";
 
     if (data[3] !== 0) {
-      const [trueVoxelId, state, mod] = VoxelLUT.voxels[data[3]];
+      const trueVoxelId = VoxelLUT.voxelIdToTrueId[data[3]];
+      const state = VoxelLUT.voxelIdToState[data[3]];
+      const mod = VoxelLUT.voxelIdToMod[data[3]];
       paintData.secondaryVoxelId = VoxelLUT.voxelIds.getStringId(trueVoxelId);
       paintData.secondaryState = state;
       paintData.secondaryMod = mod;

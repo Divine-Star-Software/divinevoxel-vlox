@@ -42,7 +42,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
         return data.textureRecrod.downTex as number;
 
       let sideTexture = data.textureRecrod.sideDisconnectedTex as number;
-      const currentState = VoxelLUT.voxelIdToModelState[builder.voxel.getId()];
+      const currentState = VoxelLUT.voxelIdToState[builder.voxel.getId()];
 
       const topVoxel = builder.nVoxel.getVoxel(
         builder.position.x,
@@ -51,7 +51,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       );
       const topSame = topVoxel
         ? builder.voxel.isSameVoxel(topVoxel) &&
-          VoxelLUT.voxelIdToModelState[topVoxel.getId()] == currentState
+          VoxelLUT.voxelIdToState[topVoxel.getId()] == currentState
         : false;
 
       const bottomVoxel = builder.nVoxel.getVoxel(
@@ -61,7 +61,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       );
       const bottomSame = bottomVoxel
         ? builder.voxel.isSameVoxel(bottomVoxel) &&
-          VoxelLUT.voxelIdToModelState[bottomVoxel.getId()] == currentState
+          VoxelLUT.voxelIdToState[bottomVoxel.getId()] == currentState
         : false;
 
       if (topSame && !bottomSame) {
@@ -92,7 +92,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
         return data.textureRecrod.downTex as number;
 
       let sideTexture = data.textureRecrod.sideDisconnectedTex as number;
-      const currentState = VoxelLUT.voxelIdToModelState[builder.voxel.getId()];
+      const currentState = VoxelLUT.voxelIdToState[builder.voxel.getId()];
 
       const northVoxel = builder.nVoxel.getVoxel(
         builder.position.x,
@@ -101,7 +101,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       );
       const northSame = northVoxel
         ? builder.voxel.isSameVoxel(northVoxel) &&
-          VoxelLUT.voxelIdToModelState[northVoxel.getId()] == currentState
+          VoxelLUT.voxelIdToState[northVoxel.getId()] == currentState
         : false;
 
       const southVoxel = builder.nVoxel.getVoxel(
@@ -111,7 +111,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       );
       const southSame = southVoxel
         ? builder.voxel.isSameVoxel(southVoxel) &&
-          VoxelLUT.voxelIdToModelState[southVoxel.getId()] == currentState
+          VoxelLUT.voxelIdToState[southVoxel.getId()] == currentState
         : false;
 
       if (northSame && !southSame) {
@@ -142,7 +142,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
         return data.textureRecrod.downTex as number;
 
       let sideTexture = data.textureRecrod.sideDisconnectedTex as number;
-      const currentState = VoxelLUT.voxelIdToModelState[builder.voxel.getId()];
+      const currentState = VoxelLUT.voxelIdToState[builder.voxel.getId()];
 
       const eastVoxel = builder.nVoxel.getVoxel(
         builder.position.x + 1,
@@ -151,7 +151,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       );
       const northSame = eastVoxel
         ? builder.voxel.isSameVoxel(eastVoxel) &&
-          VoxelLUT.voxelIdToModelState[eastVoxel.getId()] == currentState
+          VoxelLUT.voxelIdToState[eastVoxel.getId()] == currentState
         : false;
 
       const westVoxel = builder.nVoxel.getVoxel(
@@ -161,7 +161,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       );
       const westSame = westVoxel
         ? builder.voxel.isSameVoxel(westVoxel) &&
-          VoxelLUT.voxelIdToModelState[westVoxel.getId()] == currentState
+          VoxelLUT.voxelIdToState[westVoxel.getId()] == currentState
         : false;
 
       if (northSame && !westSame) {

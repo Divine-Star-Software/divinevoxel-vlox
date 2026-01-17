@@ -73,9 +73,9 @@ export default function CreateArchivedTemplate(
 
         let voxelSecondary = 0;
         if (
-          VoxelTagsRegister.VoxelTags[
-            VoxelLUT.voxels[rawData[0]][0]
-          ]["dve_can_have_secondary"]
+          VoxelTagsRegister.VoxelTags[VoxelLUT.voxelIdToTrueId[rawData[0]]][
+            "dve_can_have_secondary"
+          ]
         ) {
           voxelSecondary = voxelPalette.register(rawData[3]);
           if (!secondaryPalette.isRegistered(voxelSecondary))
