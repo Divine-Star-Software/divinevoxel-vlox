@@ -11,13 +11,14 @@ const { quads: Quads } = Box.Create([
   [0, 0, 0],
   [1, 1, 1],
 ]);
+
 const addUvs = (
   quad: Quad,
   factor: number,
   sx: number,
   sy: number,
   ex: number,
-  ey: number
+  ey: number,
 ) => {
   const uR = ex * factor;
   const uL = sx * factor;
@@ -43,7 +44,7 @@ class TextureVoxelData {
   constructor(
     public width: number,
     public height: number,
-    public textureData: number[]
+    public textureData: number[],
   ) {
     this.index.setBounds(width, height);
   }
@@ -54,55 +55,54 @@ class TextureVoxelData {
 
   isSolid(x: number, y: number) {
     if (!this.inBounds(x, y)) return false;
-
     const a =
       this.textureData[this.index.getIndexXY(x, this.height - 1 - y) * 4 + 3];
     return a > 0.01;
   }
 }
+
 Quads[VoxelFaces.North].setUVs(Quad.FullUVs as any);
 Quads[VoxelFaces.South].setUVs(Quad.FullUVs as any);
 
 const tool = new ItemModelBuilder("dve_item");
+
 export function MeshTexture(
   textureId: number,
   textureData: number[],
   origin = Vector3Like.Create(),
-  thickness: number | null = null
+  thickness: number | null = null,
 ) {
   const width = Math.sqrt(textureData.length / 4);
   const height = Math.sqrt(textureData.length / 4);
-  const factor = 1/width;
+  const factor = 1 / width;
 
   const data = new TextureVoxelData(width, height, textureData);
 
   tool.origin = origin;
+
+  // South face
   {
-    //south face
     tool.vars.textureIndex = textureId;
     addItemQuad(tool, Quads[VoxelFaces.South]);
   }
 
+  // North face
   {
-    //north face
     const backPositionZ = factor;
-
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.TopRight].z =
-      backPositionZ;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.TopLeft].z =
-      backPositionZ;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.BottomLeft].z =
-      backPositionZ;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.BottomRight].z =
-      backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.TopRight].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.TopLeft].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.BottomLeft].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.BottomRight].z = backPositionZ;
 
     tool.vars.textureIndex = textureId;
     addItemQuad(tool, Quads[VoxelFaces.North]);
   }
 
+  // East/West faces
   for (let x = 0; x < width; x++) {
     let eastFace: Vec2Array | null = null;
     let westFace: Vec2Array | null = null;
+
     for (let y = 0; y < height; y++) {
       let eastFaceExposed = true;
       let westFaceExposed = true;
@@ -125,22 +125,21 @@ export function MeshTexture(
         const z0 = 0;
         const z1 = factor;
 
-        // Flip winding vs previous: (p1 <-> p3)
         const newQuad = Quad.Create(
           [
-            [x1, y0, z0], // p0
-            [x1, y0, z1], // p1 (was p3)
-            [x1, y1, z1], // p2
-            [x1, y1, z0], // p3 (was p1)
+            [x1, y0, z0],
+            [x1, y0, z1],
+            [x1, y1, z1],
+            [x1, y1, z0],
           ],
           Quad.FullUVs as any,
-          false
+          false,
         );
 
         let [sx, sy] = eastFace;
         let ex = x + 1;
         let ey = y;
-        addUvs(newQuad, factor, sx, sy, ex, ey);
+        addUvs(newQuad, factor, sx, ey, ex, sy);
         eastFace = null;
 
         tool.vars.textureIndex = textureId;
@@ -154,27 +153,27 @@ export function MeshTexture(
         const z0 = 0;
         const z1 = factor;
 
-        // Flip winding vs previous: (p1 <-> p3)
         const newQuad = Quad.Create(
           [
-            [x0, y0, z0], // p0
-            [x0, y1, z0], // p1 (was p3)
-            [x0, y1, z1], // p2
-            [x0, y0, z1], // p3 (was p1)
+            [x0, y0, z0],
+            [x0, y1, z0],
+            [x0, y1, z1],
+            [x0, y0, z1],
           ],
           Quad.FullUVs as any,
-          false
+          false,
         );
 
         let [sx, sy] = westFace;
         let ex = x + 1;
         let ey = y;
-        addUvs(newQuad, factor, sx, sy, ex, ey);
+        addUvs(newQuad, factor, sx, ey, ex, sy);
         westFace = null;
 
         tool.vars.textureIndex = textureId;
         addItemQuad(tool, newQuad);
       }
+
       const isPixel = data.isSolid(x, y);
       if (!data.isSolid(x + 1, y) && !eastFace && isPixel) {
         eastFace = [x, y];
@@ -183,7 +182,64 @@ export function MeshTexture(
         westFace = [x, y];
       }
     }
+
+    // FLUSH: emit any remaining faces at the top edge
+    if (eastFace) {
+      const x1 = x * factor + factor;
+      const y0 = eastFace[1] * factor;
+      const y1 = height * factor;
+      const z0 = 0;
+      const z1 = factor;
+
+      const newQuad = Quad.Create(
+        [
+          [x1, y0, z0],
+          [x1, y0, z1],
+          [x1, y1, z1],
+          [x1, y1, z0],
+        ],
+        Quad.FullUVs as any,
+        false,
+      );
+
+      let [sx, sy] = eastFace;
+      let ex = x + 1;
+      let ey = height;
+      addUvs(newQuad, factor, sx, sy, ex, ey);
+
+      tool.vars.textureIndex = textureId;
+      addItemQuad(tool, newQuad);
+    }
+
+    if (westFace) {
+      const x0 = x * factor;
+      const y0 = westFace[1] * factor;
+      const y1 = height * factor;
+      const z0 = 0;
+      const z1 = factor;
+
+      const newQuad = Quad.Create(
+        [
+          [x0, y0, z0],
+          [x0, y1, z0],
+          [x0, y1, z1],
+          [x0, y0, z1],
+        ],
+        Quad.FullUVs as any,
+        false,
+      );
+
+      let [sx, sy] = westFace;
+      let ex = x + 1;
+      let ey = height;
+      addUvs(newQuad, factor, sx, sy, ex, ey);
+
+      tool.vars.textureIndex = textureId;
+      addItemQuad(tool, newQuad);
+    }
   }
+
+  // Up/Down faces
   for (let y = 0; y < height; y++) {
     let upFace: Vec2Array | null = null;
     let downFace: Vec2Array | null = null;
@@ -210,24 +266,23 @@ export function MeshTexture(
         const z0 = 0;
         const z1 = factor;
 
-        // +Y normal — CCW when viewed from +Y
         const newQuad = Quad.Create(
           [
-            [x0, y1, z0], // p0
-            [x1, y1, z0], // p1
-            [x1, y1, z1], // p2
-            [x0, y1, z1], // p3
+            [x0, y1, z0],
+            [x1, y1, z0],
+            [x1, y1, z1],
+            [x0, y1, z1],
           ],
           Quad.FullUVs as any,
-          false
-          // 0
+          false,
         );
 
         let [sx, sy] = upFace;
-        let [ex, ey] = [x, y];
-        ey += 1;
+        let ex = x;
+        let ey = y + 1;
         addUvs(newQuad, factor, sx, sy, ex, ey);
         upFace = null;
+
         tool.vars.textureIndex = textureId;
         addItemQuad(tool, newQuad);
       }
@@ -239,24 +294,23 @@ export function MeshTexture(
         const z0 = 0;
         const z1 = factor;
 
-        // -Y normal — flip winding relative to +Y
         const newQuad = Quad.Create(
           [
-            [x0, y0, z0], // p0
-            [x0, y0, z1], // p1
-            [x1, y0, z1], // p2
-            [x1, y0, z0], // p3
+            [x0, y0, z0],
+            [x0, y0, z1],
+            [x1, y0, z1],
+            [x1, y0, z0],
           ],
           Quad.FullUVs as any,
-          false
-          // 1
+          false,
         );
 
         let [sx, sy] = downFace;
-        let [ex, ey] = [x, y];
-        ey += 1;
+        let ex = x;
+        let ey = y + 1;
         addUvs(newQuad, factor, sx, sy, ex, ey);
         downFace = null;
+
         tool.vars.textureIndex = textureId;
         addItemQuad(tool, newQuad);
       }
@@ -269,7 +323,64 @@ export function MeshTexture(
         downFace = [x, y];
       }
     }
+
+    // FLUSH: emit any remaining faces at the right edge
+    if (upFace) {
+      const x0 = upFace[0] * factor;
+      const x1 = width * factor;
+      const y1 = y * factor + factor;
+      const z0 = 0;
+      const z1 = factor;
+
+      const newQuad = Quad.Create(
+        [
+          [x0, y1, z0],
+          [x1, y1, z0],
+          [x1, y1, z1],
+          [x0, y1, z1],
+        ],
+        Quad.FullUVs as any,
+        false,
+      );
+
+      let [sx, sy] = upFace;
+      let ex = width;
+      let ey = y + 1;
+      addUvs(newQuad, factor, sx, sy, ex, ey);
+
+      tool.vars.textureIndex = textureId;
+      addItemQuad(tool, newQuad);
+    }
+
+    if (downFace) {
+      const x0 = downFace[0] * factor;
+      const x1 = width * factor;
+      const y0 = y * factor;
+      const z0 = 0;
+      const z1 = factor;
+
+      const newQuad = Quad.Create(
+        [
+          [x0, y0, z0],
+          [x0, y0, z1],
+          [x1, y0, z1],
+          [x1, y0, z0],
+        ],
+        Quad.FullUVs as any,
+        false,
+      );
+
+      let [sx, sy] = downFace;
+      let ex = width;
+      let ey = y + 1;
+      addUvs(newQuad, factor, sx, sy, ex, ey);
+
+      tool.vars.textureIndex = textureId;
+      addItemQuad(tool, newQuad);
+    }
   }
 
-  return CompactItemMesh([tool]);
+  const compacted = CompactItemMesh([tool]);
+  tool.clear();
+  return compacted;
 }

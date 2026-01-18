@@ -6,8 +6,8 @@ import {
 } from "./VoxelArchive.types";
 import { BinaryBuffer } from "../../Util/BinaryBuffer/BinaryBuffer";
 
-const temp: [id: string, state: number, mod: number] = ["", 0, 0];
 export class VoxelPaletteArchiveReader {
+  temp: [id: string, state: number, mod: number] = ["", 0, 0];
   voxelPalette: Uint16Array;
 
   _voxels: ArchivedVoxelDataForPalette[] = [];
@@ -29,55 +29,56 @@ export class VoxelPaletteArchiveReader {
       }
       if (voxel.stateSchemaId && this._stateSchemas.has(voxel.stateSchemaId)) {
         this._voxelStateSchema.set(
-          voxel.stateSchemaId,
-          this._stateSchemas.get(voxel.stateSchemaId)!
+          voxel.id,
+          this._stateSchemas.get(voxel.stateSchemaId)!,
         );
       }
     }
 
     this.voxelPalette = BinaryBuffer.ToTypedArray(
-      palettes.voxelPalette
+      palettes.voxelPalette,
     ) as Uint16Array;
   }
 
   getVoxelData(id: number) {
+    const temp = this.temp;
     const index = id * 3;
     const voxelId = this._voxels[this.voxelPalette[index]]?.id;
     temp[0] = voxelId;
+    temp[1] = 0;
+    temp[2] = 0;
     if (temp[0] == "dve_air") {
-      temp[1] = 0;
-      temp[2] = 0;
       return temp;
     }
     const currentStateSchema = VoxelSchemas.getStateSchema(voxelId)!;
-    let finalStateValue = 0;
 
     if (this._voxelStateSchema.has(voxelId)) {
       const stateSchema = this._voxelStateSchema.get(voxelId)!;
       const stateValue = this.voxelPalette[index + 1];
       stateSchema.startEncoding(stateValue);
+      currentStateSchema.startEncoding(0);
       for (const node of stateSchema.nodes) {
         if (node.valuePalette) {
           currentStateSchema.setValue(
             node.name,
-            stateSchema.getValue(node.name)
+            stateSchema.getValue(node.name),
           );
         } else {
           currentStateSchema.setNumber(
             node.name,
-            stateSchema.getNumber(node.name)
+            stateSchema.getNumber(node.name),
           );
         }
       }
-      finalStateValue = stateSchema.getEncoded();
+      temp[1] = currentStateSchema.getEncoded();
     }
-    temp[1] = finalStateValue;
-    let finalModValue = 0;
+
     const currentModSchema = VoxelSchemas.mod.get(voxelId)!;
     if (this._modSchema.has(voxelId)) {
       const modSchema = this._modSchema.get(voxelId)!;
       const modValue = this.voxelPalette[index + 2];
       modSchema.startEncoding(modValue);
+      currentModSchema.startEncoding(0);
       for (const node of modSchema.nodes) {
         if (node.valuePalette) {
           currentModSchema.setValue(node.name, modSchema.getValue(node.name));
@@ -85,9 +86,9 @@ export class VoxelPaletteArchiveReader {
           currentModSchema.setNumber(node.name, modSchema.getNumber(node.name));
         }
       }
-      finalModValue = modSchema.getEncoded();
+      temp[2] = currentModSchema.getEncoded();
     }
-    temp[2] = finalModValue;
+
     return temp;
   }
 }

@@ -46,7 +46,6 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
   VoxelLUT.modelRelationalStateMaps[0] = new Map([[0, 0]]);
   VoxelLUT.voxelModMaps[0] = new Map([[0, 0]]);
   VoxelLUT.voxelRelationalModMaps[0] = new Map([[0, 0]]);
-
   //build state schemas
   for (const model of models) {
     VoxelLUT.models.register(model.id);
@@ -95,6 +94,8 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
   for (const voxel of voxels) {
     const modelData = voxel.properties["dve_model_data"];
     const trueVoxelId = VoxelLUT.voxelIds.register(voxel.id);
+    VoxelLUT.voxelIdToNameMap.set(voxel.id, voxel.name || voxel.id);
+    VoxelLUT.voxelNametoIdMap.set(voxel.name || voxel.id, voxel.id);
 
     VoxelLUT.materialMap[trueVoxelId] = VoxelLUT.material.getNumberId(
       voxel.properties["dve_rendered_material"] || "dve_solid"

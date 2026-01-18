@@ -16,7 +16,7 @@ export function BuildTriangleInputs(
   data: VoxelModelInputs,
   tri: BaseVoxelTriangleData,
   model: VoxelModelData,
-  geometry: VoxelGeometryData
+  geometry: VoxelGeometryData,
 ) {
   const ArgIndexes = TriangleVoxelGometryInputs.ArgIndexes;
   const inputs = TriangleVoxelGometryInputs.CreateArgs();
@@ -38,7 +38,7 @@ export function BuildTriangleInputs(
     }
     if (!modelInput)
       throw new Error(
-        `Could not find input for ${tri.texture} on geometry ${geometry.id} model ${model.id}`
+        `Could not find input for ${tri.texture} on geometry ${geometry.id} model ${model.id}`,
       );
 
     if (typeof modelInput == "string") {
@@ -46,7 +46,8 @@ export function BuildTriangleInputs(
       texture = processTexture(data.voxelInputs[modelInputId]);
     }
     if (typeof modelInput == "object") {
-      const procedureData: BaseVoxelGeometryTextureProcedureData = structuredClone(modelInput);
+      const procedureData: BaseVoxelGeometryTextureProcedureData =
+        structuredClone(modelInput);
       if (
         typeof procedureData.texture == "string" &&
         isArgString(procedureData.texture)
@@ -112,7 +113,10 @@ export function BuildTriangleInputs(
         uvs = modelInput;
       }
     }
+  } else if (Array.isArray(tri.uv)) {
+    uvs = tri.uv;
   }
+
   inputs[ArgIndexes.UVs] = uvs;
   /**@TODO updae the tri uvs if it is rotated or transformed */
   if (inputs[ArgIndexes.Rotation]) {

@@ -14,6 +14,8 @@ import {
   fencePost,
   leverGeometry,
   leverModel,
+  diamondGeometry,
+  diamondModel
 } from "./Models/Defaults/Examples";
 import {
   cube,
@@ -105,6 +107,7 @@ const geometry = [
   ...leverGeometry,
 
   ...farmGeometry,
+  diamondGeometry
 ];
 
 const models = [
@@ -131,6 +134,7 @@ const models = [
   liquidModel,
 
   ...farmModels,
+  diamondModel
 ];
 
 export function InitVoxelData(data: InitVoxelDataProps): CompiledvVxelTags {

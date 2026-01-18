@@ -14,7 +14,7 @@ type RunData = {
 
 export default function ImportSector(
   archivedSector: ArchivedSectorData,
-  archiveData: RunData
+  archiveData: RunData,
 ): SectorData {
   const sector = new Sector();
 
@@ -53,7 +53,7 @@ export default function ImportSector(
       for (let p = 0; p < paletteSize; p++) {
         const paletteValue = sectionPalettes.voxels.getValue(p);
         voxelIdLUT[p] = VoxelLUT.getVoxelIdFromString(
-          ...voxelReader.getVoxelData(paletteValue)
+          ...voxelReader.getVoxelData(paletteValue),
         );
       }
     }
@@ -65,14 +65,14 @@ export default function ImportSector(
       for (let p = 0; p < paletteSize; p++) {
         const paletteValue = sectionPalettes.secondaryVoxels.getValue(p);
         secondaryIdLUT[p] = VoxelLUT.getVoxelIdFromString(
-          ...voxelReader.getVoxelData(paletteValue)
+          ...voxelReader.getVoxelData(paletteValue),
         );
       }
     }
 
     if (idsBuffer.isValue) {
       const voxelId = VoxelLUT.getVoxelIdFromString(
-        ...voxelReader.getVoxelData(idsBuffer.getValue(0))
+        ...voxelReader.getVoxelData(idsBuffer.getValue(0)),
       );
       section.ids.fill(voxelId);
     }
@@ -87,13 +87,6 @@ export default function ImportSector(
       section.level.fill(levelValue);
     }
 
-    if (secondaryBuffer.isValue) {
-      const secondaryValue = VoxelLUT.getVoxelIdFromString(
-        ...voxelReader.getVoxelData(secondaryBuffer.getValue(0))
-      );
-      section.secondary.fill(secondaryValue);
-    }
-
     const sunIsValue = lightBuffers.sun.isValue;
     const redIsValue = lightBuffers.red.isValue;
     const greenIsValue = lightBuffers.green.isValue;
@@ -103,19 +96,19 @@ export default function ImportSector(
       let finalLight = 0;
       finalLight = lightSemgnetSet.sun(
         lightBuffers.sun.getValue(0),
-        finalLight
+        finalLight,
       );
       finalLight = lightSemgnetSet.red(
         lightBuffers.red.getValue(0),
-        finalLight
+        finalLight,
       );
       finalLight = lightSemgnetSet.green(
         lightBuffers.green.getValue(0),
-        finalLight
+        finalLight,
       );
       finalLight = lightSemgnetSet.blue(
         lightBuffers.blue.getValue(0),
-        finalLight
+        finalLight,
       );
       section.light.fill(finalLight);
     }
@@ -137,12 +130,22 @@ export default function ImportSector(
       !needsPerVoxelLight
     ) {
       const staticId = section.ids[0];
+      const trueVoxelId = VoxelLUT.voxelIdToTrueId[staticId];
+      if (
+        VoxelTagsRegister.VoxelTags[trueVoxelId]?.["dve_can_have_secondary"]
+      ) {
+        const secondaryValue = VoxelLUT.getVoxelIdFromString(
+          ...voxelReader.getVoxelData(secondaryBuffer.getValue(0)),
+        );
+        section.secondary.fill(secondaryValue);
+      }
+
       const staticSecondary = section.secondary[0];
       if (staticId !== 0 || staticSecondary !== 0) {
         for (let i = 0; i < sectionVolume; i++) {
           section.setHasVoxel(
             WorldSpaces.voxel.getPositionFromIndex(i, position).y - 1,
-            true
+            true,
           );
         }
       }
@@ -173,7 +176,7 @@ export default function ImportSector(
           voxelId = voxelIdLUT[rawValue];
         } else {
           voxelId = VoxelLUT.getVoxelIdFromString(
-            ...voxelReader.getVoxelData(rawValue)
+            ...voxelReader.getVoxelData(rawValue),
           );
         }
         section.ids[i] = voxelId;
@@ -203,7 +206,7 @@ export default function ImportSector(
         } else {
           finalLight = lightSemgnetSet.sun(
             lightBuffers.sun.getValue(0),
-            finalLight
+            finalLight,
           );
         }
 
@@ -216,7 +219,7 @@ export default function ImportSector(
         } else {
           finalLight = lightSemgnetSet.red(
             lightBuffers.red.getValue(0),
-            finalLight
+            finalLight,
           );
         }
 
@@ -229,7 +232,7 @@ export default function ImportSector(
         } else {
           finalLight = lightSemgnetSet.green(
             lightBuffers.green.getValue(0),
-            finalLight
+            finalLight,
           );
         }
 
@@ -242,36 +245,34 @@ export default function ImportSector(
         } else {
           finalLight = lightSemgnetSet.blue(
             lightBuffers.blue.getValue(0),
-            finalLight
+            finalLight,
           );
         }
 
         section.light[i] = finalLight;
       }
 
-      if (needsPerVoxelSecondary) {
-        const trueVoxelId = VoxelLUT.voxelIdToTrueId[voxelId];
-        const rawSecondary = secondaryBuffer.getValue(i);
+      const trueVoxelId = VoxelLUT.voxelIdToTrueId[voxelId];
+      const rawSecondary = secondaryBuffer.getValue(i);
 
-        if (
-          VoxelTagsRegister.VoxelTags[trueVoxelId]?.["dve_can_have_secondary"]
-        ) {
-          if (secondaryIdLUT) {
-            section.secondary[i] = secondaryIdLUT[rawSecondary];
-          } else {
-            section.secondary[i] = VoxelLUT.getVoxelIdFromString(
-              ...voxelReader.getVoxelData(rawSecondary)
-            );
-          }
+      if (
+        VoxelTagsRegister.VoxelTags[trueVoxelId]?.["dve_can_have_secondary"]
+      ) {
+        if (secondaryIdLUT) {
+          section.secondary[i] = secondaryIdLUT[rawSecondary];
         } else {
-          section.secondary[i] = rawSecondary;
+          section.secondary[i] = VoxelLUT.getVoxelIdFromString(
+            ...voxelReader.getVoxelData(rawSecondary),
+          );
         }
+      } else {
+        section.secondary[i] = 0;
       }
 
       if (section.ids[i] !== 0 || section.secondary[i] !== 0) {
         section.setHasVoxel(
           WorldSpaces.voxel.getPositionFromIndex(i, position).y - 1,
-          true
+          true,
         );
       }
     }

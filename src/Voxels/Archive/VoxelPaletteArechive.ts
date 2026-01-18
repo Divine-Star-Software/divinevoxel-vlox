@@ -54,8 +54,8 @@ export class VoxelArchivePalette {
       const modelId = VoxelLUT.models.getStringId(
         VoxelLUT.modelsIndex[VoxelLUT.voxelIds.getNumberId(stringId)]
       );
-      const stateData = VoxelSchemas.getStateSchema(stringId)!.getSchema();
-      const modData = VoxelSchemas.mod.get(stringId)!.getSchema();
+      const stateData = VoxelSchemas.getStateSchema(stringId)?.getSchema();
+      const modData = VoxelSchemas.mod.get(stringId)?.getSchema();
       if (stateData && stateData?.length) {
         this._stateShemas[modelId] = stateData;
       }

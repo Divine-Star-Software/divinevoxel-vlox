@@ -9,7 +9,7 @@ export class CompiledTexture {
   static GetAtlasPosition = (
     index: number,
     boundsX: number,
-    position: Vec2Array = [0, 0]
+    position: Vec2Array = [0, 0],
   ) => {
     position[1] = Math.floor(index / boundsX);
     position[0] = Math.floor(index % boundsX);
@@ -46,7 +46,7 @@ export class CompiledTexture {
         frameIndex = CompiledTexture.GetAtlasIndex(
           id[1][0],
           id[1][1],
-          this.atlasSizeMap[finalId][0]
+          this.atlasSizeMap[finalId][0],
         );
       if (typeof id[1] == "string") {
         finalId = `${id[0]}:${id[1]}`;
@@ -55,7 +55,7 @@ export class CompiledTexture {
           frameIndex = CompiledTexture.GetAtlasIndex(
             id[2][0],
             id[2][1],
-            this.atlasSizeMap[finalId][0]
+            this.atlasSizeMap[finalId][0],
           );
       }
     }
@@ -65,7 +65,7 @@ export class CompiledTexture {
         `Texture with id [passed in: ${id.toString()}] [final: ${finalId}] does not exist on compiled texture [${
           this.id
         }]`,
-        this.textureMap
+        this.textureMap,
       );
       return 0;
     }
@@ -86,7 +86,8 @@ export class CompiledTexture {
     const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("OffscreenCanvas context unavailable");
-
+    ctx.translate(0, canvas.height);
+    ctx.scale(1, -1);
     ctx.drawImage(bitmap, 0, 0);
     return ctx.getImageData(0, 0, bitmap.width, bitmap.height).data;
   }

@@ -2105,3 +2105,155 @@ export const leverModel: VoxelModelData = {
     ],
   },
 };
+
+export const diamondGeometry: VoxelGeometryData = {
+  id: "dve_diamond",
+  doNotBuildRules: true,
+  arguments: {
+    texture: {
+      type: "texture",
+    },
+  },
+  nodes: [
+    //top
+    {
+      type: "triangle",
+      points: [
+        [0.5, 0.5, 0],
+        [0.5, 1, 0.5],
+        [0, 0.5, 0.5],
+      ],
+      texture: "@texture",
+      uv: [
+        [0.5, 0.5],
+        [0.5, 1],
+        [0, 0.5],
+      ],
+    },
+    {
+      type: "triangle",
+      points: [
+        [1, 0.5, 0.5],
+        [0.5, 1, 0.5],
+        [0.5, 0.5, 0],
+      ],
+      texture: "@texture",
+      uv: [
+        [1, 0.5],
+        [0.5, 1],
+        [0.5, 0.5],
+      ],
+    },
+    {
+      type: "triangle",
+      points: [
+        [0.5, 0.5, 1],
+        [0.5, 1, 0.5],
+        [1, 0.5, 0.5],
+      ],
+      texture: "@texture",
+      uv: [
+        [0.5, 0.5],
+        [1, 0.5],
+        [0.5, 1],
+      ],
+    },
+    {
+      type: "triangle",
+      points: [
+        [0, 0.5, 0.5],
+        [0.5, 1, 0.5],
+        [0.5, 0.5, 1],
+      ],
+      texture: "@texture",
+      uv: [
+        [0, 0.5],
+        [0.5, 1],
+        [0.5, 0.5],
+      ],
+    },
+    //bottom
+    {
+      type: "triangle",
+      points: [
+        [0, 0.5, 0.5],
+        [0.5, 0, 0.5],
+        [0.5, 0.5, 0],
+      ],
+      texture: "@texture",
+      uv: [
+        [0, 0.5],
+        [0.5, 1],
+        [0.5, 0.5],
+      ],
+    },
+    {
+      type: "triangle",
+      points: [
+        [0.5, 0.5, 0],
+        [0.5, 0, 0.5],
+        [1, 0.5, 0.5],
+      ],
+      texture: "@texture",
+      uv: [
+        [0.5, 0.5],
+        [0.5, 1],
+        [1, 0.5],
+      ],
+    },
+    {
+      type: "triangle",
+      points: [
+        [1, 0.5, 0.5],
+        [0.5, 0, 0.5],
+        [0.5, 0.5, 1],
+      ],
+      texture: "@texture",
+      uv: [
+        [0.5, 1],
+        [1, 0.5],
+        [0.5, 0.5],
+      ],
+    },
+    {
+      type: "triangle",
+      points: [
+        [0.5, 0.5, 1],
+        [0.5, 0, 0.5],
+        [0, 0.5, 0.5],
+      ],
+      texture: "@texture",
+      uv: [
+        [0.5, 0.5],
+        [0.5, 1],
+        [0, 0.5],
+      ],
+    },
+  ],
+};
+
+
+export const diamondModel: VoxelModelData = {
+  id: "dve_diamond",
+  relationsSchema: [],
+  stateSchema: [],
+  arguments: {
+    texture: {
+      type: "texture",
+    },
+  },
+  conditonalNodes: {},
+  properties: {
+    dve_placing_strategy: "*",
+  },
+  stateNodes: {
+    "*": [
+      {
+        geometryId: "dve_diamond",
+        inputs: {
+          texture: "@texture",
+        },
+      },
+    ],
+  },
+};

@@ -69,8 +69,8 @@ export class VoxelLUT {
   static totalReltionalStates: Uint16Array;
   //maps true voxel ids to the total number of reltional mod states
   static totalReltionalMods: Uint16Array;
-  static totalVoxelIds = 0;
-  static totalRelationalVoxelIds = 0;
+  static totalVoxelIds = 1;
+  static totalRelationalVoxelIds = 1;
   /** totalVoxelIds * totalRelationalVoxelIds */
   static totalCombinedIds = 0;
 
@@ -136,8 +136,8 @@ export class VoxelLUT {
     return this.voxelRecord[
       this.voxelRecordStartIndex[trueId] +
         this.getStateIndex(
-          this.modelStateMaps[this.modelsIndex[trueId]].get(state)!,
-          this.voxelModMaps[trueId].get(mod)!,
+          this.modelStateMaps[this.modelsIndex[trueId]].get(state)! ?? 0,
+          this.voxelModMaps[trueId].get(mod)! ?? 0,
           this.totalStates[trueId]
         )
     ];
