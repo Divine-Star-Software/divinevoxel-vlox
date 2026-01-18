@@ -8,7 +8,7 @@ export enum PathToolModes {
   MovePoints = "Move Points",
   RemovePoints = "Remove Points",
   FillPath = "Fill Path",
-  RemovePath = "Remvoe Path",
+  RemovePath = "Remove Path",
 }
 interface PathToolEvents {}
 export class PathTool extends BuilderToolBase<PathToolEvents> {
