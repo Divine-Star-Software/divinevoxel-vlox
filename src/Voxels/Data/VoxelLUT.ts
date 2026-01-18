@@ -144,6 +144,7 @@ export class VoxelLUT {
   }
 
   static getVoxelIdFromString(id: string, state: number = 0, mod: number = 0) {
+    if (id == "dve_air") return 0;
     return this.getVoxelId(this.voxelIds.getNumberId(id), state, mod);
   }
 

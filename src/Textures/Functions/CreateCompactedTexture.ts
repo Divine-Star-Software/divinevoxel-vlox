@@ -116,6 +116,7 @@ export async function CreateCompactedTexture(
       for (let varation of textureData.variations) {
         if (typeof varation == "string") {
           varation = { id: varation };
+          if (textureData.basePath) varation.basePath = textureData.basePath;
         }
         if (varation.basePath) {
           loader.baseURL = varation.basePath;

@@ -40,6 +40,13 @@ function getAllCombinations(valuePairs: [string, string[]][]) {
 function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
   const totalModelStates = new Map<string, number>();
   const totalModelRelationalStates = new Map<string, number>();
+  VoxelLUT.models.register("dve_air");
+  VoxelLUT.modelsIndex[0] = 0;
+  VoxelLUT.modelStateMaps[0] = new Map([[0, 0]]);
+  VoxelLUT.modelRelationalStateMaps[0] = new Map([[0, 0]]);
+  VoxelLUT.voxelModMaps[0] = new Map([[0, 0]]);
+  VoxelLUT.voxelRelationalModMaps[0] = new Map([[0, 0]]);
+
   //build state schemas
   for (const model of models) {
     VoxelLUT.models.register(model.id);
