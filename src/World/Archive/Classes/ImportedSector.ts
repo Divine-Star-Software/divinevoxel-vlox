@@ -48,7 +48,6 @@ class ImportedSectorPalettes {
   }
 }
 
-const temp: [id: string, state: number, mod: number] = ["", 0, 0];
 export class ImportedSector {
   sections: ImportedSection[] = [];
   palettes: ImportedSectorPalettes;

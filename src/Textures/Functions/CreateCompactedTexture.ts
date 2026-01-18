@@ -32,7 +32,7 @@ async function process(
   node.index = [];
   for (let i = 0; i < tiles.length; i++) {
     node.index.push(textureIndex + i);
-    await reader.writeImage(textureIndex + i, tiles[i]);
+    reader.writeImage(textureIndex + i, tiles[i]);
   }
 
   return textureIndex + tiles.length;

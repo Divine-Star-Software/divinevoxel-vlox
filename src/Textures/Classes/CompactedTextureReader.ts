@@ -73,7 +73,7 @@ export class CompactedTextureReader {
     return image;
   }
 
-  async writeImage(index: number, image: HTMLImageElement) {
+  writeImage(index: number, image: HTMLImageElement) {
     const [x, y] = this.index.getPosition(index);
     this.context.drawImage(
       image,
