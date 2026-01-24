@@ -13,7 +13,7 @@ export type QuadVertexVec3Data = [Vec3Array, Vec3Array, Vec3Array, Vec3Array];
 export type QuadVertexFloatData = [number, number, number, number];
 export type QuadUVData = [Vec2Array, Vec2Array, Vec2Array, Vec2Array];
 
-export enum QuadVerticies {
+export const enum QuadVerticies {
   TopRight,
   TopLeft,
   BottomLeft,
@@ -26,7 +26,7 @@ export const QuadVerticiesArray: QuadVerticies[] = [
   QuadVerticies.BottomLeft,
   QuadVerticies.BottomRight,
 ];
-export enum TriangleVerticies {
+export const enum TriangleVerticies {
   One,
   Two,
   Three,

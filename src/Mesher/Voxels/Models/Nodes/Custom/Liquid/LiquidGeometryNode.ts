@@ -28,19 +28,19 @@ const quadRotations: Record<CompassAngles, QuadUVData> = {
 
   [CompassAngles.NorthWest]: Quad.RotateUvs(
     Quad.FullUVs,
-    CompassAngles.NorthWest
+    CompassAngles.NorthWest,
   ),
   [CompassAngles.NorthEast]: Quad.RotateUvs(
     Quad.FullUVs,
-    CompassAngles.NorthEast
+    CompassAngles.NorthEast,
   ),
   [CompassAngles.SouthWest]: Quad.RotateUvs(
     Quad.FullUVs,
-    CompassAngles.SouthWest
+    CompassAngles.SouthWest,
   ),
   [CompassAngles.SouthEast]: Quad.RotateUvs(
     Quad.FullUVs,
-    CompassAngles.SouthEast
+    CompassAngles.SouthEast,
   ),
 };
 
@@ -65,21 +65,19 @@ export class LiquidGeometryNode extends GeoemtryNode<
 > {
   init(): void {}
 
-  isExposed(face: VoxelFaces) {
-    /*     if (this.builder.voxel.getLevel() <= 0 || this.builder.voxel.getLevelState() && face !== VoxelFaces.Up) {
-      return true;
-    } */
-
-    const nv = this.builder.nVoxel.getVoxel(
+  isExposed(face: VoxelFaces, voxelId: number) {
+    const hashed = this.builder.space.getHash(
+      this.builder.nVoxel,
       VoxelFaceDirections[face][0] + this.builder.position.x,
       VoxelFaceDirections[face][1] + this.builder.position.y,
-      VoxelFaceDirections[face][2] + this.builder.position.z
+      VoxelFaceDirections[face][2] + this.builder.position.z,
     );
-    if (!nv) return true;
-    if (this.builder.voxel.isSameVoxel(nv)) return false;
-    if (nv.isAir() || nv.tags["dve_is_transparent"]) return true;
-    if (face == VoxelFaces.Up) return true;
 
+    const found = this.builder.space.foundHash[hashed];
+    if (!found) return true;
+    if (voxelId == this.builder.space.trueVoxelCache[hashed]) return false;
+    if (found == 1 || found == 3) return true;
+    if (face == VoxelFaces.Up) return true;
     return false;
   }
 
@@ -111,9 +109,10 @@ export class LiquidGeometryNode extends GeoemtryNode<
       stillTexture = 0;
     } */
 
+    const voxelId = builder.voxel.getVoxelId();
     let added = false;
     let upFaceExposed = false;
-    if (this.isExposed(VoxelFaces.Up)) {
+    if (this.isExposed(VoxelFaces.Up, voxelId)) {
       upFaceExposed = true;
       added = true;
       getFlowGradient(builder, vertexLevel);
@@ -125,7 +124,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
         vertexLevel.vertices[0] / 7,
         vertexLevel.vertices[1] / 7,
         vertexLevel.vertices[2] / 7,
-        vertexLevel.vertices[3] / 7
+        vertexLevel.vertices[3] / 7,
       );
       const flowData = getFlowAngle(vertexLevel);
       const uvSet = quadRotations[flowData[0]];
@@ -163,7 +162,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
       builder.updateBounds(quad.bounds);
     }
 
-    if (this.isExposed(VoxelFaces.Down)) {
+    if (this.isExposed(VoxelFaces.Down, voxelId)) {
       added = true;
 
       const quad = Quads[VoxelFaces.Down];
@@ -186,7 +185,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
       builder.updateBounds(quad.bounds);
     }
 
-    if (this.isExposed(VoxelFaces.North)) {
+    if (this.isExposed(VoxelFaces.North, voxelId)) {
       added = true;
 
       const quad = Quads[VoxelFaces.North];
@@ -225,7 +224,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
       builder.updateBounds(quad.bounds);
     }
 
-    if (this.isExposed(VoxelFaces.South)) {
+    if (this.isExposed(VoxelFaces.South, voxelId)) {
       added = true;
 
       const quad = Quads[VoxelFaces.South];
@@ -264,7 +263,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
       builder.updateBounds(quad.bounds);
     }
 
-    if (this.isExposed(VoxelFaces.East)) {
+    if (this.isExposed(VoxelFaces.East, voxelId)) {
       added = true;
 
       const quad = Quads[VoxelFaces.East];
@@ -304,7 +303,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
       builder.updateBounds(quad.bounds);
     }
 
-    if (this.isExposed(VoxelFaces.West)) {
+    if (this.isExposed(VoxelFaces.West, voxelId)) {
       added = true;
 
       const quad = Quads[VoxelFaces.West];

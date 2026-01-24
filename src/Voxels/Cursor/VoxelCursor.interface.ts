@@ -41,13 +41,14 @@ export abstract class VoxelCursorInterface {
     this.id = this.ids[this._index];
     this.secondaryId = this.secondary[this._index];
 
-    this._voxelId = this.getVoxelId();
+    this._voxelId = this.__readingSecondaryVoxel
+      ? VoxelLUT.voxelIdToTrueId[this.secondary[this._index]]
+      : VoxelLUT.voxelIdToTrueId[this.ids[this._index]];
+      
     this.tags = VoxelTagsRegister.VoxelTags[this._voxelId];
 
     this.substanceTags =
-      VoxelTagsRegister.SubstanceTags[
-        VoxelLUT.substance.getNumberId(this.tags["dve_substance"]!)
-      ];
+      VoxelTagsRegister.SubstanceTags[VoxelLUT.substanceMap[this._voxelId]];
   }
 
   abstract loadIn(): void;
@@ -88,7 +89,7 @@ export abstract class VoxelCursorInterface {
   setLevel(level: number) {
     this.level[this._index] = VoxelLevelReader.setLevel(
       this.level[this._index],
-      level
+      level,
     );
     return this;
   }
@@ -98,7 +99,7 @@ export abstract class VoxelCursorInterface {
   setLevelState(state: number) {
     this.level[this._index] = VoxelLevelReader.setLevelState(
       this.level[this._index],
-      state
+      state,
     );
     return this;
   }
@@ -131,7 +132,7 @@ export abstract class VoxelCursorInterface {
     if (this.isLightSource()) {
       return this._lightData.mixLight(
         this.light[this._index],
-        this.tags[VoxelTagIds.lightValue] as number
+        this.tags[VoxelTagIds.lightValue] as number,
       );
     }
     return this.light[this._index];
@@ -146,12 +147,12 @@ export abstract class VoxelCursorInterface {
     if (this._voxelId <= 0) return false;
     if (
       VoxelLogicRegister.voxels[this._voxelId]?.hasTag(
-        VoxelTagIds.isLightSource
+        VoxelTagIds.isLightSource,
       )
     ) {
       return VoxelLogicRegister.voxels[this._voxelId].getTagValue(
         VoxelTagIds.isLightSource,
-        this
+        this,
       );
     }
     return this.tags[VoxelTagIds.isLightSource];
@@ -196,7 +197,7 @@ export abstract class VoxelCursorInterface {
   setPower(level: number) {
     this.level[this._index] = VoxelLevelReader.setLevel(
       this.level[this._index],
-      level
+      level,
     );
     return this;
   }
@@ -205,12 +206,12 @@ export abstract class VoxelCursorInterface {
     if (this._voxelId <= 0) return false;
     if (
       VoxelLogicRegister.voxels[this._voxelId]?.hasTag(
-        VoxelTagIds.isPowerSource
+        VoxelTagIds.isPowerSource,
       )
     ) {
       return VoxelLogicRegister.voxels[this._voxelId].getTagValue(
         VoxelTagIds.isPowerSource,
-        this
+        this,
       );
     }
     return this.tags[VoxelTagIds.isPowerSource];
@@ -276,7 +277,7 @@ export abstract class VoxelCursorInterface {
     return this.setVoxelId(
       VoxelLUT.voxelIds.getNumberId(VoxelLUT.voxelNametoIdMap.get(name)!),
       state,
-      mod
+      mod,
     );
   }
 
@@ -308,6 +309,10 @@ export abstract class VoxelCursorInterface {
     return this;
   }
 
+  isFullBlock(){
+    return this.tags["dve_full_block"];
+  }
+  
   isSameVoxel(voxel: VoxelCursorInterface) {
     return this.getVoxelId() == voxel.getVoxelId();
   }

@@ -38,7 +38,7 @@ export const VoxelFaceNameDirectionsRecord: Record<VoxelFaceNames, Vec3Array> =
     east: [1, 0, 0],
     west: [-1, 0, 0],
   };
-export enum VoxelFaces {
+export const enum VoxelFaces {
   Up,
   Down,
   North,
@@ -56,15 +56,14 @@ export const VoxelFacesArray = Object.freeze([
   VoxelFaces.West,
 ]);
 
-export const VoxelFaceDirections: Readonly<Record<VoxelFaces, Vec3Array>> =
-  Object.freeze({
-    [VoxelFaces.Up]: [0, 1, 0],
-    [VoxelFaces.Down]: [0, -1, 0],
-    [VoxelFaces.North]: [0, 0, 1],
-    [VoxelFaces.South]: [0, 0, -1],
-    [VoxelFaces.East]: [1, 0, 0],
-    [VoxelFaces.West]: [-1, 0, 0],
-  });
+export const VoxelFaceDirections: Readonly<Vec3Array[]> = Object.freeze([
+  [0, 1, 0], // 0 = Up
+  [0, -1, 0], // 1 = Down
+  [0, 0, 1], // 2 = North
+  [0, 0, -1], // 3 = South
+  [1, 0, 0], // 4 = East
+  [-1, 0, 0], // 5 = West
+]);
 
 export const VoxelFaceOpositeDirectionMap: Record<VoxelFaces, VoxelFaces> = {
   [VoxelFaces.Up]: VoxelFaces.Down,

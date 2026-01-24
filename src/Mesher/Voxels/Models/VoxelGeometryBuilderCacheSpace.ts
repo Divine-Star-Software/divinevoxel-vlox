@@ -8,6 +8,7 @@ export class VoxelGeometryBuilderCacheSpace {
   foundHash: Uint8Array;
   //cache of the voxel ids
   voxelCache: Uint16Array;
+  lightCache: Int32Array;
   //cache of the true voxel ids
   trueVoxelCache: Uint16Array;
   //cache of the reltional voxel ids
@@ -17,6 +18,7 @@ export class VoxelGeometryBuilderCacheSpace {
   reltionalStateCache: Uint16Array;
 
   noCastAO: Uint8Array;
+  fullBlock: Uint8Array;
   offset: Vec3Array = [0, 0, 0];
 
   voxelCursor = new VoxelCursor();
@@ -27,7 +29,9 @@ export class VoxelGeometryBuilderCacheSpace {
     this.voxelCache = new Uint16Array(volume);
     this.trueVoxelCache = new Uint16Array(volume);
     this.reltionalVoxelCache = new Uint16Array(volume);
+    this.lightCache = new Int32Array(volume);
     this.reltionalStateCache = new Uint16Array(volume);
+    this.fullBlock = new Uint8Array(volume);
 
     this.noCastAO = new Uint8Array(volume);
   }
@@ -36,6 +40,8 @@ export class VoxelGeometryBuilderCacheSpace {
     this.offset[1] = y;
     this.offset[2] = z;
 
+    this.fullBlock.fill(0);
+    this.lightCache.fill(0);
     this.foundHash.fill(0);
     this.voxelCache.fill(0);
     this.trueVoxelCache.fill(0);
@@ -52,7 +58,7 @@ export class VoxelGeometryBuilderCacheSpace {
       z - this.offset[2],
       this.bounds.x,
       this.bounds.y,
-      this.bounds.z
+      this.bounds.z,
     );
   }
 
@@ -69,12 +75,15 @@ export class VoxelGeometryBuilderCacheSpace {
     index: number,
     x: number,
     y: number,
-    z: number
+    z: number,
   ) {
-    if (this.foundHash[index] == 1) return;
-    if (this.foundHash[index] == 2) return;
+    if (this.foundHash[index] > 0) return;
 
     const voxel = dataCursor.getVoxel(x, y, z);
+
+    if (voxel) {
+      this.lightCache[index] = voxel.getLight();
+    }
 
     if (!voxel || !voxel.isRenderable()) {
       this.foundHash[index] = 1;
@@ -87,7 +96,13 @@ export class VoxelGeometryBuilderCacheSpace {
     this.trueVoxelCache[index] = trueVoxelId;
     this.voxelCache[index] = voxelId;
 
-    this.foundHash[index] = 2;
+    if (voxel.isOpaque()) {
+      this.foundHash[index] = 2;
+    } else {
+      this.foundHash[index] = 3;
+    }
+
+    this.fullBlock[index] = voxel.tags["dve_full_block"] ? 1 : 0;
 
     //no ao
     this.noCastAO[index] = voxel.isLightSource() || voxel.noAO() ? 1 : 0;
@@ -115,14 +130,12 @@ export class VoxelGeometryBuilderCacheSpace {
       relationalModBuilder.voxel = this.voxelCursor;
       relationalModBuilder.dataCursor = dataCursor;
       reltionalMod = relationalModBuilder.buildState();
-    } else {
-      this.reltionalVoxelCache[index] = 0;
     }
 
     this.reltionalVoxelCache[index] = VoxelLUT.getReltionalVoxelId(
       trueVoxelId,
       reltionalState,
-      reltionalMod
+      reltionalMod,
     );
   }
 }

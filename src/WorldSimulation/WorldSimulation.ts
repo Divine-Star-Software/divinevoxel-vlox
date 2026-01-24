@@ -146,7 +146,7 @@ export class WorldSimulation {
     WorldSimulationTasks.worldPropagationTasks.runTask();
 
     if (generationOnly) return;
-    WorldSimulationTasks.buildTasks.runTask(32);
+    WorldSimulationTasks.buildTasks.runTask(64);
     WorldSimulationTasks.saveTasks.runTask(50);
     WorldSimulationTasks.unloadTasks.runTask(50);
     WorldSimulationTasks.unbuildTasks.runTask();

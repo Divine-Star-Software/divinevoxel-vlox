@@ -6,7 +6,7 @@ import { WorldRegister } from "../../WorldRegister";
 
 export default async function LockSectors(
   dimension: number,
-  bounds: BoundsInterface
+  bounds: BoundsInterface,
 ) {
   const { min, max } = bounds.getMinMax();
 
@@ -43,7 +43,12 @@ export default async function LockSectors(
     }
   }
 
-  await Promise.all(waitingToLockSectors.map((_) => _.waitTillCheckedIn()));
+  const proms: Promise<any>[] = [];
+  for (const _ of waitingToLockSectors) {
+    proms.push(_.waitTillCheckedIn() as any);
+  }
+
+  await Promise.all(proms);
 
   for (const sector of waitingToLockSectors) {
     sector.setLocked(true);

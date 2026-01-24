@@ -16,10 +16,16 @@ export class SectionSnapshotCursor implements DataCursorInterface {
 
   sectors: Sector[] = [];
   cursors: SectorCursor[] = [];
-  index = Flat3DIndex.GetXYZOrder();
-  
+  private invSectorSizeX: number = 0;
+  private invSectorSizeY: number = 0;
+  private invSectorSizeZ: number = 0;
+
   constructor() {
-    this.index.setBounds(3, 3, 3);
+    // Initialize inverse sizes FIRST
+    this.invSectorSizeX = 1 / WorldSpaces.sector.bounds.x;
+    this.invSectorSizeY = 1 / WorldSpaces.sector.bounds.y;
+    this.invSectorSizeZ = 1 / WorldSpaces.sector.bounds.z;
+
     const { x: sizeX, y: sizeY, z: sizeZ } = WorldSpaces.sector.bounds;
 
     for (let x = 0; x < 3; x++) {
@@ -29,11 +35,12 @@ export class SectionSnapshotCursor implements DataCursorInterface {
             !WorldSpaces.world.inBounds(
               (x - 1) * sizeX,
               (y - 1) * sizeY,
-              (z - 1) * sizeZ
+              (z - 1) * sizeZ,
             )
           )
             continue;
-          const sectorIndex = this.index.getIndexXYZ(x, y, z);
+          // Use direct index calculation here — we're iterating grid positions, not world coords
+          const sectorIndex = x + y * 3 + z * 9;
           const sector = new Sector();
           sector.setBuffer(Sector.CreateNewBuffer());
           const cursor = new SectorCursor();
@@ -50,14 +57,17 @@ export class SectionSnapshotCursor implements DataCursorInterface {
       Vector3Like.Create(
         WorldSpaces.world.bounds.MinX,
         WorldSpaces.world.bounds.MinY,
-        WorldSpaces.world.bounds.MinZ
+        WorldSpaces.world.bounds.MinZ,
       ),
       Vector3Like.Create(
         WorldSpaces.world.bounds.MaxX,
         WorldSpaces.world.bounds.MaxY,
-        WorldSpaces.world.bounds.MaxZ
-      )
+        WorldSpaces.world.bounds.MaxZ,
+      ),
     );
+    this.invSectorSizeX = 1 / WorldSpaces.sector.bounds.x;
+    this.invSectorSizeY = 1 / WorldSpaces.sector.bounds.y;
+    this.invSectorSizeZ = 1 / WorldSpaces.sector.bounds.z;
   }
   private _snapShot: SectionSnapShot;
   private _centeralCursor = new SectionCursor();
@@ -93,14 +103,15 @@ export class SectionSnapshotCursor implements DataCursorInterface {
     for (let x = 0; x < 3; x++) {
       for (let y = 0; y < 3; y++) {
         for (let z = 0; z < 3; z++) {
-          const sectorIndex = this.index.getIndexXYZ(x, y, z);
+          // Direct index — these are grid positions, not world coords
+          const sectorIndex = x + y * 3 + z * 9;
           const sector = this.sectors[sectorIndex];
           if (!sector) continue;
           const secotrPosition = WorldSpaces.sector.getPosition(
             this.sectorOrigin.x + (x - 1) * sectorSizeX,
             this.sectorOrigin.y + (y - 1) * sectorSizeY,
             this.sectorOrigin.z + (z - 1) * sectorSizeZ,
-            tempPosition
+            tempPosition,
           );
           sector.position[0] = secotrPosition.x;
           sector.position[1] = secotrPosition.y;
@@ -128,8 +139,9 @@ export class SectionSnapshotCursor implements DataCursorInterface {
           if (!sector) continue;
           const section = sector.getSection(sectionX, sectionY, sectionZ);
           section.updatePosition();
+          
           section.view.set(
-            snapShot.sections[snapShot.index.getIndexXYZ(x, y, z)]
+            snapShot.sections[x + y * 3 + z * 9],
           );
         }
       }
@@ -137,12 +149,11 @@ export class SectionSnapshotCursor implements DataCursorInterface {
   }
 
   protected getSectorIndex(x: number, y: number, z: number) {
-    const sectorPos = WorldSpaces.sector.getPosition(x, y, z, tempPosition);
-    return this.index.getIndexXYZ(
-      (sectorPos.x - this.sectorOrigin.x) / WorldSpaces.sector.bounds.x + 1,
-      (sectorPos.y - this.sectorOrigin.y) / WorldSpaces.sector.bounds.y + 1,
-      (sectorPos.z - this.sectorOrigin.z) / WorldSpaces.sector.bounds.z + 1
-    );
+    const ix = ((x - this.sectorOrigin.x) * this.invSectorSizeX + 1) | 0;
+    const iy = ((y - this.sectorOrigin.y) * this.invSectorSizeY + 1) | 0;
+    const iz = ((z - this.sectorOrigin.z) * this.invSectorSizeZ + 1) | 0;
+
+    return ix + iy * 3 + iz * 9;
   }
 
   inBounds(x: number, y: number, z: number) {
@@ -150,9 +161,9 @@ export class SectionSnapshotCursor implements DataCursorInterface {
   }
 
   getVoxel(x: number, y: number, z: number) {
-    const sector = this.cursors[this.getSectorIndex(x, y, z)];
-    if (!sector) return null;
-    return sector.getVoxel(x, y, z);
+    const cursor = this.cursors[this.getSectorIndex(x, y, z)];
+    if (!cursor) return null;
+    return cursor.getVoxel(x, y, z);
   }
 
   clone() {

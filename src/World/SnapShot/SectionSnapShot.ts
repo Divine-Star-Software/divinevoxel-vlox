@@ -7,24 +7,37 @@ import { WorldRegister } from "../WorldRegister";
 export interface SectionSnapShotTransferData {
   location: LocationData;
   sections: Uint8Array[];
+  used: boolean[];
 }
 
 export class SectionSnapShot {
   sections: Uint8Array[] = [];
   location: LocationData = [0, 0, 0, 0];
-  index = Flat3DIndex.GetXYZOrder();
   private _buffers: ArrayBuffer[] = [];
+  private _used: boolean[] = [];
+
+  private _sectionSizeX = 0;
+  private _sectionSizeY = 0;
+  private _sectionSizeZ = 0;
+
   constructor() {
-    this.index.setBounds(3, 3, 3);
-    let totalSections = this.index.size;
-    while (totalSections--) {
+    const totalSections = 27;
+    for (let i = 0; i < totalSections; i++) {
       const buffer = new ArrayBuffer(Section.GetBufferSize());
       this.sections.push(new Uint8Array(buffer));
       this._buffers.push(buffer);
+      this._used[i] = false;
     }
+    this._updateSizes();
   }
 
-  setLocation([dimension, x, y, z]: LocationData) {
+  private _updateSizes() {
+    this._sectionSizeX = WorldSpaces.section.bounds.x;
+    this._sectionSizeY = WorldSpaces.section.bounds.y;
+    this._sectionSizeZ = WorldSpaces.section.bounds.z;
+  }
+
+  setLocation(dimension: number, x: number, y: number, z: number) {
     this.location[0] = dimension;
     this.location[1] = x;
     this.location[2] = y;
@@ -32,25 +45,43 @@ export class SectionSnapShot {
   }
 
   storeSnapShot() {
-    const { x: sizeX, y: sizeY, z: sizeZ } = WorldSpaces.section.bounds;
-    const [dim, ox, oy, oz] = this.location;
-    for (let x = 0; x < 3; x++) {
+    const sizeX = this._sectionSizeX;
+    const sizeY = this._sectionSizeY;
+    const sizeZ = this._sectionSizeZ;
+    const dim = this.location[0];
+    const ox = this.location[1];
+    const oy = this.location[2];
+    const oz = this.location[3];
+    const sections = this.sections;
+    const used = this._used;
+    const world = WorldSpaces.world;
+    const sectorReg = WorldRegister.sectors;
+
+    let index = 0;
+    for (let z = 0; z < 3; z++) {
+      const wz = oz + (z - 1) * sizeZ;
       for (let y = 0; y < 3; y++) {
-        for (let z = 0; z < 3; z++) {
+        const wy = oy + (y - 1) * sizeY;
+        for (let x = 0; x < 3; x++) {
           const wx = ox + (x - 1) * sizeX;
-          const wy = oy + (y - 1) * sizeY;
-          const wz = oz + (z - 1) * sizeZ;
-          const snapShotSection =
-            this.sections[this.index.getIndexXYZ(x, y, z)];
-          if (!WorldSpaces.world.inBounds(wx, wy, wz)) {
-            snapShotSection.fill(0);
+          const i = index++;
+          const snapShotSection = sections[i];
+          const beenUsed = used[i];
+
+          if (!world.inBounds(wx, wy, wz)) {
+            if (beenUsed) snapShotSection.fill(0);
+            used[i] = false;
             continue;
           }
-          const sector = WorldRegister.sectors.get(dim, wx, wy, wz);
+
+          const sector = sectorReg.get(dim, wx, wy, wz);
           if (!sector) {
-            snapShotSection.fill(0);
+            if (beenUsed) snapShotSection.fill(0);
+            used[i] = false;
             continue;
           }
+
+          used[i] = true;
           snapShotSection.set(sector.getSection(wx, wy, wz).view);
         }
       }
@@ -67,8 +98,9 @@ export class SectionSnapShot {
     this._isTransfered = true;
     return [
       {
-        location: [...this.location],
-        sections: [...this.sections],
+        location: this.location,
+        sections: this.sections,
+        used: this._used,
       },
       this._buffers,
     ];
@@ -77,10 +109,10 @@ export class SectionSnapShot {
   restore(data: SectionSnapShotTransferData) {
     this.sections = data.sections;
     this.location = data.location;
-    this._buffers = [];
+    this._used = data.used;
     this._isTransfered = false;
     for (let i = 0; i < this.sections.length; i++) {
-      this._buffers.push(this.sections[i].buffer as ArrayBuffer);
+      this._buffers[i] = this.sections[i].buffer as ArrayBuffer;
     }
   }
 }

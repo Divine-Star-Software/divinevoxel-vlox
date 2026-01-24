@@ -26,11 +26,11 @@ export class SnapShots {
     return this.bounds;
   }
 
-  static createSnapShot(location: LocationData) {
+  static createSnapShot(dimension: number, x: number, y: number, z: number) {
     let snapShot = this._readyCache.length
-      ? this._readyCache.shift()!
+      ? this._readyCache.pop()!
       : new SectionSnapShot();
-    snapShot.setLocation(location);
+    snapShot.setLocation(dimension,x,y,z);
     snapShot.storeSnapShot();
     return snapShot;
   }

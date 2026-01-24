@@ -10,8 +10,7 @@ import { TextureId } from "Textures";
 
 import { Vec3Array } from "@amodx/math";
 import { VoxelFaceDirections, VoxelFaces } from "../../../../../Math/index.js";
-export interface OutlinedTextureProcedureData
-  extends BaseVoxelGeometryTextureProcedureData {
+export interface OutlinedTextureProcedureData extends BaseVoxelGeometryTextureProcedureData {
   type: "outlined";
   texture: TextureId | number;
   textureRecrod: {
@@ -178,30 +177,30 @@ const generateCheck = (
   direction: keyof typeof uvsSets,
   tool: VoxelModelBuilder,
   normal: Vec3Array,
-  sets: Vec3Array[]
+  sets: Vec3Array[],
 ) => {
   const { x, y, z } = tool.position;
 
   let key = 0b0;
 
+  const currentVoxelId = tool.voxel.getVoxelId();
   for (let i = 0; i < sets.length; i++) {
     const set = sets[i];
     const cx = x + set[0];
     const cy = y + set[1];
     const cz = z + set[2];
 
-    const sameLevelCheck = tool.nVoxel
-      .getVoxel(cx, cy, cz)
-      ?.isSameVoxel(tool.voxel);
+    const hashed = tool.space.getHash(tool.nVoxel, cx, cy, cz);
+    const sameLevelCheck = currentVoxelId == tool.space.trueVoxelCache[hashed];
     let normalCheck = true;
 
-    const nVoxel = tool.nVoxel.getVoxel(
+    const hashedNormal = tool.space.getHash(
+      tool.nVoxel,
       cx + normal[0],
       cy + normal[1],
-      cz + normal[2]
+      cz + normal[2],
     );
-
-    if (nVoxel && nVoxel.isRenderable() && nVoxel.isOpaque()) {
+    if (tool.space.foundHash[hashedNormal] == 2) {
       normalCheck = false;
     }
 
@@ -222,7 +221,7 @@ export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTexturePr
     builder: VoxelModelBuilder,
     data: OutlinedTextureProcedureData,
     closestFace: VoxelFaces,
-    primitive: Quad
+    primitive: Quad,
   ): number {
     return data.texture! as number;
   }
@@ -232,7 +231,7 @@ export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTexturePr
     data: OutlinedTextureProcedureData,
     closestFace: VoxelFaces,
     primitive: Quad,
-    ref: Vector4Like
+    ref: Vector4Like,
   ): Vector4Like {
     const set = CheckSets[closestFace];
     const normal = VoxelFaceDirections[closestFace];
@@ -266,6 +265,6 @@ export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTexturePr
     builder: VoxelModelBuilder,
     data: OutlinedTextureProcedureData,
     closestFace: VoxelFaces,
-    primitive: Quad
+    primitive: Quad,
   ) {}
 }

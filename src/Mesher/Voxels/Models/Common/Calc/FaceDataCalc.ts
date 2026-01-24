@@ -6,29 +6,28 @@ import { VoxelLightData } from "../../../../../Voxels/Cursor/VoxelLightData.js";
 const lightData = new VoxelLightData();
 export default function calculateFaceData(
   face: VoxelFaces,
-  builder: VoxelModelBuilder
+  builder: VoxelModelBuilder,
 ) {
   const x = builder.position.x;
   const y = builder.position.y;
   const z = builder.position.z;
   const vertexData = builder.lightData[face];
-  const nVoxel = builder.nVoxel;
   const checkSet = GradientCheckSets[face];
   let startLight = 0;
 
   if (builder.voxel.isLightSource()) {
     startLight = builder.voxel.getLightSourceValue();
   } else {
-    startLight =
-      nVoxel
-        .getVoxel(
-          x + VoxelFaceDirections[face][0],
-          y + VoxelFaceDirections[face][1],
-          z + VoxelFaceDirections[face][2]
-        )
-        ?.getLight() || -1;
+    let hashed = builder.space.getHash(
+      builder.nVoxel,
+      x + VoxelFaceDirections[face][0],
+      y + VoxelFaceDirections[face][1],
+      z + VoxelFaceDirections[face][2],
+    );
+    startLight = builder.space.lightCache[hashed];
     if (startLight <= 0) {
-      startLight = nVoxel.getVoxel(x, y, z)?.getLight() || 0;
+      hashed = builder.space.getHash(builder.nVoxel, x, y, z);
+      startLight = builder.space.lightCache[hashed];
     }
   }
   if (startLight < 0) startLight = 0;
@@ -44,14 +43,13 @@ export default function calculateFaceData(
     let g = startG;
     let b = startB;
     for (let i = 0; i < 9; i += 3) {
-      const nl =
-        nVoxel
-          .getVoxel(
-            checkSet[vertex][i] + x,
-            checkSet[vertex][i + 1] + y,
-            checkSet[vertex][i + 2] + z
-          )
-          ?.getLight() || -1;
+      const hashed = builder.space.getHash(
+        builder.nVoxel,
+        checkSet[vertex][i] + x,
+        checkSet[vertex][i + 1] + y,
+        checkSet[vertex][i + 2] + z,
+      );
+      const nl = builder.space.lightCache[hashed];
       if (nl <= 0) continue;
       let ns = lightData.getS(nl);
       let nr = lightData.getR(nl);

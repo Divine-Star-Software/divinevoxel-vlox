@@ -2,6 +2,7 @@ import { LocationData } from "../../Math";
 import { WorldSpaces } from "../../World/WorldSpaces";
 import { DimensionSegment } from "../Dimensions/DimensionSegment";
 const pool: LocationData[] = [];
+
 export class TaskSegment {
   _hash = new Set();
   nodes: LocationData[] = [];
@@ -16,11 +17,11 @@ export class TaskSegment {
   constructor(
     public dimension: DimensionSegment,
     public generationTask: boolean,
-    public log = false
+    public log = false,
   ) {}
 
   _getLocationData(dimension: number, x: number, y: number, z: number) {
-    const location: LocationData = pool.length ? pool.shift()! : [0, 0, 0, 0];
+    const location: LocationData = pool.length ? pool.pop()! : [0, 0, 0, 0];
     location[0] = dimension;
     location[1] = x;
     location[2] = y;
@@ -35,8 +36,8 @@ export class TaskSegment {
       WorldSpaces.hash.hashXYZ(
         locationData[1],
         locationData[2],
-        locationData[3]
-      )
+        locationData[3],
+      ),
     );
     this._task.delete(id);
     pool.push(locationData);
@@ -67,45 +68,77 @@ export class TaskSegment {
 
   sort(x: number, y: number, z: number) {
     const sections = this.nodes;
-    const sx = x,
-      sy = y,
-      sz = z;
-    let i = sections.length,
-      j,
-      temp,
-      ax,
-      ay,
-      az,
-      bx,
-      by,
-      bz,
-      distA,
-      distB;
-
-    while (i > 1) {
-      for (j = 1; j < i; j++) {
-        (ax = sections[j - 1][1]),
-          (ay = sections[j - 1][2]),
-          (az = sections[j - 1][3]);
-        (bx = sections[j][1]), (by = sections[j][2]), (bz = sections[j][3]);
-
-        distA = (ax - sx) ** 2 + (ay - sy) ** 2 + (az - sz) ** 2;
-        distB = (bx - sx) ** 2 + (by - sy) ** 2 + (bz - sz) ** 2;
-
-        if (distA > distB) {
-          temp = sections[j - 1];
-          sections[j - 1] = sections[j];
-          sections[j] = temp;
-        }
-      }
-      i--;
-    }
+    this._quickSort(sections, 0, sections.length - 1, x, y, z);
     return sections;
+  }
+
+  private _quickSort(
+    arr: LocationData[],
+    low: number,
+    high: number,
+    sx: number,
+    sy: number,
+    sz: number,
+  ) {
+    const stack: number[] = [];
+    stack.push(low, high);
+
+    while (stack.length) {
+      high = stack.pop()!;
+      low = stack.pop()!;
+
+      if (low >= high) continue;
+
+      const pivotIndex = this._partition(arr, low, high, sx, sy, sz);
+
+      // Push smaller partition first to limit stack growth
+      if (pivotIndex - low < high - pivotIndex) {
+        stack.push(pivotIndex + 1, high);
+        stack.push(low, pivotIndex - 1);
+      } else {
+        stack.push(low, pivotIndex - 1);
+        stack.push(pivotIndex + 1, high);
+      }
+    }
+  }
+
+  private _partition(
+    arr: LocationData[],
+    low: number,
+    high: number,
+    sx: number,
+    sy: number,
+    sz: number,
+  ): number {
+    const pivot = arr[high];
+    const pivotDist =
+      (pivot[1] - sx) ** 2 + (pivot[2] - sy) ** 2 + (pivot[3] - sz) ** 2;
+
+    let i = low - 1;
+    let temp: LocationData;
+
+    for (let j = low; j < high; j++) {
+      const dist =
+        (arr[j][1] - sx) ** 2 + (arr[j][2] - sy) ** 2 + (arr[j][3] - sz) ** 2;
+
+      if (dist > pivotDist) {
+        i++;
+        temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+      }
+    }
+
+    temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+
+    return i + 1;
   }
 
   *run(): Generator<LocationData> {
     while (this.nodes.length) {
-      const vec = this.nodes.shift()!;
+      const vec = this.nodes.pop()!;
       const key = WorldSpaces.hash.hashXYZ(vec[1], vec[2], vec[3]);
       this._hash.delete(key);
       yield vec;

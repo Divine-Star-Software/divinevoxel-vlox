@@ -49,7 +49,6 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
   //build state schemas
   for (const model of models) {
     VoxelLUT.models.register(model.id);
-    //build state schema
     const schemaNodes: VoxelBinaryStateSchemaNode[] = [];
     for (const schemaNode of model.stateSchema) {
       const node: VoxelBinaryStateSchemaNode = {
@@ -100,7 +99,7 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
     VoxelLUT.materialMap[trueVoxelId] = VoxelLUT.material.getNumberId(
       voxel.properties["dve_rendered_material"] || "dve_solid"
     );
-    VoxelLUT.substanceMap[trueVoxelId] = VoxelLUT.material.getNumberId(
+    VoxelLUT.substanceMap[trueVoxelId] = VoxelLUT.substance.getNumberId(
       voxel.properties["dve_substance"] || "dve_solid"
     );
     if (!modelData) continue;

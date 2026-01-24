@@ -30,8 +30,8 @@ export class SectorCursor
       Vector3Like.Create(
         WorldSpaces.sector.bounds.x,
         WorldSpaces.sector.bounds.y,
-        WorldSpaces.sector.bounds.z
-      )
+        WorldSpaces.sector.bounds.z,
+      ),
     );
   }
 
@@ -65,16 +65,13 @@ export class SectorCursor
     const section =
       this._current.sections[WorldSpaces.section.getIndex(x, y, z)];
     if (!section) {
-      if (!section)
-        throw new Error(
-          `Could not load section at ${x}-${y}-${z} | ${WorldSpaces.section.getIndex(
-            x,
-            y,
-            z
-          )}`
-        );
-      this._section = null;
-      return null;
+      throw new Error(
+        `Could not load section at ${x}-${y}-${z} | ${WorldSpaces.section.getIndex(
+          x,
+          y,
+          z,
+        )}`,
+      );
     }
     return section;
   }
@@ -87,7 +84,7 @@ export class SectorCursor
     this._voxelIndex = WorldSpaces.voxel.getIndexFromPosition(
       this._voxelPosition.x,
       this._voxelPosition.y,
-      this._voxelPosition.z
+      this._voxelPosition.z,
     );
 
     this.voxel.loadIn();
@@ -102,4 +99,3 @@ export class SectorCursor
     return new SectorCursor();
   }
 }
-

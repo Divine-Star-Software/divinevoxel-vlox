@@ -1,5 +1,5 @@
 import { Vec4Array } from "@amodx/math";
-import { VoxelFaces } from "../../../../../Math";
+import { VoxelFaceDirections, VoxelFaces } from "../../../../../Math";
 import { Quad } from "../../../../Geometry/Primitives/Quad";
 import { addVoxelQuad } from "../../../Geometry/VoxelGeometryBuilder";
 import { GeoemtryNode } from "../GeometryNode";
@@ -35,28 +35,30 @@ export class QuadVoxelGometryNode extends GeoemtryNode<
 
   add(args: QuadVoxelGometryArgs) {
     if (!args[ArgIndexes.Enabled]) return false;
+
+    const builder = this.builder;
+
     if (
       this.trueFaceIndex !== undefined &&
-      !CullRulledFace(this.builder, this.trueFaceIndex)
+      !CullRulledFace(builder, this.trueFaceIndex)
     )
       return false;
 
-    const builder = this.builder;
     builder.calculateFaceData(this.closestFace);
 
     this.trueFaceIndex !== undefined
       ? ShadeRulledFace(
-          this.builder,
+          builder,
           this.trueFaceIndex,
-          this.builder.lightData[this.closestFace],
+          builder.lightData[this.closestFace],
           this.vertexWeights,
-          4
+          4,
         )
       : ShadeRulelessFace(
-          this.builder,
-          this.builder.lightData[this.closestFace],
+          builder,
+          builder.lightData[this.closestFace],
           this.vertexWeights,
-          4
+          4,
         );
     const quad = this.quad;
 

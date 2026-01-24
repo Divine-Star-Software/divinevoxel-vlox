@@ -24,7 +24,7 @@ export default function ({
   Threads.registerTask<SectionSnapShotTransferData>(
     "cache-snap-shot",
     (data) => {
-      const snapShot = SnapShots._pendingCache.shift()!;
+      const snapShot = SnapShots._pendingCache.pop()!;
       snapShot.restore(data);
       SnapShots._readyCache.push(snapShot);
     }

@@ -8,7 +8,23 @@ import { EngineSettings } from "../../Settings/EngineSettings";
 import { SnapShots } from "../../World/SnapShot/SnapShots";
 import LockSectors from "../../World/Lock/Function/LockSectors";
 import UnLockSectors from "../../World/Lock/Function/UnLockSectors";
-
+import { TaskSegment } from "WorldSimulation/Tasks/TaskSegment";
+function createAndTransferSnapShot(
+  task: TaskSegment,
+  taskId: number,
+  dim: number,
+  x: number,
+  y: number,
+  z: number,
+) {
+  task.completeTask(taskId);
+  const snapShot = SnapShots.createSnapShot(dim, x, y, z);
+  WorldSimulationTools.taskTool.build.sectionSnapShot.run(
+    ...snapShot.transfer(),
+  );
+  SnapShots.transferSnapShot(snapShot);
+  UnLockSectors(dim, SnapShots.getSnapShotBounds(x, y, z));
+}
 export class WorldSimulationTasks {
   /**# Load Sectors
    * ---
@@ -45,6 +61,7 @@ export class WorldSimulationTasks {
     generationTask: true,
     checkInRequired: true,
     log: true,
+    sort: true,
     checkDone(location) {
       const sector = WorldRegister.sectors.get(...location);
       if (!sector || sector.isCheckedOut()) return false;
@@ -63,7 +80,7 @@ export class WorldSimulationTasks {
         () => {
           simSector.checkIn(generator);
         },
-        generator
+        generator,
       );
     },
   });
@@ -90,7 +107,7 @@ export class WorldSimulationTasks {
         () => {
           simSector.checkIn(generator);
         },
-        generator
+        generator,
       );
     },
   });
@@ -118,7 +135,7 @@ export class WorldSimulationTasks {
         () => {
           simSector.checkIn(generator);
         },
-        generator
+        generator,
       );
     },
   });
@@ -145,7 +162,7 @@ export class WorldSimulationTasks {
         () => {
           simSector.checkIn(generator);
         },
-        generator
+        generator,
       );
     },
   });
@@ -176,6 +193,7 @@ export class WorldSimulationTasks {
       task.completeTask(taskId);
     },
   });
+
   /**# Build Task
    * ---
    */
@@ -198,13 +216,7 @@ export class WorldSimulationTasks {
       const [dim, x, y, z] = location;
 
       LockSectors(dim, SnapShots.getSnapShotBounds(x, y, z)).then(() => {
-        task.completeTask(taskId);
-        const snapShot = SnapShots.createSnapShot(location);
-        WorldSimulationTools.taskTool.build.sectionSnapShot.run(
-          ...snapShot.transfer()
-        );
-        SnapShots.transferSnapShot(snapShot);
-        UnLockSectors(dim, SnapShots.getSnapShotBounds(x, y, z));
+        createAndTransferSnapShot(task, taskId, dim, x, y, z);
       });
     },
   });
@@ -219,7 +231,7 @@ export class WorldSimulationTasks {
       dimension.activeSectors.get(
         location[1],
         location[2],
-        location[3]
+        location[3],
       )!._rendered = false;
       task.completeTask(taskId);
     },

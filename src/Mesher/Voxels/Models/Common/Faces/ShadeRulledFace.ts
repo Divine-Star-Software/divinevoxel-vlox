@@ -11,63 +11,74 @@ export function ShadeRulledFace(
   trueFaceIndex: number,
   lightData: Record<QuadVerticies, number>,
   vertexWeights: Vec4Array[],
-  vertexStride: number
+  vertexStride: number,
 ) {
-  const noAO = builder.voxel.isLightSource() || builder.voxel.noAO();
+  const voxel = builder.voxel;
+  const noAO = voxel.isLightSource() || voxel.noAO();
 
-  const worldLight = builder.vars.light;
-  const worldAO = builder.vars.ao;
+  const worldLightVerts = builder.vars.light.vertices;
+  const worldAOVerts = builder.vars.ao.vertices;
+
+  const space = builder.space;
+  const foundHash = space.foundHash;
+  const noCastAO = space.noCastAO;
+  const voxelCache = space.voxelCache;
+  const trueVoxelCache = space.trueVoxelCache;
+  const reltionalVoxelCache = space.reltionalVoxelCache;
+  const reltionalStateCache = space.reltionalStateCache;
+
+  const posX = builder.position.x;
+  const posY = builder.position.y;
+  const posZ = builder.position.z;
+  const nVoxel = builder.nVoxel;
+
+  const aoVertexHitMap = GeometryLUT.aoVertexHitMap!;
+  const geometryIndex = GeometryLUT.geometryIndex;
+  const aoIndex = GeometryLUT.aoIndex;
+  const voxelIdToState = VoxelLUT.voxelIdToState;
 
   for (let v = 0; v < vertexStride; v++) {
-    worldAO.vertices[v] = 0;
-
-    worldLight.vertices[v] = getInterpolationValue(
+    worldAOVerts[v] = 0;
+    worldLightVerts[v] = getInterpolationValue(
       lightData as Vec4Array,
-      vertexWeights[v]
+      vertexWeights[v],
     );
 
     if (noAO) continue;
 
-    const aoIndexes = GeometryLUT.aoVertexHitMap![trueFaceIndex][v];
-
+    const aoIndexes = aoVertexHitMap[trueFaceIndex][v];
     if (!aoIndexes) continue;
 
     for (let i = 0; i < aoIndexes.length; i++) {
       const directionIndex = aoIndexes[i];
       const p = VoxelRelativeCubeIndexPositionMap[directionIndex];
 
-      const hashed = builder.space.getHash(
-        builder.nVoxel,
-        builder.position.x + p[0],
-        builder.position.y + p[1],
-        builder.position.z + p[2]
+      const hashed = space.getHash(
+        nVoxel,
+        posX + p[0],
+        posY + p[1],
+        posZ + p[2],
       );
 
-      if (
-        builder.space.foundHash[hashed] < 2 ||
-        builder.space.noCastAO[hashed] === 1
-      )
-        continue;
+      if (foundHash[hashed] < 2 || noCastAO[hashed] === 1) continue;
 
-      const voxelId = builder.space.voxelCache[hashed];
-      const reltionalVoxelId = builder.space.reltionalVoxelCache[hashed];
-      const geometryIndex = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
-      const baseGeo = GeometryLUT.geometryIndex[geometryIndex];
+      const voxelId = voxelCache[hashed];
+      const reltionalVoxelId = reltionalVoxelCache[hashed];
+      const geoIdx = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
+      const baseGeo = geometryIndex[geoIdx];
 
-      //  if (!baseGeo && !conditonalGeo) continue;
       let shaded = false;
       if (baseGeo) {
         for (let geoIndex = 0; geoIndex < baseGeo.length; geoIndex++) {
           if (
-            GeometryLUT.aoIndex.getValue(
+            aoIndex.getValue(
               baseGeo[geoIndex],
               directionIndex,
               trueFaceIndex,
-              v
+              v,
             )
           ) {
-            worldAO.vertices[v]++;
-            if (worldAO.vertices[v] >= 3) {
+            if (++worldAOVerts[v] >= 3) {
               shaded = true;
               break;
             }
@@ -76,40 +87,35 @@ export function ShadeRulledFace(
       }
       if (shaded) continue;
 
-      const trueVoxelId = builder.space.trueVoxelCache[hashed];
+      const trueVoxelId = trueVoxelCache[hashed];
       const offsetConditonalGeometry =
         VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
 
       if (offsetConditonalGeometry) {
-        const modelState = VoxelLUT.voxelIdToState[voxelId];
-        const relationalModSeltate = builder.space.reltionalStateCache[hashed];
-        for (let i = 0; i < offsetConditonalGeometry.length; i++) {
+        const modelState = voxelIdToState[voxelId];
+        const relationalModState = reltionalStateCache[hashed];
+
+        for (let j = 0; j < offsetConditonalGeometry.length; j++) {
           const [geoId, requiredModelState, requiredReltionalModelState] =
-            offsetConditonalGeometry[i];
+            offsetConditonalGeometry[j];
           if (
             requiredModelState !== modelState ||
-            !requiredReltionalModelState[relationalModSeltate]
+            !requiredReltionalModelState[relationalModState]
           )
             continue;
 
-          const geomerties = GeometryLUT.geometryIndex[geoId];
-          for (let geoIndex = 0; geoIndex < geomerties.length; geoIndex++) {
-            const geoId = geomerties[geoIndex];
+          const geometries = geometryIndex[geoId];
+          for (let k = 0; k < geometries.length; k++) {
             if (
-              GeometryLUT.aoIndex.getValue(
-                geoId,
-                directionIndex,
-                trueFaceIndex,
-                v
-              )
+              aoIndex.getValue(geometries[k], directionIndex, trueFaceIndex, v)
             ) {
-              worldAO.vertices[v]++;
-              if (worldAO.vertices[v] >= 3) {
+              if (++worldAOVerts[v] >= 3) {
                 shaded = true;
                 break;
               }
             }
           }
+          if (shaded) break;
         }
       }
     }

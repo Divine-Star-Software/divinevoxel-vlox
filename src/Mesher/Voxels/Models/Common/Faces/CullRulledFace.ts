@@ -5,95 +5,108 @@ import { VoxelModelBuilder } from "../../VoxelModelBuilder";
 
 export function CullRulledFace(
   builder: VoxelModelBuilder,
-  trueFaceIndex: number
+  trueFaceIndex: number,
 ) {
-  const faceIndexes = GeometryLUT.faceCullMap![trueFaceIndex];
+  const faceCullMap = GeometryLUT.faceCullMap!;
+  const faceIndexes = faceCullMap[trueFaceIndex];
   if (!faceIndexes) return true;
+
+  const space = builder.space;
+  const foundHash = space.foundHash;
+  const voxelCache = space.voxelCache;
+  const trueVoxelCache = space.trueVoxelCache;
+  const reltionalVoxelCache = space.reltionalVoxelCache;
+  const reltionalStateCache = space.reltionalStateCache;
+
+  const posX = builder.position.x;
+  const posY = builder.position.y;
+  const posZ = builder.position.z;
+  const nVoxel = builder.nVoxel;
+
+  const geometryIndexLUT = GeometryLUT.geometryIndex;
+  const rulelessIndex = GeometryLUT.rulelessIndex;
+  const cullingProcedures = GeometryLUT.geometryCullingProcedures;
+  const cullingProceduresIndex = GeometryLUT.geometryCullingProceduresIndex;
+  const faceCullIndex = GeometryLUT.faceCullIndex;
+  const voxelIdToState = VoxelLUT.voxelIdToState;
+
+  const currentVoxelId = builder.voxel.getVoxelId();
 
   for (let i = 0; i < faceIndexes.length; i++) {
     const directionIndex = faceIndexes[i];
     const p = VoxelRelativeCubeIndexPositionMap[directionIndex];
-    const hashed = builder.space.getHash(
-      builder.nVoxel,
-      builder.position.x + p[0],
-      builder.position.y + p[1],
-      builder.position.z + p[2]
-    );
-    if (builder.space.foundHash[hashed] < 2) continue;
+    const hashed = space.getHash(nVoxel, posX + p[0], posY + p[1], posZ + p[2]);
 
-    const voxelStringId = VoxelLUT.voxelIds.getStringId(
-      builder.space.trueVoxelCache[hashed]
-    );
+    if (foundHash[hashed] < 2) continue;
 
-    const voxelId = builder.space.voxelCache[hashed];
-    const reltionalVoxelId = builder.space.reltionalVoxelCache[hashed];
+    const voxelId = voxelCache[hashed];
+    const reltionalVoxelId = reltionalVoxelCache[hashed];
     const geometryIndex = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
-    const offsetBaseGometry = GeometryLUT.geometryIndex[geometryIndex];
-    if (offsetBaseGometry) {
-      for (let i = 0; i < offsetBaseGometry.length; i++) {
-        const geoId = offsetBaseGometry[i];
-        if (GeometryLUT.rulelessIndex[geoId]) continue;
-        const cullingProcedure =
-          GeometryLUT.geometryCullingProcedures[
-            GeometryLUT.geometryCullingProceduresIndex[geoId]
-          ];
+    const offsetBaseGeometry = geometryIndexLUT[geometryIndex];
 
-        if (cullingProcedure.type == "transparent") {
-          if (voxelStringId != builder.voxel.getStringId()) continue;
-        } else {
-          if (cullingProcedure.type != "default") continue;
+    if (offsetBaseGeometry) {
+      for (let j = 0; j < offsetBaseGeometry.length; j++) {
+        const geoId = offsetBaseGeometry[j];
+        if (rulelessIndex[geoId]) continue;
+
+        const cullingProcedure =
+          cullingProcedures[cullingProceduresIndex[geoId]];
+        const procType = cullingProcedure.type;
+
+        if (procType === "transparent") {
+          if (voxelId !== currentVoxelId) continue;
+        }
+        if (procType == "none") {
+          continue;
         }
 
         if (
-          GeometryLUT.faceCullIndex.getValue(
-            geoId,
-            directionIndex,
-            trueFaceIndex
-          ) == 1
+          faceCullIndex.getValue(geoId, directionIndex, trueFaceIndex) === 1
         ) {
           return false;
         }
       }
     }
 
-    const trueVoxelId = builder.space.trueVoxelCache[hashed];
-    const offsetConditonalGeometry =
+    const trueVoxelId = trueVoxelCache[hashed];
+    const offsetConditionalGeometry =
       VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
 
-    if (offsetConditonalGeometry) {
-      const modelState = VoxelLUT.voxelIdToState[voxelId];
-      const relationalModSeltate = builder.space.reltionalStateCache[hashed];
-      for (let i = 0; i < offsetConditonalGeometry.length; i++) {
-        const [geoId, requiredModelState, requiredReltionalModelState] =
-          offsetConditonalGeometry[i];
+    if (offsetConditionalGeometry) {
+      const modelState = voxelIdToState[voxelId];
+      const relationalModState = reltionalStateCache[hashed];
+
+      for (let j = 0; j < offsetConditionalGeometry.length; j++) {
+        const [condGeoId, requiredModelState, requiredRelationalModelState] =
+          offsetConditionalGeometry[j];
         if (
           requiredModelState !== modelState ||
-          !requiredReltionalModelState[relationalModSeltate]
-        )
+          !requiredRelationalModelState[relationalModState]
+        ) {
           continue;
+        }
 
-        const geomerties = GeometryLUT.geometryIndex[geoId];
-        for (let k = 0; k < geomerties.length; k++) {
-          const geoId = geomerties[k];
-          if (GeometryLUT.rulelessIndex[geoId]) continue;
+        const geometries = geometryIndexLUT[condGeoId];
+        for (let k = 0; k < geometries.length; k++) {
+          const geoId = geometries[k];
+          if (rulelessIndex[geoId]) continue;
+
           const cullingProcedure =
-            GeometryLUT.geometryCullingProcedures[
-              GeometryLUT.geometryCullingProceduresIndex[geoId]
-            ];
-          if (cullingProcedure.type == "transparent") {
-            if (voxelStringId != builder.voxel.getStringId()) continue;
-          } else {
-            if (cullingProcedure.type != "default") continue;
+            cullingProcedures[cullingProceduresIndex[geoId]];
+          const procType = cullingProcedure.type;
+
+          if (procType === "transparent") {
+            if (voxelId !== currentVoxelId) continue;
           }
-          if (GeometryLUT.rulelessIndex[geoId]) continue;
+          if (procType == "none") {
+            continue;
+          }
+
           if (
-            GeometryLUT.faceCullIndex.getValue(
-              geoId,
-              directionIndex,
-              trueFaceIndex
-            ) == 1
-          )
+            faceCullIndex.getValue(geoId, directionIndex, trueFaceIndex) === 1
+          ) {
             return false;
+          }
         }
       }
     }

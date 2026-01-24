@@ -6,7 +6,7 @@ export type DVESectionMeshesAttributes = [
   data: TypedArrays,
   stride: number,
   componentTypes?: number,
-  noramlizer?: number
+  noramlizer?: number,
 ][];
 
 export type NodeMaterialData = {
@@ -21,6 +21,7 @@ export type NodeMaterialOptions = {
   mipMapBias?: number;
   hasEffects?: boolean;
   backFaceCulling?: boolean;
+  forceDepthWrite?: boolean;
 };
 
 export type NodeMeshData = {
@@ -28,7 +29,7 @@ export type NodeMeshData = {
   materialId: string;
   boundingBoxMaxSize: Vec3Array;
   type?: string;
-  worldMesh?:boolean;
+  worldMesh?: boolean;
 } & NodeMeshOptions;
 
 export type NodeMeshOptions = {
