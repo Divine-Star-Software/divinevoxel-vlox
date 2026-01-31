@@ -101,7 +101,7 @@ export class VoxelBuildSpace {
     public DVER: DivineVoxelEngineRender,
     rayProvider: RayProvider,
     min = Vector3Like.Create(-Infinity, -Infinity, -Infinity),
-    max = Vector3Like.Create(Infinity, Infinity, Infinity)
+    max = Vector3Like.Create(Infinity, Infinity, Infinity),
   ) {
     this.bounds = new BoundingBox(min, max);
     this.addRayProvider(0, rayProvider);
@@ -121,7 +121,7 @@ export class VoxelBuildSpace {
   async pick(
     rayOrigin: Vector3Like = this.rayProvider.origin,
     rayDirection: Vector3Like = this.rayProvider.direction,
-    length: number = this.rayProvider.length
+    length: number = this.rayProvider.length,
   ): Promise<VoxelPickResult | null> {
     const pickedVoxel = await this.DVER.threads.world.runTaskAsync(
       "pick-voxel",
@@ -129,7 +129,7 @@ export class VoxelBuildSpace {
         [rayOrigin.x, rayOrigin.y, rayOrigin.z],
         [rayDirection.x, rayDirection.y, rayDirection.z],
         length,
-      ]
+      ],
     );
 
     if (pickedVoxel === null) {
@@ -147,7 +147,7 @@ export class VoxelBuildSpace {
     return await this.pick(
       provider.origin,
       this.rayProvider.direction,
-      this.rayProvider.length
+      this.rayProvider.length,
     );
   }
 
@@ -166,30 +166,30 @@ export class VoxelBuildSpace {
     position: Vector3Like,
     normal: Vector3Like,
     extrusion: number,
-    maxSize?: number
+    maxSize?: number,
   ): Promise<VoxelSurfaceSelectionData> {
     return await this.DVER.threads.world.runTaskAsync(
       "get-voxel-surface-selection",
-      [position, normal, extrusion, maxSize]
+      [position, normal, extrusion, maxSize],
     );
   }
   async getBFSSelection(
     position: Vector3Like,
-    maxSize?: number
+    maxSize?: number,
   ): Promise<VoxelBFSSelectionData> {
     return await this.DVER.threads.world.runTaskAsync(
       "get-voxel-bfs-selection",
-      [position, maxSize]
+      [position, maxSize],
     );
   }
 
   async getExtrudedSelectionTemplate(
     selection: IVoxelSelectionData<any>,
-    nomral: Vector3Like
+    nomral: Vector3Like,
   ) {
     const templateData = await this.DVER.threads.world.runTaskAsync(
       "get-extruded-voxel-selection-template",
-      [selection, nomral]
+      [selection, nomral],
     );
     return new FullVoxelTemplate(templateData);
   }
@@ -197,7 +197,7 @@ export class VoxelBuildSpace {
   getPlaceState(
     data: PaintVoxelData,
     picked: VoxelPickResult,
-    alt: number | null = null
+    alt: number | null = null,
   ) {
     const strategy = VoxelPlacingStrategyRegister.get(data.id);
     if (!strategy) return data;
@@ -220,9 +220,9 @@ export class VoxelBuildSpace {
       [0, min.x, min.y, min.z],
       VoxelShapeTemplate.CreateNew({
         shapeSelection: BoxVoxelShapeSelection.CreateNew({
-          width: this.bounds.size.x,
-          height: this.bounds.size.y,
-          depth: this.bounds.size.z,
+          width: this.bounds.size.x + 1,
+          height: this.bounds.size.y + 1,
+          depth: this.bounds.size.z + 1,
         }),
       }),
     ]);
@@ -314,7 +314,7 @@ export class VoxelBuildSpace {
 
   async paintTemplate(
     position: Vec3Array | Vector3Like | Vector3Like,
-    template: IVoxelTemplateData<any>
+    template: IVoxelTemplateData<any>,
   ) {
     await this.update({
       type: "paint-voxel-template",
@@ -327,7 +327,7 @@ export class VoxelBuildSpace {
 
   async eraseTemplate(
     position: Vec3Array | Vector3Like,
-    template: IVoxelTemplateData<any>
+    template: IVoxelTemplateData<any>,
   ) {
     await this.update({
       type: "erase-voxel-template",

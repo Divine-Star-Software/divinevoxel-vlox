@@ -7,7 +7,7 @@ export class SurfaceBoxSelection {
   offset = 0;
   constructor(
     public space: VoxelBuildSpace,
-    public selection: VoxelBoundsSelection
+    public selection: VoxelBoundsSelection,
   ) {}
 
   update() {
@@ -16,14 +16,14 @@ export class SurfaceBoxSelection {
     const distance =
       Vector3Like.Dot(
         Vector3Like.Subtract(this.planeOrigin, rayOrigin),
-        this.planeNormal
+        this.planeNormal,
       ) / Vector3Like.Dot(rayDirection, this.planeNormal);
 
     const intersectionPoint = Vector3Like.FloorInPlace(
       Vector3Like.Add(
         rayOrigin,
-        Vector3Like.MultiplyScalar(rayDirection, distance)
-      )
+        Vector3Like.MultiplyScalar(rayDirection, distance),
+      ),
     );
     let offset = this.offset;
     if (
@@ -33,12 +33,13 @@ export class SurfaceBoxSelection {
     ) {
       offset++;
     }
+    if (!this.space.bounds.intersectsPoint(intersectionPoint)) return;
     this.selection.reConstruct(
       this.planeOrigin,
       this.planeNormal,
       intersectionPoint,
       this.planeNormal,
-      offset
+      offset,
     );
   }
 }

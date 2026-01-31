@@ -1,5 +1,4 @@
 import { VoxelBuildSpace } from "../../VoxelBuildSpace";
-import { VoxelTemplateSelection } from "../../../Templates/Selection/VoxelTemplateSelection";
 import { VoxelShapeTemplate } from "../../../Templates/Shapes/VoxelShapeTemplate";
 import { SphereVoxelShapeSelection } from "../../../Templates/Shapes/Selections/SphereVoxelShapeSelection";
 import { BoxVoxelShapeSelection } from "../../../Templates/Shapes/Selections/BoxVoxelShapeSelection";
@@ -10,6 +9,8 @@ import { VoxelPickResult } from "../../../Voxels/Interaction/VoxelPickResult";
 import { Vector3Like } from "@amodx/math";
 import { PaintVoxelData } from "../../../Voxels";
 import { BuilderToolBase, ToolOptionsData } from "../BuilderToolBase";
+import { FreePointSelection } from "../../Util/FreePointSelection";
+import { VoxelPointSelection } from "../../../Templates/Selection/VoxelPointSelection";
 
 export enum BrushPositionModes {
   Start = "Start",
@@ -21,6 +22,11 @@ export enum BrushToolModes {
   Fill = "Fill",
   Extrude = "Extrude",
   Remove = "Remove",
+}
+
+export enum BrushToolSelectionPositionModes {
+  Surface = "Surface",
+  Free = "Free",
 }
 
 type BrushVoxelData = {
@@ -40,6 +46,10 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     BrushToolModes.Extrude,
     BrushToolModes.Remove,
   ];
+  static PositionTypeModeArray: BrushToolSelectionPositionModes[] = [
+    BrushToolSelectionPositionModes.Surface,
+    BrushToolSelectionPositionModes.Free,
+  ];
   static PositionModeArray: BrushPositionModes[] = [
     BrushPositionModes.Start,
     BrushPositionModes.Center,
@@ -53,28 +63,28 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       return new VoxelShapeTemplate(
         VoxelShapeTemplate.CreateNew({
           shapeSelection: SphereVoxelShapeSelection.CreateNew({}),
-        })
+        }),
       );
     },
     Box() {
       return new VoxelShapeTemplate(
         VoxelShapeTemplate.CreateNew({
           shapeSelection: BoxVoxelShapeSelection.CreateNew({}),
-        })
+        }),
       );
     },
     Pyramid() {
       return new VoxelShapeTemplate(
         VoxelShapeTemplate.CreateNew({
           shapeSelection: PyramidVoxelShapeSelection.CreateNew({}),
-        })
+        }),
       );
     },
     Ellipsoid() {
       return new VoxelShapeTemplate(
         VoxelShapeTemplate.CreateNew({
           shapeSelection: EllipsoidVoxelShapeSelection.CreateNew({}),
-        })
+        }),
       );
     },
   };
@@ -222,6 +232,16 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   axisYPositionMode = BrushPositionModes.Center;
   axisZPositionMode = BrushPositionModes.Center;
   mode = BrushToolModes.Fill;
+  positionMode = BrushToolSelectionPositionModes.Surface;
+  private pointSelection = new VoxelPointSelection();
+  freeSelection = new FreePointSelection(this.space, this.pointSelection);
+  get distance() {
+    return this.freeSelection.distance;
+  }
+
+  set distance(distance: number) {
+    this.freeSelection.distance = distance;
+  }
 
   template: VoxelShapeTemplate;
   get selection() {
@@ -237,25 +257,36 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   }
 
   async update() {
-    this._lastPicked = await this.space.pickWithProvider(this.rayProviderIndex);
-    if (!this._lastPicked) return;
-    if (
-      this.mode == BrushToolModes.Fill ||
-      this.mode == BrushToolModes.Extrude
-    ) {
-      if (!this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)) {
-        this._lastPicked = null;
-        return;
+    let place: Vector3Like | null = null;
+    if (this.positionMode == BrushToolSelectionPositionModes.Surface) {
+      this._lastPicked = await this.space.pickWithProvider(
+        this.rayProviderIndex,
+      );
+      if (!this._lastPicked) return;
+      if (
+        this.mode == BrushToolModes.Fill ||
+        this.mode == BrushToolModes.Extrude
+      ) {
+        if (
+          !this.space.bounds.intersectsPoint(this._lastPicked.normalPosition)
+        ) {
+          this._lastPicked = null;
+          return;
+        }
       }
-    }
-    if (this.mode == BrushToolModes.Remove) {
-      if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
-        this._lastPicked = null;
-        return;
+      if (this.mode == BrushToolModes.Remove) {
+        if (!this.space.bounds.intersectsPoint(this._lastPicked.position)) {
+          this._lastPicked = null;
+          return;
+        }
       }
+      place = this.getPlacePosition(this._lastPicked.normalPosition);
     }
-
-    const place = this.getPlacePosition(this._lastPicked);
+    if (this.positionMode == BrushToolSelectionPositionModes.Free) {
+      this.freeSelection.update();
+      place = this.getPlacePosition(this.pointSelection.origin);
+    }
+    if (!place) return;
     this.placePosition.x = place.x;
     this.placePosition.y = place.y;
     this.placePosition.z = place.z;
@@ -274,17 +305,17 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       if (this.voxelData.fill) {
         const newData = this.space.getPlaceState(
           this.voxelData.fill,
-          this._lastPicked
+          this._lastPicked,
         );
         if (newData) this.voxelData.fill = newData;
       }
     }
+    const place = this.placePosition;
     if (this.mode == BrushToolModes.Fill && this.voxelData.fill) {
       this.template.setVoxels(this.voxelData.fill);
-      const place = this.getPlacePosition(this._lastPicked);
       await this.space.paintTemplate(
         [place.x, place.y, place.z],
-        this.template.toJSON()
+        this.template.toJSON(),
       );
       return;
     }
@@ -292,7 +323,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     if (this.mode == BrushToolModes.Extrude) {
       const template = await this.space.getExtrudedSelectionTemplate(
         this.selection.toJSON(),
-        this._lastPicked.normal
+        this._lastPicked.normal,
       );
       await this.space.paintTemplate(this.selection.origin, template.toJSON());
       return;
@@ -301,56 +332,52 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     if (this.mode == BrushToolModes.Remove) {
       const voxel = this._lastPicked.voxel;
       if (voxel && !voxel.isAir()) {
-        const place = this.getPlacePosition(this._lastPicked);
         await this.space.eraseTemplate(
           [place.x, place.y, place.z],
-          this.template.toJSON()
+          this.template.toJSON(),
         );
       }
       return;
     }
   }
 
-  protected getPlacePosition(picked: VoxelPickResult) {
+  protected getPlacePosition(position: Vector3Like) {
     //x
 
     if (this.axisXPositionMode == BrushPositionModes.Center) {
       this._position.x =
-        picked.normalPosition.x -
-        Math.floor(this.template.shapeSelection.bounds.size.x / 2);
+        position.x - Math.floor(this.template.shapeSelection.bounds.size.x / 2);
     }
     if (this.axisXPositionMode == BrushPositionModes.Start) {
-      this._position.x = picked.normalPosition.x;
+      this._position.x = position.x;
     }
     if (this.axisXPositionMode == BrushPositionModes.End) {
       this._position.x =
-        picked.normalPosition.x - this.template.shapeSelection.bounds.size.x;
+        position.x - this.template.shapeSelection.bounds.size.x;
     }
     //y
     if (this.axisYPositionMode == BrushPositionModes.Center) {
       this._position.y =
-        picked.normalPosition.y -
-        Math.floor(this.template.shapeSelection.bounds.size.y / 2);
+        position.y - Math.floor(this.template.shapeSelection.bounds.size.y / 2);
     }
     if (this.axisYPositionMode == BrushPositionModes.Start) {
-      this._position.y = picked.normalPosition.y;
+      this._position.y = position.y;
     }
     if (this.axisYPositionMode == BrushPositionModes.End) {
       this._position.y =
-        picked.normalPosition.y - this.template.shapeSelection.bounds.size.y;
+        position.y - this.template.shapeSelection.bounds.size.y;
     }
     //z
     if (this.axisZPositionMode == BrushPositionModes.Center) {
       this._position.z =
-        picked.normalPosition.z -
-        Math.floor(this.template.shapeSelection.bounds.size.z / 2);
+        position.z - Math.floor(this.template.shapeSelection.bounds.size.z / 2);
     }
     if (this.axisZPositionMode == BrushPositionModes.Start) {
-      this._position.z = picked.normalPosition.z;
+      this._position.z = position.z;
     }
     if (this.axisXPositionMode == BrushPositionModes.End) {
       this._position.z =
-        picked.normalPosition.z - this.template.shapeSelection.bounds.size.z;
+        position.z - this.template.shapeSelection.bounds.size.z;
     }
 
     return this._position;

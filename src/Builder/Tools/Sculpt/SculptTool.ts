@@ -54,19 +54,27 @@ export class SculptTool extends BuilderToolBase<SculptToolEvents> {
         this.mode == SculptToolModes.Fill ||
         this.mode == SculptToolModes.Extrude
       ) {
+        if (!this.space.bounds.intersectsPoint(picked.normalPosition)) {
+          this._lastPicked = null;
+          return;
+        }
         this.selection.reConstruct(
           picked.normalPosition,
           picked.normal,
           Vector3Like.Add(picked.normalPosition, Vector3Like.Create(1, 1, 1)),
-          picked.normal
+          picked.normal,
         );
       }
       if (this.mode == SculptToolModes.Remove) {
+        if (!this.space.bounds.intersectsPoint(picked.position)) {
+          this._lastPicked = null;
+          return;
+        }
         this.selection.reConstruct(
           picked.position,
           picked.normal,
           Vector3Like.Add(picked.position, Vector3Like.Create(1, 1, 1)),
-          picked.normal
+          picked.normal,
         );
       }
       this._normal = { ...picked.normal };
@@ -105,14 +113,14 @@ export class SculptTool extends BuilderToolBase<SculptToolEvents> {
           .toTemplate({
             fillVoxel: this.voxelData,
           })
-          .toJSON()
+          .toJSON(),
       );
       return;
     }
     if (this.mode == SculptToolModes.Extrude) {
       const template = await this.space.getExtrudedSelectionTemplate(
         this.selection.toJSON(),
-        this._normal
+        this._normal,
       );
       await this.space.paintTemplate(this.selection.origin, template.toJSON());
       return;
@@ -120,7 +128,7 @@ export class SculptTool extends BuilderToolBase<SculptToolEvents> {
     if (this.mode == SculptToolModes.Remove) {
       await this.space.eraseTemplate(
         Vector3Like.ToArray(this.selection.origin),
-        this.selection.toTemplate({}).toJSON()
+        this.selection.toTemplate({}).toJSON(),
       );
     }
   }

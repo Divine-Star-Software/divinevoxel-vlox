@@ -6,14 +6,12 @@ import {
   closestVoxelFace,
 } from "../../../Math/UtilFunctions";
 import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
-
-const epsilon = 1e-5;
 const bounds = new BoundingBox();
 export default function PickVoxel(
   cursor: DataCursorInterface,
   rayStart: Vec3Array,
   rayDirection: Vec3Array,
-  rayLength: number
+  rayLength: number,
 ) {
   const rayDir = Vector3Like.Create(...rayDirection);
   const rayOrigin = Vector3Like.Create(...rayStart);
@@ -22,23 +20,17 @@ export default function PickVoxel(
     : Vector3Like.Create();
   bounds.setMinMax(
     Vector3Like.Add(cursor.volumeBounds.min, offset),
-    Vector3Like.Add(cursor.volumeBounds.max, offset)
+    Vector3Like.Add(cursor.volumeBounds.max, offset),
   );
 
-  const safeDirection = Vector3Like.Create(
-    Math.abs(rayDir.x) < epsilon ? epsilon : rayDir.x,
-    Math.abs(rayDir.y) < epsilon ? epsilon : rayDir.y,
-    Math.abs(rayDir.z) < epsilon ? epsilon : rayDir.z
-  );
-
-  const invDir = Vector3Like.Divide(Vector3Like.Create(1, 1, 1), safeDirection);
+  const invDir = Vector3Like.Divide(Vector3Like.Create(1, 1, 1), rayDir);
   const tDelta = Vector3Like.Create(
     Math.abs(invDir.x),
     Math.abs(invDir.y),
-    Math.abs(invDir.z)
+    Math.abs(invDir.z),
   );
 
-  const tEnter = bounds.rayIntersection(rayOrigin, safeDirection);
+  const tEnter = bounds.rayIntersection(rayOrigin, rayDir);
   if (!isFinite(tEnter)) {
     return null;
   }
@@ -46,13 +38,13 @@ export default function PickVoxel(
   let traveled = Math.max(tEnter - 0.5, 0.0);
   const pos = Vector3Like.Add(
     rayOrigin,
-    Vector3Like.MultiplyScalar(rayDir, traveled)
+    Vector3Like.MultiplyScalar(rayDir, traveled),
   );
   const voxel = Vector3Like.FloorInPlace(Vector3Like.Clone(pos));
   const step = Vector3Like.Create(
     rayDir.x >= 0.0 ? 1 : -1,
     rayDir.y >= 0.0 ? 1 : -1,
-    rayDir.z >= 0.0 ? 1 : -1
+    rayDir.z >= 0.0 ? 1 : -1,
   );
 
   const tMax = Vector3Like.Create(
@@ -61,7 +53,7 @@ export default function PickVoxel(
     (rayDir.y >= 0 ? voxel.y + 1 - pos.y : pos.y - voxel.y) * tDelta.y +
       traveled,
     (rayDir.z >= 0 ? voxel.z + 1 - pos.z : pos.z - voxel.z) * tDelta.z +
-      traveled
+      traveled,
   );
   const normal = Vector3Like.Create();
   const maxDist = rayLength;
@@ -90,7 +82,7 @@ export default function PickVoxel(
           closestVoxelFace(urd),
           Vector3Like.FromArray(closestUnitNormal(n)),
           closestVoxelFace(un),
-          0
+          0,
         );
       }
     }
@@ -118,7 +110,7 @@ export default function PickVoxel(
       normal.z = -step.z;
     }
 
-    if (traveled - tEnter > maxDist) {
+    if (traveled > maxDist) {
       break;
     }
   }
