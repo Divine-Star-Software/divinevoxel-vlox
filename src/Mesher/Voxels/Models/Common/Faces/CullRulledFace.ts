@@ -54,7 +54,7 @@ export function CullRulledFace(
         const procType = cullingProcedure.type;
 
         if (procType === "transparent") {
-          if (voxelId !== currentVoxelId) continue;
+          if (trueVoxelCache[hashed] !== currentVoxelId) continue;
         }
         if (procType == "none") {
           continue;
@@ -96,7 +96,7 @@ export function CullRulledFace(
           const procType = cullingProcedure.type;
 
           if (procType === "transparent") {
-            if (voxelId !== currentVoxelId) continue;
+            if (trueVoxelCache[hashed] !== currentVoxelId) continue;
           }
           if (procType == "none") {
             continue;

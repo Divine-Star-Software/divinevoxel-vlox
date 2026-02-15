@@ -7,9 +7,9 @@ import { WorldSimulationTools } from "./Internal/WorldSimulationTools";
 import { WorldSimulationDimensions } from "./Internal/WorldSimulationDimensions";
 import { Vector3Like } from "@amodx/math";
 import { InitalLoad } from "./Procedures/InitalLoad";
-import { BuildOnly } from "./Procedures/BuildOnly";
 import SaveAllSectors from "./Procedures/SaveAllSectors";
 import { runActiveSectorUpdate } from "./Internal/runActiveSectorUpdate";
+import { WorldRegister } from "../World/WorldRegister";
 
 interface WorldSimulationInitData {
   parent: Thread;
@@ -32,7 +32,6 @@ export class WorldSimulation {
   static Procedures = {
     InitalLoad,
     SaveAllSectors,
-    BuildOnly,
   };
 
   static logTasks() {
@@ -66,6 +65,7 @@ export class WorldSimulation {
 
   static init(data: WorldSimulationInitData) {
     initalized = true;
+
     WorldSimulationTools.parent = data.parent;
     WorldSimulationTools.taskTool = new TaskTool(data.meshers, data.generators);
     if (data.worldStorage)
@@ -89,7 +89,7 @@ export class WorldSimulation {
   static addGenerator(generator: Generator) {
     this._generators.push(generator);
     WorldSimulationDimensions.getDimension(generator._dimension)!.addGenerator(
-      generator
+      generator,
     );
   }
 
@@ -99,7 +99,7 @@ export class WorldSimulation {
 
   static removeGenerator(generator: Generator) {
     WorldSimulationDimensions.getDimension(
-      generator._dimension
+      generator._dimension,
     )!.removeGenerator(generator);
     for (let i = 0; i < this._generators.length; i++) {
       if (this._generators[i] == generator) {
@@ -113,15 +113,40 @@ export class WorldSimulation {
 
   static doTickUpdates = true;
 
-  static tick(generationOnly = false) {
+  static clearAll() {
+    for (const [, dimension] of WorldSimulationDimensions._dimensions) {
+      dimension.clearAll();
+    }
+    WorldSimulationTools.parent.runTask("clear-all", []);
+    const meshers = WorldSimulationTools.taskTool.meshers;
+    if (meshers instanceof Thread) {
+      meshers.runTask("clear-all", []);
+    } else {
+      meshers.runTaskForAll("clear-all", []);
+    }
+    const generators = WorldSimulationTools.taskTool.generators;
+    if (generators instanceof Thread) {
+      generators.runTask("clear-all", []);
+    } else {
+      generators.runTaskForAll("clear-all", []);
+    }
+    WorldRegister.clearAll();
+  }
+
+  static tick(generationOnly = false, buildOnly = false) {
     let total = 0;
     for (const [, dimension] of WorldSimulationDimensions._dimensions) {
       dimension.incrementTick();
 
       for (let i = 0; i < dimension.activeSectors._sectors.length; i++) {
         total += dimension.activeSectors._sectors[i].tickQueue.getTotalTicks();
+        if (buildOnly) {
+          dimension.activeSectors._sectors[i].updateGenAllDone();
+        }
         dimension.activeSectors._sectors[i].tickUpdate(this.doTickUpdates);
-        dimension.activeSectors._sectors[i].generateUpdate();
+        if (!buildOnly) {
+          dimension.activeSectors._sectors[i].generateUpdate();
+        }
       }
     }
 
@@ -139,17 +164,21 @@ export class WorldSimulation {
       runActiveSectorUpdate();
     }
 
-    WorldSimulationTasks.worldLoadTasks.runTask();
-    WorldSimulationTasks.worldGenTasks.runTask();
-    WorldSimulationTasks.worldDecorateTasks.runTask();
-    WorldSimulationTasks.worldSunTasks.runTask();
-    WorldSimulationTasks.worldPropagationTasks.runTask();
+    if (!buildOnly) {
+      WorldSimulationTasks.worldLoadTasks.runTask();
+      WorldSimulationTasks.worldGenTasks.runTask();
+      WorldSimulationTasks.worldDecorateTasks.runTask();
+      WorldSimulationTasks.worldSunTasks.runTask();
+      WorldSimulationTasks.worldPropagationTasks.runTask();
+    }
 
     if (generationOnly) return;
     WorldSimulationTasks.buildTasks.runTask(64);
-    WorldSimulationTasks.saveTasks.runTask(50);
-    WorldSimulationTasks.unloadTasks.runTask(50);
-    WorldSimulationTasks.unbuildTasks.runTask();
+    if (!buildOnly) {
+      WorldSimulationTasks.saveTasks.runTask(50);
+      WorldSimulationTasks.unloadTasks.runTask(50);
+      WorldSimulationTasks.unbuildTasks.runTask();
+    }
   }
 }
 

@@ -807,7 +807,7 @@ export const candlesGeometry4: VoxelGeometryData = {
         [9, 3, 7],
         [7, 3, 9],
       ],
-      uv: [14, 14, 1, 1],
+      uv: [14, 14, 16, 16],
       texture: "@candleTexture",
       doubleSided: true,
     },
@@ -819,7 +819,7 @@ export const candlesGeometry4: VoxelGeometryData = {
         [7, 3, 7],
         [9, 3, 9],
       ],
-      uv: [14, 14, 1, 1],
+      uv: [14, 14, 16, 16],
       texture: "@candleTexture",
       doubleSided: true,
     },
@@ -2231,7 +2231,6 @@ export const diamondGeometry: VoxelGeometryData = {
     },
   ],
 };
-
 
 export const diamondModel: VoxelModelData = {
   id: "dve_diamond",

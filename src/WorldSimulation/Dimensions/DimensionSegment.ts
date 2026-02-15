@@ -25,9 +25,14 @@ class ActiveSectors {
     this._map.set(key, newSector);
   }
 
+  clearAll() {
+    this._sectors = [];
+    this._map.clear();
+  }
+
   get(x: number, y: number, z: number) {
     const key = WorldSpaces.hash.hashVec3(
-      WorldSpaces.sector.getPosition(x, y, z, tempPosition)
+      WorldSpaces.sector.getPosition(x, y, z, tempPosition),
     );
     if (!this._map.has(key)) return null;
     return this._map.get(key);
@@ -35,7 +40,7 @@ class ActiveSectors {
 
   remove(x: number, y: number, z: number) {
     const key = WorldSpaces.hash.hashVec3(
-      WorldSpaces.sector.getPosition(x, y, z, tempPosition)
+      WorldSpaces.sector.getPosition(x, y, z, tempPosition),
     );
     if (!this._map.has(key)) return false;
     for (let i = 0; i < this._sectors.length; i++) {
@@ -54,7 +59,7 @@ export class DimensionSegment {
 
   constructor(
     public id: number,
-    public taskTool: TaskTool
+    public taskTool: TaskTool,
   ) {}
 
   getBrush() {
@@ -117,14 +122,19 @@ export class DimensionSegment {
     const task = this.tasks.get(id);
     if (!task)
       throw new Error(
-        `Task with id [${id}] not registered in dimension segment ${this.id}`
+        `Task with id [${id}] not registered in dimension segment ${this.id}`,
       );
     return task;
   }
   clearAllTasks() {
     for (const [key, task] of this.tasks) {
-      task.clear();
+      task.clearAll();
     }
+  }
+  
+  clearAll() {
+    this.activeSectors.clearAll();
+    this.clearAllTasks();
   }
 
   logTasks() {

@@ -198,7 +198,7 @@ export class WorldSimulationTasks {
    * ---
    */
   static readonly buildTasks = TaskRegister.addTasks({
-    id: "build_tasks",
+    id: "build",
     sort: true,
     checkInRequired: false,
     run(dimension, location, taskId, task, simSector) {
@@ -221,7 +221,7 @@ export class WorldSimulationTasks {
     },
   });
   static readonly unbuildTasks = TaskRegister.addTasks({
-    id: "unbuild_tasks",
+    id: "unbuild",
     sort: true,
     checkInRequired: false,
     run(dimension, location, taskId, task) {

@@ -52,13 +52,13 @@ export class SimulationSector {
         cx + nx * WorldSpaces.sector.bounds.x,
         cy,
         cz + nz * WorldSpaces.sector.bounds.z,
-        tempPosition
+        tempPosition,
       );
 
       const sector = this.dimension.activeSectors.get(
         sectorPOS.x,
         cy,
-        sectorPOS.z
+        sectorPOS.z,
       );
 
       if (!sector) {
@@ -91,14 +91,14 @@ export class SimulationSector {
       thread.runTask(
         WorldDataSyncIds.CheckInSector,
         [[this.dimension.id, ...simSector.position], sector.buffer],
-        [sector.buffer]
+        [sector.buffer],
       );
     }
     this.sector.setCheckedOut(true);
     thread.runTask(
       WorldDataSyncIds.CheckInSector,
       [[this.dimension.id, ...this.position], this.sector.buffer],
-      [this.sector.buffer]
+      [this.sector.buffer],
     );
   }
 
@@ -117,7 +117,7 @@ export class SimulationSector {
     ]);
   }
 
-  tickUpdate(doTickUpdate= true) {
+  tickUpdate(doTickUpdate = true) {
     if (!this.fullNeighbors) return false;
     if (this.sector?.isCheckedOut()) {
       return false;
@@ -135,11 +135,11 @@ export class SimulationSector {
             section.getTick(section._Ticks.displayDirty)
         ) {
           this._displayTicks[section.index] = section.getTick(
-            section._Ticks.displayDirty
+            section._Ticks.displayDirty,
           );
           WorldSimulationTasks.buildTasks.add(
             this.dimension.id,
-            ...section.position
+            ...section.position,
           );
           renderedSection = true;
         }
@@ -171,7 +171,7 @@ export class SimulationSector {
         const voxel = this.dimension.simulation.nDataCursor.getVoxel(
           randomX,
           randomY,
-          randomZ
+          randomZ,
         );
         if (!voxel || voxel.isAir()) {
           attempts--;
@@ -179,7 +179,7 @@ export class SimulationSector {
         }
 
         const behavior = VoxelBehaviorsRegister.get(
-          voxel.tags["dve_simulation_behavior"]
+          voxel.tags["dve_simulation_behavior"],
         );
         behavior.onTick(this.dimension.simulation, randomX, randomY, randomZ);
 
@@ -227,7 +227,7 @@ export class SimulationSector {
             const y = cy + this.sectionCursor._voxelPosition.y;
             const z = cz + this.sectionCursor._voxelPosition.z;
             const behavior = VoxelBehaviorsRegister.get(
-              voxel.tags["dve_simulation_behavior"]
+              voxel.tags["dve_simulation_behavior"],
             );
             behavior.needUpdate(this.dimension.simulation, x, y, z);
           }
@@ -240,6 +240,29 @@ export class SimulationSector {
     return true;
   }
 
+  updateGenAllDone() {
+    if (this._genAllDone) return 0;
+    if (!this.sector) {
+      const sector = WorldRegister.sectors.get(
+        this.dimension.id,
+        ...this.position,
+      );
+      if (!sector) {
+        return 1;
+      }
+      this.sector = sector;
+    }
+    const state = this.state.update();
+    if (
+      state.nSunAllDone &&
+      this.sector.getBitFlag(Sector.FlagIds.isWorldSunDone)
+    ) {
+      this._genAllDone = true;
+      return 2;
+    }
+    return 3;
+  }
+
   generateUpdate() {
     if (!this.fullNeighbors) return false;
     if (this.sector?.isCheckedOut()) return;
@@ -249,13 +272,13 @@ export class SimulationSector {
     if (!this.sector) {
       const sector = WorldRegister.sectors.get(
         this.dimension.id,
-        ...this.position
+        ...this.position,
       );
 
       if (!sector) {
         WorldSimulationTasks.worldLoadTasks.add(
           this.dimension.id,
-          ...this.position
+          ...this.position,
         );
         return;
       }
@@ -277,7 +300,7 @@ export class SimulationSector {
       // console.log("add to world gen", ...this.position);
       WorldSimulationTasks.worldGenTasks.add(
         this.dimension.id,
-        ...this.position
+        ...this.position,
       );
       return true;
     }
@@ -289,7 +312,7 @@ export class SimulationSector {
       //  console.log("add to world decor");
       WorldSimulationTasks.worldDecorateTasks.add(
         this.dimension.id,
-        ...this.position
+        ...this.position,
       );
       return true;
     }
@@ -300,7 +323,7 @@ export class SimulationSector {
     ) {
       WorldSimulationTasks.worldPropagationTasks.add(
         this.dimension.id,
-        ...this.position
+        ...this.position,
       );
       return true;
     }
@@ -311,7 +334,7 @@ export class SimulationSector {
     ) {
       WorldSimulationTasks.worldSunTasks.add(
         this.dimension.id,
-        ...this.position
+        ...this.position,
       );
       return true;
     }

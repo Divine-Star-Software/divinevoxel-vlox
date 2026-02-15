@@ -11,6 +11,7 @@ export async function InitalLoad(props: {
   dimension?: number;
   logTasks?: true;
   genData: Partial<GeneratorData>;
+  buildOnly?: boolean;
 }) {
   return new Promise((resolve) => {
     const generator = WorldSimulation.createGenerator({
@@ -22,17 +23,20 @@ export async function InitalLoad(props: {
       WorldSimulationDimensions.addDimension(generator._dimension);
     }
     const dimension = WorldSimulationDimensions.getDimension(
-      props.dimension || 0
+      props.dimension || 0,
     );
     let done = false;
-    generator._building = false;
+    generator._building = props.buildOnly || false;
     WorldSimulation.addGenerator(generator);
 
     let timeOut: any = null;
     const update = () => {
       if (done) return;
 
-      WorldSimulation.tick(true);
+      WorldSimulation.tick(
+        props.buildOnly ? false : true,
+        props.buildOnly || false,
+      );
       timeOut = setTimeout(update, 0);
     };
     update();
@@ -42,21 +46,31 @@ export async function InitalLoad(props: {
         console.log(WorldSimulation.logTasks());
       }
       let allDone = true;
-      for (const [key, task] of dimension.tasks) {
-        if (!task.generationTask) continue;
+      if (props.buildOnly) {
+        const task = dimension.tasks.get("build")!;
         if (task.waitingFor > 0 || task._task.size > 0) {
           allDone = false;
-          break;
+        }
+      } else {
+        for (const [key, task] of dimension.tasks) {
+          if (!task.generationTask) continue;
+          if (task.waitingFor > 0 || task._task.size > 0) {
+            allDone = false;
+            break;
+          }
         }
       }
+
       if (!allDone) return;
       done = true;
       clearInterval(inte);
       clearTimeout(timeOut);
       WorldSimulation.removeGenerator(generator);
       (async () => {
-        if (WorldSimulationTools.worldStorage) {
-          await SaveAllSectors();
+        if (!props.buildOnly) {
+          if (WorldSimulationTools.worldStorage) {
+            await SaveAllSectors();
+          }
         }
 
         resolve(true);

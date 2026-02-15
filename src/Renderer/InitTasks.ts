@@ -5,6 +5,7 @@ import { MeshManager } from "./MeshManager";
 import { MeshRegister } from "./MeshRegister";
 import { EngineSettings } from "../Settings/EngineSettings";
 import { getLocationData } from "../Util/LocationData";
+import { WorldRegister } from "../World/WorldRegister";
 
 export default function RendererTasks() {
   Threads.registerTask<SetSectionMeshTask>("set-section", (data, origin) => {
@@ -18,5 +19,6 @@ export default function RendererTasks() {
   });
   Threads.registerTask<LocationData>("clear-all", (data) => {
     MeshRegister.clearAll();
+    WorldRegister.clearAll();
   });
 }

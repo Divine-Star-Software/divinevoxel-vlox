@@ -1,14 +1,34 @@
+import { Distance3D, Vec3Array } from "@amodx/math";
 import { LocationData } from "../../Math";
 import { WorldSpaces } from "../../World/WorldSpaces";
 import { DimensionSegment } from "../Dimensions/DimensionSegment";
 const pool: LocationData[] = [];
 
+const sortPosition: Vec3Array = [0, 0, 0];
+const sort = (a: LocationData, b: LocationData) => {
+  const ad = Distance3D(
+    sortPosition[0],
+    sortPosition[1],
+    sortPosition[2],
+    a[1],
+    a[2],
+    a[3],
+  );
+  const bd = Distance3D(
+    sortPosition[0],
+    sortPosition[1],
+    sortPosition[2],
+    b[1],
+    b[2],
+    b[3],
+  );
+  return bd - ad;
+};
 export class TaskSegment {
   _hash = new Set();
   nodes: LocationData[] = [];
 
   waitingFor = 0;
-  clear() {}
 
   _taskCount = 0;
 
@@ -19,6 +39,12 @@ export class TaskSegment {
     public generationTask: boolean,
     public log = false,
   ) {}
+
+  clearAll(){
+    this.nodes=[];
+    this._task.clear();
+
+  }
 
   _getLocationData(dimension: number, x: number, y: number, z: number) {
     const location: LocationData = pool.length ? pool.pop()! : [0, 0, 0, 0];
@@ -68,72 +94,11 @@ export class TaskSegment {
 
   sort(x: number, y: number, z: number) {
     const sections = this.nodes;
-    this._quickSort(sections, 0, sections.length - 1, x, y, z);
+    sortPosition[0] = x;
+    sortPosition[1] = y;
+    sortPosition[2] = z;
+    this.nodes.sort(sort);
     return sections;
-  }
-
-  private _quickSort(
-    arr: LocationData[],
-    low: number,
-    high: number,
-    sx: number,
-    sy: number,
-    sz: number,
-  ) {
-    const stack: number[] = [];
-    stack.push(low, high);
-
-    while (stack.length) {
-      high = stack.pop()!;
-      low = stack.pop()!;
-
-      if (low >= high) continue;
-
-      const pivotIndex = this._partition(arr, low, high, sx, sy, sz);
-
-      // Push smaller partition first to limit stack growth
-      if (pivotIndex - low < high - pivotIndex) {
-        stack.push(pivotIndex + 1, high);
-        stack.push(low, pivotIndex - 1);
-      } else {
-        stack.push(low, pivotIndex - 1);
-        stack.push(pivotIndex + 1, high);
-      }
-    }
-  }
-
-  private _partition(
-    arr: LocationData[],
-    low: number,
-    high: number,
-    sx: number,
-    sy: number,
-    sz: number,
-  ): number {
-    const pivot = arr[high];
-    const pivotDist =
-      (pivot[1] - sx) ** 2 + (pivot[2] - sy) ** 2 + (pivot[3] - sz) ** 2;
-
-    let i = low - 1;
-    let temp: LocationData;
-
-    for (let j = low; j < high; j++) {
-      const dist =
-        (arr[j][1] - sx) ** 2 + (arr[j][2] - sy) ** 2 + (arr[j][3] - sz) ** 2;
-
-      if (dist > pivotDist) {
-        i++;
-        temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
-      }
-    }
-
-    temp = arr[i + 1];
-    arr[i + 1] = arr[high];
-    arr[high] = temp;
-
-    return i + 1;
   }
 
   *run(): Generator<LocationData> {
