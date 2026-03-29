@@ -169,6 +169,7 @@ export class WorldSimulationTasks {
   /**# Save Sector
    * ---
    */
+
   static readonly saveTasks = TaskRegister.addTasks({
     id: "save",
     checkInRequired: false,

@@ -10,6 +10,7 @@ import { lightSemgnetSet } from "../../Functions/Shared/LightSegments";
 
 type RunData = {
   version?: number;
+  healLight?: boolean;
 };
 
 export default function ImportSector(
@@ -23,6 +24,11 @@ export default function ImportSector(
   sector.position[1] = archivedSector.position.y;
   sector.position[2] = archivedSector.position.z;
 
+  if (archiveData.healLight) {
+    archivedSector.flags["dve_is_world_progation_done"] = false;
+    archivedSector.flags["dve_is_world_sun_done"] = false;
+  }
+
   sector.loadFlags(archivedSector.flags);
   sector.loadTimestamps(archivedSector.timestamps);
 
@@ -35,7 +41,7 @@ export default function ImportSector(
     const archivedSection = importedSection.section;
     const section = sector.sections[importedSection.sectionIndex];
     archivedSection.flags && section.loadFlags(archivedSection.flags);
-    section.dirtyMap.fill(0xff);
+    section.dirtyMap.fill(0);
 
     const idsBuffer = importedSection.buffers.ids;
     const levelBuffer = importedSection.buffers.level;
@@ -144,10 +150,14 @@ export default function ImportSector(
       if (staticId !== 0 || staticSecondary !== 0) {
         for (let i = 0; i < sectionVolume; i++) {
           section.setHasVoxel(
-            WorldSpaces.voxel.getPositionFromIndex(i, position).y - 1,
+            WorldSpaces.voxel.getPositionFromIndex(i, position).y,
             true,
           );
         }
+      }
+
+      if (archiveData.healLight) {
+        section.light.fill(0);
       }
       continue;
     }
@@ -271,10 +281,14 @@ export default function ImportSector(
 
       if (section.ids[i] !== 0 || section.secondary[i] !== 0) {
         section.setHasVoxel(
-          WorldSpaces.voxel.getPositionFromIndex(i, position).y - 1,
+          WorldSpaces.voxel.getPositionFromIndex(i, position).y,
           true,
         );
       }
+    }
+
+    if (archiveData.healLight) {
+      section.light.fill(0);
     }
   }
 

@@ -8,9 +8,10 @@ import { PaintVoxelData } from "../../Voxels/Types/PaintVoxelData.js";
 import { VoxelPathData } from "../../Templates/Path/VoxelPath.types.js";
 import { IVoxelSelection } from "../../Templates/Selection/VoxelSelection.js";
 const air: RawVoxelData = [0, 0, 0, 0];
-const temp: RawVoxelData = [0, 0, 0, 0];
+
 PaintVoxelData.Set;
 export class BrushTool {
+  private temp: RawVoxelData = [0, 0, 0, 0];
   data = PaintVoxelData.Create();
 
   dimension = 0;
@@ -195,6 +196,7 @@ export class BrushTool {
     const { x: ox, y: oy, z: oz } = this;
     const { x: sx, y: sy, z: sz } = voxelTemplate.bounds.size;
 
+    const temp: RawVoxelData = [0, 0, 0, 0];
     for (let x = 0; x < sx; x++) {
       for (let y = 0; y < sy; y++) {
         for (let z = 0; z < sz; z++) {
