@@ -13,8 +13,7 @@ import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
  * Extend your data type so we can add a seed if we want, and define
  * the rotations we can choose from.
  */
-export interface PillarTextureProcedureData
-  extends BaseVoxelGeometryTextureProcedureData {
+export interface PillarTextureProcedureData extends BaseVoxelGeometryTextureProcedureData {
   type: "pillar";
   texture: TextureId | number;
   textureRecrod: {
@@ -33,7 +32,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
     builder: VoxelModelBuilder,
     data: PillarTextureProcedureData,
     closestFace: VoxelFaces,
-    primitive: Quad
+    primitive: Quad,
   ): number {
     if (data.direction == "up-down") {
       if (closestFace == VoxelFaces.Up)
@@ -47,7 +46,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       const topVoxel = builder.nVoxel.getVoxel(
         builder.position.x,
         builder.position.y + 1,
-        builder.position.z
+        builder.position.z,
       );
       const topSame = topVoxel
         ? builder.voxel.isSameVoxel(topVoxel) &&
@@ -57,7 +56,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       const bottomVoxel = builder.nVoxel.getVoxel(
         builder.position.x,
         builder.position.y - 1,
-        builder.position.z
+        builder.position.z,
       );
       const bottomSame = bottomVoxel
         ? builder.voxel.isSameVoxel(bottomVoxel) &&
@@ -97,7 +96,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       const northVoxel = builder.nVoxel.getVoxel(
         builder.position.x,
         builder.position.y,
-        builder.position.z + 1
+        builder.position.z + 1,
       );
       const northSame = northVoxel
         ? builder.voxel.isSameVoxel(northVoxel) &&
@@ -107,7 +106,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       const southVoxel = builder.nVoxel.getVoxel(
         builder.position.x,
         builder.position.y,
-        builder.position.z - 1
+        builder.position.z - 1,
       );
       const southSame = southVoxel
         ? builder.voxel.isSameVoxel(southVoxel) &&
@@ -147,9 +146,9 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       const eastVoxel = builder.nVoxel.getVoxel(
         builder.position.x + 1,
         builder.position.y,
-        builder.position.z
+        builder.position.z,
       );
-      const northSame = eastVoxel
+      const eastSame = eastVoxel
         ? builder.voxel.isSameVoxel(eastVoxel) &&
           VoxelLUT.voxelIdToState[eastVoxel.getId()] == currentState
         : false;
@@ -157,22 +156,22 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
       const westVoxel = builder.nVoxel.getVoxel(
         builder.position.x - 1,
         builder.position.y,
-        builder.position.z
+        builder.position.z,
       );
       const westSame = westVoxel
         ? builder.voxel.isSameVoxel(westVoxel) &&
           VoxelLUT.voxelIdToState[westVoxel.getId()] == currentState
         : false;
 
-      if (northSame && !westSame) {
+      if (eastSame && !westSame) {
         sideTexture = data.textureRecrod.sideDownTex as number;
       }
 
-      if (!northSame && westSame) {
+      if (!eastSame && westSame) {
         sideTexture = data.textureRecrod.sideUpTex as number;
       }
 
-      if (northSame && westSame) {
+      if (eastSame && westSame) {
         sideTexture = data.textureRecrod.sideConnectedTex as number;
       }
 
@@ -186,7 +185,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
     }
 
     throw new Error(
-      `Invalid direction for pillar box texture procedure | ${data.direction}`
+      `Invalid direction for pillar box texture procedure | ${data.direction}`,
     );
   }
 
@@ -195,7 +194,7 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
     data: PillarTextureProcedureData,
     closestFace: VoxelFaces,
     primitive: Quad,
-    ref: Vector4Like
+    ref: Vector4Like,
   ): Vector4Like {
     return ref;
   }
@@ -204,22 +203,31 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
     builder: VoxelModelBuilder,
     data: PillarTextureProcedureData,
     closestFace: VoxelFaces,
-    primitive: Quad
+    primitive: Quad,
   ): void {
-    if (
-      (data.direction == "north-south" &&
-        (closestFace == VoxelFaces.East || closestFace == VoxelFaces.West)) ||
+    const rotate90 =
+      (data.direction == "north-south" && closestFace == VoxelFaces.East) ||
       (data.direction == "east-west" &&
-        (closestFace == VoxelFaces.North ||
-          closestFace == VoxelFaces.South ||
-          closestFace == VoxelFaces.Up ||
-          closestFace == VoxelFaces.Down))
-    ) {
+        (closestFace == VoxelFaces.South || closestFace == VoxelFaces.Up));
+
+    const rotate270 =
+      (data.direction == "north-south" && closestFace == VoxelFaces.West) ||
+      (data.direction == "east-west" &&
+        (closestFace == VoxelFaces.North || closestFace == VoxelFaces.Down));
+
+    if (rotate90) {
       for (const v of primitive.uvs.vertices) {
         const oldX = v.x;
         const oldY = v.y;
         v.x = 1 - oldY;
         v.y = oldX;
+      }
+    } else if (rotate270) {
+      for (const v of primitive.uvs.vertices) {
+        const oldX = v.x;
+        const oldY = v.y;
+        v.x = oldY;
+        v.y = 1 - oldX;
       }
     }
   }

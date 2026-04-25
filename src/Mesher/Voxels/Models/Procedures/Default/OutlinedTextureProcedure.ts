@@ -104,13 +104,13 @@ const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
   [VoxelFaces.Down]: {
     north: [
       [0, 0, 1],
-      [1, 0, 1],
       [-1, 0, 1],
+      [1, 0, 1],
     ],
     south: [
       [0, 0, -1],
-      [1, 0, -1],
       [-1, 0, -1],
+      [1, 0, -1],
     ],
     east: [[-1, 0, 0]],
     west: [[1, 0, 0]],
@@ -118,17 +118,18 @@ const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
   [VoxelFaces.North]: {
     north: [
       [0, 1, 0],
-      [1, 1, 0],
       [-1, 1, 0],
+      [1, 1, 0], 
     ],
     south: [
       [0, -1, 0],
+      [-1, -1, 0], 
       [1, -1, 0],
-      [-1, -1, 0],
     ],
     east: [[-1, 0, 0]],
     west: [[1, 0, 0]],
   },
+
   [VoxelFaces.South]: {
     north: [
       [0, 1, 0],
@@ -160,13 +161,13 @@ const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
   [VoxelFaces.West]: {
     north: [
       [0, 1, 0],
-      [0, 1, 1],
-      [0, 1, -1],
+      [0, 1, -1], 
+      [0, 1, 1], 
     ],
     south: [
       [0, -1, 0],
-      [0, -1, 1],
-      [0, -1, -1],
+      [0, -1, -1], 
+      [0, -1, 1], 
     ],
     east: [[0, 0, -1]],
     west: [[0, 0, 1]],
