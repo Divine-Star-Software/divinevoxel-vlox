@@ -18,15 +18,11 @@ export class VoxelShaderData {
 
   static createTextureIndex(index1: number, index2: number) {
     let value = 0;
-    value =
-      (value & ~(this.TextureIndexMax << 0)) |
-      ((index1 & this.TextureIndexMax) << 0);
-    value =
-      (value & ~(this.TextureIndexMax << 16)) |
-      ((index2 & this.TextureIndexMax) << 16);
-    return value;
+    value = (value & ~(this.TextureIndexMax << 0)) | ((index1 & this.TextureIndexMax) << 0);
+    value = (value & ~(this.TextureIndexMax << 16)) | ((index2 & this.TextureIndexMax) << 16);
+    
+    return value >>> 0; 
   }
-
 
 
   static create(

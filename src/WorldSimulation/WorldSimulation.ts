@@ -177,8 +177,8 @@ export class WorldSimulation {
     if (!buildOnly) {
       WorldSimulationTasks.saveTasks.runTask(50);
       WorldSimulationTasks.unloadTasks.runTask(50);
-      WorldSimulationTasks.unbuildTasks.runTask();
     }
+    WorldSimulationTasks.unbuildTasks.runTask();
   }
 }
 

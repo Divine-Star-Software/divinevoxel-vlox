@@ -31,7 +31,7 @@ export function addItemTriangle(builder: ItemModelBuilder, tri: Triangle) {
     builder.mesh.buffer.setIndex(baseIndex);
     addVertex(
       builder.mesh.buffer.curentIndex,
-      builder.mesh.buffer.currentArray,
+      builder.mesh.buffer.currentFloat32Array,
       origin,
       topRightPos,
       topRightNor,
@@ -43,7 +43,7 @@ export function addItemTriangle(builder: ItemModelBuilder, tri: Triangle) {
     builder.mesh.buffer.setIndex(baseIndex + 1);
     addVertex(
       builder.mesh.buffer.curentIndex,
-      builder.mesh.buffer.currentArray,
+      builder.mesh.buffer.currentFloat32Array,
       origin,
       topLeftPos,
       topLeftNor,
@@ -54,7 +54,7 @@ export function addItemTriangle(builder: ItemModelBuilder, tri: Triangle) {
     builder.mesh.buffer.setIndex(baseIndex + 2);
     addVertex(
       builder.mesh.buffer.curentIndex,
-      builder.mesh.buffer.currentArray,
+      builder.mesh.buffer.currentFloat32Array,
       origin,
       bottomLeftPos,
       bottomLeftNor,
@@ -112,7 +112,7 @@ export function addItemQuad(builder: ItemModelBuilder, quad: Quad) {
   builder.mesh.buffer.setIndex(baseIndex);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
     origin,
     topRightPos,
     topRightNor,
@@ -124,7 +124,7 @@ export function addItemQuad(builder: ItemModelBuilder, quad: Quad) {
   builder.mesh.buffer.setIndex(baseIndex + 1);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
     origin,
     topLeftPos,
     topLeftNor,
@@ -135,7 +135,7 @@ export function addItemQuad(builder: ItemModelBuilder, quad: Quad) {
   builder.mesh.buffer.setIndex(baseIndex + 2);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
     origin,
     bottomLeftPos,
     bottomLeftNor,
@@ -146,7 +146,7 @@ export function addItemQuad(builder: ItemModelBuilder, quad: Quad) {
   builder.mesh.buffer.setIndex(baseIndex + 3);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
     origin,
     bottomRightPos,
     bottomRightNor,

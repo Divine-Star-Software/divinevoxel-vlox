@@ -76,19 +76,55 @@ export class CompiledTexture {
     return this.images[this.getTextureIndex(id)].src;
   }
 
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+  private setUpCanvas() {
+    if (this.canvas) return;
+    this.canvas = document.createElement("canvas");
+    this.context = this.canvas.getContext("2d", {
+      willReadFrequently: true,
+    })!;
+  }
+
   async getTextureData(id: TextureId): Promise<Uint8ClampedArray> {
+    this.setUpCanvas();
     const path = this.images[this.getTextureIndex(id)].src;
     const res = await fetch(path);
     if (!res.ok) throw new Error(`Failed to fetch texture: ${path}`);
 
     const blob = await res.blob();
     const bitmap = await createImageBitmap(blob);
-    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("OffscreenCanvas context unavailable");
-    ctx.translate(0, canvas.height);
-    ctx.scale(1, -1);
-    ctx.drawImage(bitmap, 0, 0);
-    return ctx.getImageData(0, 0, bitmap.width, bitmap.height).data;
+    this.canvas.width = bitmap.width;
+    this.canvas.height = bitmap.height;
+
+    this.context.translate(0, bitmap.height);
+    this.context.scale(1, -1);
+    this.context.drawImage(bitmap, 0, 0);
+    return this.context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+  }
+
+  getTextureDataSync(id: TextureId): Uint8ClampedArray {
+    this.setUpCanvas();
+    const img = this.images[this.getTextureIndex(id)];
+
+    if (!img) {
+      throw new Error(`Texture image not found for ID: ${id}`);
+    }
+
+    if (!img.complete || img.naturalWidth === 0) {
+      throw new Error(`Texture image is not fully loaded yet: ${img.src}`);
+    }
+
+    const width = img.naturalWidth;
+    const height = img.naturalHeight;
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    this.context.translate(0, height);
+    this.context.scale(1, -1);
+
+    this.context.drawImage(img, 0, 0);
+
+    return this.context.getImageData(0, 0, width, height).data;
   }
 }

@@ -20,6 +20,7 @@ export class Generator {
   _generating = true;
   _isNew = true;
   _dirty = true;
+  _valuesUpdated = false;
   _waitingForCull = false;
   _cullTime = 0;
   _culling = true;
@@ -42,13 +43,26 @@ export class Generator {
     this._maxCircle.radius = data.maxRadius;
   }
 
+  setRenderRadius(value: number) {
+    this._renderCircle.radius = value;
+    this._valuesUpdated = true;
+  }
+  setGenRadius(value: number) {
+    this._genCircle.radius = value;
+    this._valuesUpdated = true;
+  }
+  setMaxRadius(value: number) {
+    this._maxCircle.radius = value;
+    this._valuesUpdated = true;
+  }
   update() {
-    this._dirty = false;
+    this._dirty = this._valuesUpdated;
+    this._valuesUpdated = false;
     WorldSpaces.section.getPosition(
       this.position.x,
       0,
       this.position.z,
-      this._sectorPosition
+      this._sectorPosition,
     );
 
     if (!Vector3Like.Equals(this._sectorPosition, this._cachedPosition)) {

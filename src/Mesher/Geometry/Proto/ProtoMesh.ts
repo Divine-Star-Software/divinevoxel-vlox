@@ -16,7 +16,7 @@ export class ProtoMesh {
   create() {
     const totalVertices = this.vertexCount * this.vertexFloatSize;
     const vertexArray = new Float32Array(totalVertices);
-    const vertexBuffers = this.buffer._buffers;
+    const vertexBuffers = this.buffer._float32Views;
 
     let offset = 0;
     for (let i = 0; i < vertexBuffers.length && offset < totalVertices; i++) {

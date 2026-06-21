@@ -119,11 +119,11 @@ const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
     north: [
       [0, 1, 0],
       [-1, 1, 0],
-      [1, 1, 0], 
+      [1, 1, 0],
     ],
     south: [
       [0, -1, 0],
-      [-1, -1, 0], 
+      [-1, -1, 0],
       [1, -1, 0],
     ],
     east: [[-1, 0, 0]],
@@ -161,13 +161,13 @@ const CheckSets: Record<VoxelFaces, Record<string, Vec3Array[]>> = {
   [VoxelFaces.West]: {
     north: [
       [0, 1, 0],
-      [0, 1, -1], 
-      [0, 1, 1], 
+      [0, 1, -1],
+      [0, 1, 1],
     ],
     south: [
       [0, -1, 0],
-      [0, -1, -1], 
-      [0, -1, 1], 
+      [0, -1, -1],
+      [0, -1, 1],
     ],
     east: [[0, 0, -1]],
     west: [[0, 0, 1]],
@@ -240,8 +240,6 @@ export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTexturePr
     const isTopOrBottom =
       closestFace === VoxelFaces.Up || closestFace === VoxelFaces.Down;
 
-    // For top/bottom faces, use north/south/east/west sets.
-    // For side faces (north/south/east/west), use top/bottom/right/left sets.
     const dirNorth: keyof typeof uvsSets = isTopOrBottom ? "north" : "top";
     const dirSouth: keyof typeof uvsSets = isTopOrBottom ? "south" : "bottom";
     const dirEast: keyof typeof uvsSets = isTopOrBottom ? "east" : "right";

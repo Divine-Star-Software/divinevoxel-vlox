@@ -39,7 +39,7 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.TopRight],
     QuadVerticies.TopRight,
-    vector1ShaderData
+    vector1ShaderData,
   );
   const topLeftVoxelData = VoxelShaderData.create(
     worldLight.vertices[QuadVerticies.TopRight],
@@ -52,7 +52,7 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.TopLeft],
     QuadVerticies.TopLeft,
-    vector2ShaderData
+    vector2ShaderData,
   );
   const bottomLeftVoxelData = VoxelShaderData.create(
     worldLight.vertices[QuadVerticies.TopRight],
@@ -65,7 +65,7 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.BottomLeft],
     QuadVerticies.BottomLeft,
-    vector3ShaderData
+    vector3ShaderData,
   );
 
   const indices = builder.mesh!.indices;
@@ -79,39 +79,42 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
     builder.mesh.buffer.setIndex(baseIndex);
     addVertex(
       builder.mesh.buffer.curentIndex,
-      builder.mesh.buffer.currentArray,
+      builder.mesh.buffer.currentFloat32Array,
+      builder.mesh.buffer.currentUint32Array,
       origin,
       topRightPos,
       topRightNor,
       tri.uvs.vertices[QuadVerticies.TopRight],
       topRightVoxelData,
       texture,
-      overlayTextures
+      overlayTextures,
     );
 
     builder.mesh.buffer.setIndex(baseIndex + 1);
     addVertex(
       builder.mesh.buffer.curentIndex,
-      builder.mesh.buffer.currentArray,
+      builder.mesh.buffer.currentFloat32Array,
+      builder.mesh.buffer.currentUint32Array,
       origin,
       topLeftPos,
       topLeftNor,
       tri.uvs.vertices[QuadVerticies.TopLeft],
       topLeftVoxelData,
       texture,
-      overlayTextures
+      overlayTextures,
     );
     builder.mesh.buffer.setIndex(baseIndex + 2);
     addVertex(
       builder.mesh.buffer.curentIndex,
-      builder.mesh.buffer.currentArray,
+      builder.mesh.buffer.currentFloat32Array,
+      builder.mesh.buffer.currentUint32Array,
       origin,
       bottomLeftPos,
       bottomLeftNor,
       tri.uvs.vertices[QuadVerticies.BottomLeft],
       bottomLeftVoxelData,
       texture,
-      overlayTextures
+      overlayTextures,
     );
 
     builder.mesh.addVerticies(3, 3);
@@ -170,7 +173,7 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.TopRight],
     QuadVerticies.TopRight,
-    vector1ShaderData
+    vector1ShaderData,
   );
   const topLeftVoxelData = VoxelShaderData.create(
     worldLight.vertices[QuadVerticies.TopRight],
@@ -183,7 +186,7 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.TopLeft],
     QuadVerticies.TopLeft,
-    vector2ShaderData
+    vector2ShaderData,
   );
   const bottomLeftVoxelData = VoxelShaderData.create(
     worldLight.vertices[QuadVerticies.TopRight],
@@ -196,7 +199,7 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.BottomLeft],
     QuadVerticies.BottomLeft,
-    vector3ShaderData
+    vector3ShaderData,
   );
   const bottomRightVoxelData = VoxelShaderData.create(
     worldLight.vertices[QuadVerticies.TopRight],
@@ -209,7 +212,7 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
     worldAO.vertices[QuadVerticies.BottomRight],
     animData.vertices[QuadVerticies.BottomRight],
     QuadVerticies.BottomRight,
-    vector4ShaderData
+    vector4ShaderData,
   );
   const indices = builder.mesh!.indices;
   let indIndex = builder.mesh.indicieCount;
@@ -218,51 +221,55 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
   builder.mesh.buffer.setIndex(baseIndex);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
+    builder.mesh.buffer.currentUint32Array,
     origin,
     topRightPos,
     topRightNor,
     quad.uvs.vertices[QuadVerticies.TopRight],
     topRightVoxelData,
     texture,
-    overlayTextures
+    overlayTextures,
   );
 
   builder.mesh.buffer.setIndex(baseIndex + 1);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
+    builder.mesh.buffer.currentUint32Array,
     origin,
     topLeftPos,
     topLeftNor,
     quad.uvs.vertices[QuadVerticies.TopLeft],
     topLeftVoxelData,
     texture,
-    overlayTextures
+    overlayTextures,
   );
   builder.mesh.buffer.setIndex(baseIndex + 2);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
+    builder.mesh.buffer.currentUint32Array,
     origin,
     bottomLeftPos,
     bottomLeftNor,
     quad.uvs.vertices[QuadVerticies.BottomLeft],
     bottomLeftVoxelData,
     texture,
-    overlayTextures
+    overlayTextures,
   );
   builder.mesh.buffer.setIndex(baseIndex + 3);
   addVertex(
     builder.mesh.buffer.curentIndex,
-    builder.mesh.buffer.currentArray,
+    builder.mesh.buffer.currentFloat32Array,
+    builder.mesh.buffer.currentUint32Array,
     origin,
     bottomRightPos,
     bottomRightNor,
     quad.uvs.vertices[QuadVerticies.BottomRight],
     bottomRightVoxelData,
     texture,
-    overlayTextures
+    overlayTextures,
   );
 
   if (!quad.doubleSided) {
@@ -309,39 +316,43 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
 
 function addVertex(
   index: number,
-  array: Float32Array,
+  float32Array: Float32Array,
+  uint32Array: Uint32Array,
   origin: Vector3Like,
   position: Vector3Like,
   normal: Vector3Like,
   uvs: Vector2Like,
   voxelData: Vector4Like,
   texture: number,
-  overlayTextures: Vector4Like
+  overlayTextures: Vector4Like,
 ) {
   index *= VoxelMeshVertexConstants.VertexFloatSize;
-  array[VoxelMeshVertexConstants.PositionOffset + index] =
+  float32Array[VoxelMeshVertexConstants.PositionOffset + index] =
     position.x + origin.x;
-  array[VoxelMeshVertexConstants.PositionOffset + index + 1] =
+  float32Array[VoxelMeshVertexConstants.PositionOffset + index + 1] =
     position.y + origin.y;
-  array[VoxelMeshVertexConstants.PositionOffset + index + 2] =
+  float32Array[VoxelMeshVertexConstants.PositionOffset + index + 2] =
     position.z + origin.z;
 
-  array[VoxelMeshVertexConstants.UVOffset + index] = uvs.x;
-  array[VoxelMeshVertexConstants.UVOffset + index + 1] = uvs.y;
+  float32Array[VoxelMeshVertexConstants.UVOffset + index] = uvs.x;
+  float32Array[VoxelMeshVertexConstants.UVOffset + index + 1] = uvs.y;
 
-  array[VoxelMeshVertexConstants.NormalOffset + index] = normal.x;
-  array[VoxelMeshVertexConstants.NormalOffset + index + 1] = normal.y;
-  array[VoxelMeshVertexConstants.NormalOffset + index + 2] = normal.z;
+  float32Array[VoxelMeshVertexConstants.NormalOffset + index] = normal.x;
+  float32Array[VoxelMeshVertexConstants.NormalOffset + index + 1] = normal.y;
+  float32Array[VoxelMeshVertexConstants.NormalOffset + index + 2] = normal.z;
 
-  array[VoxelMeshVertexConstants.TextureIndexOffset + index] =
+  uint32Array[VoxelMeshVertexConstants.TextureIndexOffset + index] =
     VoxelShaderData.createTextureIndex(texture, overlayTextures.x);
-  array[VoxelMeshVertexConstants.TextureIndexOffset + index + 1] =
+  uint32Array[VoxelMeshVertexConstants.TextureIndexOffset + index + 1] =
     VoxelShaderData.createTextureIndex(overlayTextures.y, overlayTextures.z);
-  array[VoxelMeshVertexConstants.TextureIndexOffset + index + 2] =
+  uint32Array[VoxelMeshVertexConstants.TextureIndexOffset + index + 2] =
     VoxelShaderData.createTextureIndex(overlayTextures.w, 0);
 
-  array[VoxelMeshVertexConstants.VoxelDataOFfset + index] = voxelData.x;
-  array[VoxelMeshVertexConstants.VoxelDataOFfset + index + 1] = voxelData.y;
-  array[VoxelMeshVertexConstants.VoxelDataOFfset + index + 2] = voxelData.z;
-  array[VoxelMeshVertexConstants.VoxelDataOFfset + index + 3] = voxelData.w;
+  uint32Array[VoxelMeshVertexConstants.VoxelDataOFfset + index] = voxelData.x;
+  uint32Array[VoxelMeshVertexConstants.VoxelDataOFfset + index + 1] =
+    voxelData.y;
+  uint32Array[VoxelMeshVertexConstants.VoxelDataOFfset + index + 2] =
+    voxelData.z;
+  uint32Array[VoxelMeshVertexConstants.VoxelDataOFfset + index + 3] =
+    voxelData.w;
 }
