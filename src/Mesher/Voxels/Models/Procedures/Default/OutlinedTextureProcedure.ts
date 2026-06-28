@@ -192,7 +192,7 @@ const generateCheck = (
     const cz = z + set[2];
 
     const hashed = tool.space.getHash(tool.nVoxel, cx, cy, cz);
-    const sameLevelCheck = currentVoxelId == tool.space.trueVoxelCache[hashed];
+    const sameLevelCheck = currentVoxelId == tool.space.getTrueVoxelId(hashed);
     let normalCheck = true;
 
     const hashedNormal = tool.space.getHash(

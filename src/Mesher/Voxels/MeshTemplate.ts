@@ -9,42 +9,15 @@ import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "./Models/RenderedMaterials.js";
 import { VoxelLightData } from "../../Voxels/Cursor/VoxelLightData.js";
 import { VoxelModelBuilder } from "./Models/VoxelModelBuilder.js";
-import { BuildVoxel } from "./Base/BuildVoxel.js";
+import { BuildVoxel, BuildVoxelBase } from "./Base/BuildVoxel.js";
 import { VoxelLUT } from "../../Voxels/Data/VoxelLUT.js";
 const templateCursor = new TemplateCursor();
 const padding = Vector3Like.Create(5, 5, 5);
 const lightData = new VoxelLightData();
-function meshVoxel(
-  x: number,
-  y: number,
-  z: number,
-  voxel: TemplateVoxelCursor,
-  templateCursor: TemplateCursor
-): boolean {
-  if (voxel.isAir() || !voxel.isRenderable()) return false;
-
-  let added = false;
-
-  const builder =
-    RenderedMaterials.meshers[VoxelLUT.materialMap[voxel.getVoxelId()]];
-  builder.origin.x = x;
-  builder.origin.y = y;
-  builder.origin.z = z;
-  builder.position.x = x;
-  builder.position.y = y;
-  builder.position.z = z;
-  builder.voxel = voxel;
-  builder.nVoxel = templateCursor;
-
-  builder.startConstruction();
-  added = BuildVoxel(builder);
-  builder.endConstruction();
-  return added;
-}
 
 export function MeshTemplate(
   fullVoxelData: FullVoxelTemplateData,
-  baseLightValue = lightData.setS(0xf, 0)
+  baseLightValue = lightData.setS(0xf, 0),
 ): [mesh: CompactMeshData, tranfers: any[]] | false {
   const template = new FullVoxelTemplate(fullVoxelData);
   templateCursor.setTemplate(template);
@@ -66,16 +39,15 @@ export function MeshTemplate(
   template.light.fill(baseLightValue);
   const size = template.bounds.size;
 
+  const origin = Vector3Like.Create();
   for (let x = 0; x < size.x; x++) {
     for (let y = 0; y < size.y; y++) {
       for (let z = 0; z < size.z; z++) {
+        origin.x = x;
+        origin.y = y;
+        origin.z = z;
         const voxel = templateCursor.getVoxel(x, y, z)!;
-        meshVoxel(x, y, z, voxel, templateCursor);
-        if (voxel.hasSecondaryVoxel()) {
-          voxel.setSecondary(true);
-          meshVoxel(x, y, z, voxel, templateCursor);
-          voxel.setSecondary(false);
-        }
+        BuildVoxel(x, y, z, voxel, templateCursor, origin);
       }
     }
   }

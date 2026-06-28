@@ -6,7 +6,7 @@ import { RawVoxelData } from "../../Voxels/Types/Voxel.types.js";
 import { CompactMeshData } from "../Types/index.js";
 import { RenderedMaterials } from "./Models/RenderedMaterials.js";
 import { VoxelLUT } from "../../Voxels/Data/VoxelLUT.js";
-import { BuildVoxel } from "./Base/BuildVoxel.js";
+import { BuildVoxelBase } from "./Base/BuildVoxel.js";
 const template = new FullVoxelTemplate(
   FullVoxelTemplate.CreateNew([3, 3, 3], 0xf)
 );
@@ -45,7 +45,7 @@ export function MeshVoxel(
   builder.voxel = voxel;
   builder.nVoxel = templateCursor;
 
-  BuildVoxel(builder);
+  BuildVoxelBase(builder);
 
   const transfers: any[] = [];
   const compacted = CompactTemplateMesh([builder], transfers);

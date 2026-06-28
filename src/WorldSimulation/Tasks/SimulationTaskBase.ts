@@ -16,12 +16,16 @@ export type SimulationTaskBaseData = {
     location: LocationData,
     taskId: number,
     task: TaskSegment,
-    sector: SimulationSector
+    sector: SimulationSector,
   ): void;
 };
 
 export class SimulationTaskBase {
-  constructor(public data: SimulationTaskBaseData) {}
+  _subTask = new Map<string, SimulationTaskBase>();
+  constructor(
+    public data: SimulationTaskBaseData,
+    public parent?: SimulationTaskBase,
+  ) {}
 
   getTotal(dimensionId: number) {
     const dimension = WorldSimulationDimensions.getDimension(dimensionId);
@@ -41,6 +45,10 @@ export class SimulationTaskBase {
     if (task.has(x, y, z)) return;
 
     task.add(x, y, z);
+  }
+
+  addSubTask(data: SimulationTaskBaseData) {
+    this._subTask.set(data.id, new SimulationTaskBase(data, this));
   }
 
   runTask(max = 10) {
@@ -69,8 +77,13 @@ export class SimulationTaskBase {
           continue;
         }
 
-        const taskId = task.addTask(x, y, z);
+        const taskId = task.addTask(x, y, z,this._subTask.size);
         this.data.run(dimension, location, taskId, task, sector);
+        if (this._subTask.size) {
+          for (const [, subTask] of this._subTask) {
+            subTask.data.run(dimension, location, taskId, task, sector);
+          }
+        }
         if (task.waitingFor > max) break;
       }
       for (let i = 0; i < addBack.length; i += 3) {

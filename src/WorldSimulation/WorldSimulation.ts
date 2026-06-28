@@ -25,6 +25,9 @@ export class WorldSimulation {
   private static _cullGenerators: Generator[] = [];
   static readonly _generators: Generator[] = [];
 
+  static Tools = WorldSimulationTools;
+  static Tasks = WorldSimulationTasks;
+
   static addDimension(id: number) {
     WorldSimulationDimensions.addDimension(id);
   }

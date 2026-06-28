@@ -12,45 +12,19 @@ import { Vector3Like } from "@amodx/math";
 import { RenderedMaterials } from "../Models/RenderedMaterials";
 import { CompactVoxelSectionMesh } from "./CompactVoxelSectionMesh";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
-import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { BuildVoxel } from "./BuildVoxel";
 
 let space: VoxelGeometryBuilderCacheSpace;
 const bvhTool = new VoxelMeshBVHBuilder();
 
-function meshVoxel(
-  x: number,
-  y: number,
-  z: number,
-  voxel: WorldVoxelCursor,
-  worldCursor: DataCursorInterface,
-  sectionCursor: SectionCursor
-): boolean {
-  let added = false;
 
-  const builder =
-    RenderedMaterials.meshers[VoxelLUT.materialMap[voxel.getVoxelId()]];
-  builder.origin.x = sectionCursor._voxelPosition.x;
-  builder.origin.y = sectionCursor._voxelPosition.y;
-  builder.origin.z = sectionCursor._voxelPosition.z;
-  builder.position.x = x;
-  builder.position.y = y;
-  builder.position.z = z;
-  builder.voxel = voxel;
-  builder.nVoxel = worldCursor;
-
-  builder.startConstruction();
-  added = BuildVoxel(builder);
-  builder.endConstruction();
-  return added;
-}
 
 const padding = Vector3Like.Create(5, 5, 5);
 export function MeshSectionBase(
   worldCursor: DataCursorInterface,
   sectionCursor: SectionCursor,
   location: LocationData,
-  transfers: any[] = []
+  transfers: any[] = [],
 ): SetSectionMeshTask | null {
   if (!space)
     space = new VoxelGeometryBuilderCacheSpace({
@@ -84,6 +58,7 @@ export function MeshSectionBase(
   const startY = minY * slice;
   const endY = (maxY + 1) * slice;
 
+  let first = false;
   for (let i = startY; i < endY; i++) {
     if (!(i % slice)) {
       const y = i / slice;
@@ -99,20 +74,12 @@ export function MeshSectionBase(
     const z = cz + sectionCursor._voxelPosition.z;
 
     let addedVoxel = false;
-    if (meshVoxel(x, y, z, voxel, worldCursor, sectionCursor)) {
+    if (BuildVoxel(x, y, z, voxel, worldCursor, sectionCursor._voxelPosition)) {
       addedVoxel = true;
-    }
-    if (voxel.hasSecondaryVoxel()) {
-      voxel.setSecondary(true);
-      if (meshVoxel(x, y, z, voxel, worldCursor, sectionCursor)) {
-        addedVoxel = true;
-      }
-      voxel.setSecondary(false);
     }
 
     section.setBuried(i, !addedVoxel);
   }
-
 
   const meshed: VoxelModelBuilder[] = [];
   for (let i = 0; i < RenderedMaterials.meshers.length; i++) {

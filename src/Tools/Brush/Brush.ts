@@ -49,6 +49,7 @@ export class BrushTool {
     this.data.level = data.level ? data.level : 0;
     this.data.levelState = data.levelState ? data.levelState : 0;
     this.data.mod = data.mod ? data.mod : 0;
+
     return this;
   }
   getData() {
@@ -129,11 +130,15 @@ export class BrushTool {
   clear() {
     this.data.id = "dve_air";
     this.data.name = "";
-    this.data.secondaryVoxelId = "";
-    this.data.level = 0;
-    this.data.levelState = 0;
     this.data.state = 0;
     this.data.mod = 0;
+    this.data.secondaryVoxelId = "";
+    this.data.secondaryName = "";
+    this.data.secondaryState = 0;
+    this.data.secondaryMod = 0;
+    this.data.level = 0;
+    this.data.levelState = 0;
+
     this.x = 0;
     this.y = 0;
     this.z = 0;
@@ -151,7 +156,11 @@ export class BrushTool {
 
     if (this.data.secondaryVoxelId && this.data.secondaryVoxelId != "dve_air") {
       voxel.setSecondary(true);
-      voxel.setStringId(this.data.secondaryVoxelId);
+      voxel.setStringId(
+        this.data.secondaryVoxelId,
+        this.data.secondaryState,
+        this.data.secondaryMod,
+      );
       voxel.setSecondary(false);
     }
 
@@ -170,9 +179,12 @@ export class BrushTool {
     if (!voxel) return;
     voxel.setId(raw[0]);
     voxel.setLevel(raw[2]);
-    voxel.setSecondary(true);
-    voxel.setId(raw[3]);
-    voxel.setSecondary(false);
+    if (voxel.canHaveSecondaryVoxel() && raw[3] !== 0) {
+      voxel.setSecondary(true);
+      voxel.setId(raw[3]);
+      voxel.setSecondary(false);
+    }
+
     voxel.process();
     if (voxel.isLightSource() && voxel.getLightSourceValue()) {
       voxel.setLight(voxel.getLightSourceValue());

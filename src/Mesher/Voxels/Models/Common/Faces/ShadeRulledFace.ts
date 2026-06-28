@@ -21,11 +21,6 @@ export function ShadeRulledFace(
 
   const space = builder.space;
   const foundHash = space.foundHash;
-  const noCastAO = space.noCastAO;
-  const voxelCache = space.voxelCache;
-  const trueVoxelCache = space.trueVoxelCache;
-  const reltionalVoxelCache = space.reltionalVoxelCache;
-  const reltionalStateCache = space.reltionalStateCache;
 
   const posX = builder.position.x;
   const posY = builder.position.y;
@@ -60,54 +55,29 @@ export function ShadeRulledFace(
         posZ + p[2],
       );
 
-      if (foundHash[hashed] < 2 || noCastAO[hashed] === 1) continue;
+      if (foundHash[hashed] < 2) continue;
+      let count = 1;
 
-      const voxelId = voxelCache[hashed];
-      const reltionalVoxelId = reltionalVoxelCache[hashed];
-      const geoIdx = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
-      const baseGeo = geometryIndex[geoIdx];
+      for (let s = 0; s < count; s++) {
+        let secondary = s == 1 ? true : false;
 
-      let shaded = false;
-      if (baseGeo) {
-        for (let geoIndex = 0; geoIndex < baseGeo.length; geoIndex++) {
-          if (
-            aoIndex.getValue(
-              baseGeo[geoIndex],
-              directionIndex,
-              trueFaceIndex,
-              v,
-            )
-          ) {
-            if (++worldAOVerts[v] >= 3) {
-              shaded = true;
-              break;
-            }
-          }
-        }
-      }
-      if (shaded) continue;
+        if (space.getNoCastAO(hashed, secondary)) continue;
 
-      const trueVoxelId = trueVoxelCache[hashed];
-      const offsetConditonalGeometry =
-        VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
+        const voxelId = space.getVoxelId(hashed, secondary);
+        const reltionalVoxelId = space.getRelationalVoxelId(hashed, secondary);
+        const geoIdx = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
+        const baseGeo = geometryIndex[geoIdx];
 
-      if (offsetConditonalGeometry) {
-        const modelState = voxelIdToState[voxelId];
-        const relationalModState = reltionalStateCache[hashed];
-
-        for (let j = 0; j < offsetConditonalGeometry.length; j++) {
-          const [geoId, requiredModelState, requiredReltionalModelState] =
-            offsetConditonalGeometry[j];
-          if (
-            requiredModelState !== modelState ||
-            !requiredReltionalModelState[relationalModState]
-          )
-            continue;
-
-          const geometries = geometryIndex[geoId];
-          for (let k = 0; k < geometries.length; k++) {
+        let shaded = false;
+        if (baseGeo) {
+          for (let geoIndex = 0; geoIndex < baseGeo.length; geoIndex++) {
             if (
-              aoIndex.getValue(geometries[k], directionIndex, trueFaceIndex, v)
+              aoIndex.getValue(
+                baseGeo[geoIndex],
+                directionIndex,
+                trueFaceIndex,
+                v,
+              )
             ) {
               if (++worldAOVerts[v] >= 3) {
                 shaded = true;
@@ -115,7 +85,47 @@ export function ShadeRulledFace(
               }
             }
           }
-          if (shaded) break;
+        }
+        if (shaded) continue;
+
+        const trueVoxelId = space.getTrueVoxelId(hashed, secondary);
+        const offsetConditonalGeometry =
+          VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
+
+        if (offsetConditonalGeometry) {
+          const modelState = voxelIdToState[voxelId];
+          const relationalModState = space.getRelationalState(
+            hashed,
+            secondary,
+          );
+
+          for (let j = 0; j < offsetConditonalGeometry.length; j++) {
+            const [geoId, requiredModelState, requiredReltionalModelState] =
+              offsetConditonalGeometry[j];
+            if (
+              requiredModelState !== modelState ||
+              !requiredReltionalModelState[relationalModState]
+            )
+              continue;
+
+            const geometries = geometryIndex[geoId];
+            for (let k = 0; k < geometries.length; k++) {
+              if (
+                aoIndex.getValue(
+                  geometries[k],
+                  directionIndex,
+                  trueFaceIndex,
+                  v,
+                )
+              ) {
+                if (++worldAOVerts[v] >= 3) {
+                  shaded = true;
+                  break;
+                }
+              }
+            }
+            if (shaded) break;
+          }
         }
       }
     }

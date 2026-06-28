@@ -75,7 +75,7 @@ export class LiquidGeometryNode extends GeoemtryNode<
 
     const found = this.builder.space.foundHash[hashed];
     if (!found) return true;
-    if (voxelId == this.builder.space.trueVoxelCache[hashed]) return false;
+    if (voxelId == this.builder.space.getTrueVoxelId(hashed)) return false;
     if (found == 1 || found == 3) return true;
     if (face == VoxelFaces.Up) return true;
     return false;

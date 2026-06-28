@@ -33,6 +33,7 @@ export class TaskSegment {
   _taskCount = 0;
 
   _task = new Map<number, LocationData>();
+  _subTask = new Map<number, number>();
 
   constructor(
     public dimension: DimensionSegment,
@@ -40,10 +41,9 @@ export class TaskSegment {
     public log = false,
   ) {}
 
-  clearAll(){
-    this.nodes=[];
+  clearAll() {
+    this.nodes = [];
     this._task.clear();
-
   }
 
   _getLocationData(dimension: number, x: number, y: number, z: number) {
@@ -56,6 +56,8 @@ export class TaskSegment {
   }
 
   completeTask(id: number) {
+    const subTaskCount = this._subTask.get(id);
+    if (subTaskCount !== undefined && subTaskCount > 0) return false;
     const locationData = this._task.get(id);
     if (!locationData) return false;
     this._hash.delete(
@@ -72,9 +74,23 @@ export class TaskSegment {
     return true;
   }
 
-  addTask(x: number, y: number, z: number) {
+  completeSubTask(id: number) {
+    const subTaskCount = this._subTask.get(id);
+    if (subTaskCount === undefined) return false;
+
+    const newSubTaskCount = subTaskCount - 1;
+    if (newSubTaskCount <= 0) {
+      this._subTask.set(id, 0);
+      this.completeTask(id);
+    } else {
+      this._subTask.set(id, newSubTaskCount);
+    }
+  }
+
+  addTask(x: number, y: number, z: number, subTaskCount: number) {
     const id = this._taskCount;
     this._task.set(id, this._getLocationData(this.dimension.id, x, y, z));
+    this._subTask.set(id, subTaskCount);
     this._taskCount++;
     this.waitingFor++;
     return id;

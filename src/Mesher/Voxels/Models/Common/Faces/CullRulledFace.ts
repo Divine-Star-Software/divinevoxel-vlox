@@ -13,10 +13,6 @@ export function CullRulledFace(
 
   const space = builder.space;
   const foundHash = space.foundHash;
-  const voxelCache = space.voxelCache;
-  const trueVoxelCache = space.trueVoxelCache;
-  const reltionalVoxelCache = space.reltionalVoxelCache;
-  const reltionalStateCache = space.reltionalStateCache;
 
   const posX = builder.position.x;
   const posY = builder.position.y;
@@ -36,59 +32,23 @@ export function CullRulledFace(
     const directionIndex = faceIndexes[i];
     const p = VoxelRelativeCubeIndexPositionMap[directionIndex];
     const hashed = space.getHash(nVoxel, posX + p[0], posY + p[1], posZ + p[2]);
+      if (foundHash[hashed] < 2) continue;
+    let count =  1;
 
-    if (foundHash[hashed] < 2) continue;
+    for (let s = 0; s < count; s++) {
+      let secondary = s == 1 ? true : false;
 
-    const voxelId = voxelCache[hashed];
-    const reltionalVoxelId = reltionalVoxelCache[hashed];
-    const geometryIndex = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
-    const offsetBaseGeometry = geometryIndexLUT[geometryIndex];
+      const voxelId = space.getVoxelId(hashed, secondary);
+      const reltionalVoxelId = space.getRelationalVoxelId(hashed, secondary);
+      const geometryIndex = VoxelLUT.getGeometryIndex(
+        voxelId,
+        reltionalVoxelId,
+      );
+      const offsetBaseGeometry = geometryIndexLUT[geometryIndex];
 
-    if (offsetBaseGeometry) {
-      for (let j = 0; j < offsetBaseGeometry.length; j++) {
-        const geoId = offsetBaseGeometry[j];
-        if (rulelessIndex[geoId]) continue;
-
-        const cullingProcedure =
-          cullingProcedures[cullingProceduresIndex[geoId]];
-        const procType = cullingProcedure.type;
-
-        if (procType === "transparent") {
-          if (trueVoxelCache[hashed] !== currentVoxelId) continue;
-        }
-        if (procType == "none") {
-          continue;
-        }
-
-        if (
-          faceCullIndex.getValue(geoId, directionIndex, trueFaceIndex) === 1
-        ) {
-          return false;
-        }
-      }
-    }
-
-    const trueVoxelId = trueVoxelCache[hashed];
-    const offsetConditionalGeometry =
-      VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
-
-    if (offsetConditionalGeometry) {
-      const modelState = voxelIdToState[voxelId];
-      const relationalModState = reltionalStateCache[hashed];
-
-      for (let j = 0; j < offsetConditionalGeometry.length; j++) {
-        const [condGeoId, requiredModelState, requiredRelationalModelState] =
-          offsetConditionalGeometry[j];
-        if (
-          requiredModelState !== modelState ||
-          !requiredRelationalModelState[relationalModState]
-        ) {
-          continue;
-        }
-
-        const geometries = geometryIndexLUT[condGeoId];
-        for (let k = 0; k < geometries.length; k++) {
-          const geoId = geometries[k];
+      if (offsetBaseGeometry) {
+        for (let j = 0; j < offsetBaseGeometry.length; j++) {
+          const geoId = offsetBaseGeometry[j];
           if (rulelessIndex[geoId]) continue;
 
           const cullingProcedure =
@@ -96,7 +56,8 @@ export function CullRulledFace(
           const procType = cullingProcedure.type;
 
           if (procType === "transparent") {
-            if (trueVoxelCache[hashed] !== currentVoxelId) continue;
+            if (space.getTrueVoxelId(hashed, secondary) !== currentVoxelId)
+              continue;
           }
           if (procType == "none") {
             continue;
@@ -106,6 +67,50 @@ export function CullRulledFace(
             faceCullIndex.getValue(geoId, directionIndex, trueFaceIndex) === 1
           ) {
             return false;
+          }
+        }
+      }
+
+      const trueVoxelId = space.getTrueVoxelId(hashed, secondary);
+      const offsetConditionalGeometry =
+        VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
+
+      if (offsetConditionalGeometry) {
+        const modelState = voxelIdToState[voxelId];
+        const relationalModState = space.getRelationalState(hashed, secondary);
+
+        for (let j = 0; j < offsetConditionalGeometry.length; j++) {
+          const [condGeoId, requiredModelState, requiredRelationalModelState] =
+            offsetConditionalGeometry[j];
+          if (
+            requiredModelState !== modelState ||
+            !requiredRelationalModelState[relationalModState]
+          ) {
+            continue;
+          }
+
+          const geometries = geometryIndexLUT[condGeoId];
+          for (let k = 0; k < geometries.length; k++) {
+            const geoId = geometries[k];
+            if (rulelessIndex[geoId]) continue;
+
+            const cullingProcedure =
+              cullingProcedures[cullingProceduresIndex[geoId]];
+            const procType = cullingProcedure.type;
+
+            if (procType === "transparent") {
+              if (space.getTrueVoxelId(hashed, secondary) !== currentVoxelId)
+                continue;
+            }
+            if (procType == "none") {
+              continue;
+            }
+
+            if (
+              faceCullIndex.getValue(geoId, directionIndex, trueFaceIndex) === 1
+            ) {
+              return false;
+            }
           }
         }
       }

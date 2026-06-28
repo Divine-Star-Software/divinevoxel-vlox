@@ -93,6 +93,7 @@ export class VoxelGeometryBuilderCacheSpace {
     }
     return hashed;
   }
+
   getNoCastAO(index: number, secondary = false) {
     return (
       (secondary ? this.secondaryNoCastAO[index] : this.noCastAO[index]) == 1
@@ -119,7 +120,6 @@ export class VoxelGeometryBuilderCacheSpace {
   getHasSecondary(index: number) {
     return this.hasSecondary[index];
   }
-
   private hashState(
     dataCursor: DataCursorInterface,
     index: number,
@@ -140,12 +140,11 @@ export class VoxelGeometryBuilderCacheSpace {
       return;
     }
     const canHaveSecondary = voxel.canHaveSecondaryVoxel();
-
     voxel.setSecondary(true);
     const hasSecondary = canHaveSecondary && voxel.getStringId() !== "dve_air";
     voxel.setSecondary(false);
 
-    if (!voxel.isRenderable() && !hasSecondary) {
+    if (!voxel.isRenderable() || !hasSecondary) {
       this.foundHash[index] = 1;
       return;
     }
