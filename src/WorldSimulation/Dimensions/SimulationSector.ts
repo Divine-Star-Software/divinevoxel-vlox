@@ -12,6 +12,7 @@ import { Thread } from "@amodx/threads";
 import { WorldDataSyncIds } from "../../World/Types/WorldDataSyncIds";
 import { EngineSettings } from "../../Settings/EngineSettings";
 import { SectionCursor } from "../../World/Cursor/SectionCursor";
+import { WorldSimulation } from "../WorldSimulation";
 const tempPosition = Vector3Like.Create();
 export class SimulationSector {
   position: Vec3Array = [0, 0, 0];
@@ -127,7 +128,7 @@ export class SimulationSector {
 
     let renderedSection = false;
     const sector = this.sector;
-    if (this.renderering) {
+    if (this.renderering && WorldSimulation.doBuildUpdate) {
       for (const section of sector.sections) {
         if (
           !this._rendered ||

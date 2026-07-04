@@ -116,6 +116,8 @@ export class WorldSimulation {
 
   static doTickUpdates = true;
 
+  static doBuildUpdate = true;
+
   static clearAll() {
     for (const [, dimension] of WorldSimulationDimensions._dimensions) {
       dimension.clearAll();
@@ -176,7 +178,10 @@ export class WorldSimulation {
     }
 
     if (generationOnly) return;
-    WorldSimulationTasks.buildTasks.runTask(64);
+    if (this.doBuildUpdate) {
+      WorldSimulationTasks.buildTasks.runTask(64);
+    }
+
     if (!buildOnly) {
       WorldSimulationTasks.saveTasks.runTask(50);
       WorldSimulationTasks.unloadTasks.runTask(50);

@@ -14,7 +14,7 @@ export async function expandBinaryObject<T = any>(
   useSharedMemory = false
 ): Promise<T> {
   const decompressedBuffer = await new Response(
-    new Blob([buffer]).stream().pipeThrough(new DecompressionStream("gzip"))
+    new Blob([buffer as any]).stream().pipeThrough(new DecompressionStream("gzip"))
   ).arrayBuffer();
   BinaryObject.setUseSharedMemory(useSharedMemory);
   const object = BinaryObject.bufferToObject<T>(decompressedBuffer);

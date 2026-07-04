@@ -14,6 +14,8 @@ export async function InitalLoad(props: {
   buildOnly?: boolean;
 }) {
   return new Promise((resolve) => {
+    WorldSimulation.doBuildUpdate = props.buildOnly || false;
+
     const generator = WorldSimulation.createGenerator({
       ...props.genData,
       building: false,
@@ -41,7 +43,10 @@ export async function InitalLoad(props: {
     };
     update();
 
-    const inte = setInterval(() => {
+    const maxDoneCount = 5;
+
+    let allDoneCount = 0;
+    const check = async () => {
       if (props.logTasks) {
         console.log(WorldSimulation.logTasks());
       }
@@ -61,20 +66,24 @@ export async function InitalLoad(props: {
         }
       }
 
-      if (!allDone) return;
+      if (!allDone || allDoneCount < maxDoneCount) {
+        if (allDone) allDoneCount++;
+        setTimeout(check, 250);
+        return;
+      }
       done = true;
-      clearInterval(inte);
       clearTimeout(timeOut);
       WorldSimulation.removeGenerator(generator);
-      (async () => {
-        if (!props.buildOnly) {
-          if (WorldSimulationTools.worldStorage) {
-            await SaveAllSectors();
-          }
-        }
 
-        resolve(true);
-      })();
-    }, 250);
+      if (!props.buildOnly) {
+        if (WorldSimulationTools.worldStorage) {
+          await SaveAllSectors();
+        }
+      }
+      WorldSimulation.doBuildUpdate = true;
+      resolve(true);
+    };
+
+    check();
   });
 }

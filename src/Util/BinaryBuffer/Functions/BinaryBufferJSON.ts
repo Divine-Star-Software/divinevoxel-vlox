@@ -17,7 +17,7 @@ export async function BinaryBufferFromJSON(
     if (data.compression) {
       const ds = new DecompressionStream(data.compression);
       const writer = ds.writable.getWriter();
-      writer.write(raw);
+      writer.write(raw as any);
       writer.close();
       const decompressed = await new Response(ds.readable).arrayBuffer();
       raw = new Uint8Array(decompressed);
@@ -58,7 +58,7 @@ export async function BinaryBufferToJSON(
         : compression;
     const cs = new CompressionStream(compression);
     const writer = cs.writable.getWriter();
-    writer.write(input);
+    writer.write(input as any);
     writer.close();
     const compressedBuffer = await new Response(cs.readable).arrayBuffer();
     bufferToEncode = new Uint8Array(compressedBuffer);
