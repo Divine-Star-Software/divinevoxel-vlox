@@ -2,7 +2,7 @@
   "name": "@divinevoxel/vlox",
   "description": "Vlox a block style voxel engine.",
   "main": "index.js",
-  "version": "0.0.84",
+  "version": "0.0.85",
   "types": "index.d.ts",
   "type": "module",
   "scripts": {
@@ -23,11 +23,6 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@amodx/math": "^0.0.18",
-    "@amodx/binary": "^0.0.20",
-    "@amodx/threads": "^0.0.35"
-  },
-  "devDependencies": {
     "@amodx/math": "^0.0.18",
     "@amodx/binary": "^0.0.20",
     "@amodx/threads": "^0.0.35"
