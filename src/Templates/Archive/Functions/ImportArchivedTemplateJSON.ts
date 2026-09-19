@@ -1,4 +1,4 @@
-import { BinaryBuffer } from "../../../Util/BinaryBuffer/BinaryBuffer";
+import { BinaryBuffer } from "@amodx/binary/Buffer/BinaryBuffer";
 import type {
   ArchivedVoxelTemplateData,
   ArchivedVoxelTemplateExportedJSONData,

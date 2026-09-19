@@ -1,7 +1,7 @@
 import {
   BinaryBuffer,
   BinaryBufferCompresedTypes,
-} from "../../../../Util/BinaryBuffer";
+} from "@amodx/binary/Buffer";
 import {
   ArchivedAreaData,
   ArchivedAreaJSONData,

@@ -11,7 +11,7 @@ import {
   BinaryBuffer,
   BinaryBufferConstants,
   BinaryBufferFormat,
-} from "../../../../Util/BinaryBuffer/index";
+} from "@amodx/binary/Buffer";
 import { getBaseData, lightSegments, lightSemgnetGet } from "../Shared/index";
 import { ProcessedSection, SectorPalette } from "../../Classes/ArchiveClasses";
 import { CreateArchivedSection } from "./CreateArchivedSection";

@@ -1,7 +1,7 @@
 import {
   BinaryBuffer,
   BinaryBufferFormat,
-} from "../../../Util/BinaryBuffer/index";
+} from "@amodx/binary/Buffer";
 import {
   ArchivedVoxelTemplateBuffersExportdJSONData,
   ArchivedVoxelTemplateData,

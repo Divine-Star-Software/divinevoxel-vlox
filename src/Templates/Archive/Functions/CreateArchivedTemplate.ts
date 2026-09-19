@@ -6,7 +6,7 @@ import { ArchivedVoxelTemplateData } from "../ArchivedVoxelTemplate.types";
 import {
   BinaryBuffer,
   BinaryBufferFormat,
-} from "../../../Util/BinaryBuffer/index";
+} from "@amodx/binary/Buffer";
 import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArechive";
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";

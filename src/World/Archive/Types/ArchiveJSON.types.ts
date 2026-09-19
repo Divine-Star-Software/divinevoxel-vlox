@@ -1,4 +1,4 @@
-import { JSONBinaryBufferData } from "../../../Util/BinaryBuffer/BinaryBuffer.types";
+import { JSONBinaryBufferData } from "@amodx/binary/Buffer/BinaryBuffer.types";
 import {
   ArchivedLightSegments,
   BaseArchivedDataBase,

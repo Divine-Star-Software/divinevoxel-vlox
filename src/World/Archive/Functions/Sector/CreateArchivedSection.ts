@@ -2,7 +2,7 @@ import { ArchivedSectionData } from "../../Types/index";
 import {
   BinaryBuffer,
   BinaryBufferFormat,
-} from "../../../../Util/BinaryBuffer/index";
+} from "@amodx/binary/Buffer";
 import { getLightBuffer, lightSegments } from "../Shared/LightSegments";
 import { ProcessedSection, SectorPalette } from "../../Classes/ArchiveClasses";
 

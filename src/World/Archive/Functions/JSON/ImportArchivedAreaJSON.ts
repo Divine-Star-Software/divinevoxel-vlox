@@ -1,4 +1,4 @@
-import { BinaryBuffer } from "../../../../Util/BinaryBuffer";
+import { BinaryBuffer } from "@amodx/binary/Buffer";
 import {
   ArchivedAreaData,
   ArchivedAreaJSONData,

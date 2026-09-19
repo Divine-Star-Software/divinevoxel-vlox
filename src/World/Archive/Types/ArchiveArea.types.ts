@@ -1,5 +1,5 @@
 import { VoxelBinaryStateSchemaNode } from "../../../Voxels/State/State.types";
-import { BinaryBufferData } from "../../../Util/BinaryBuffer/BinaryBuffer.types";
+import { BinaryBufferData } from "@amodx/binary/Buffer/BinaryBuffer.types";
 import {
   ArchivedLightSegments,
   BaseArchivedDataBase,

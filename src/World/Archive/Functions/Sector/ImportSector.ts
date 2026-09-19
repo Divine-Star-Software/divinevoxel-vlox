@@ -5,7 +5,7 @@ import { ImportedSector } from "../../Classes/ImportedSector";
 import { Vector3Like } from "@amodx/math";
 import { VoxelLUT } from "../../../../Voxels/Data/VoxelLUT";
 import { VoxelTagsRegister } from "../../../../Voxels/Data/VoxelTagsRegister";
-import { BinaryBufferFormat } from "../../../../Util/BinaryBuffer/index";
+import { BinaryBufferFormat } from "@amodx/binary/Buffer";
 import { lightSemgnetSet } from "../../Functions/Shared/LightSegments";
 
 type RunData = {

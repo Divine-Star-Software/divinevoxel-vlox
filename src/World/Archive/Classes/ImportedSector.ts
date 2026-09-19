@@ -3,7 +3,7 @@ import { NumberPalette } from "../../../Util/NumberPalette";
 import { ArchivedLightSegments, ArchivedSectorData } from "../Types/index";
 import { ImportedSection } from "./ImportedSection";
 import { BinarySchema } from "../../../Voxels/State/Schema/BinarySchema";
-import { BinaryBuffer } from "../../../Util/BinaryBuffer/BinaryBuffer";
+import { BinaryBuffer } from "@amodx/binary/Buffer/BinaryBuffer";
 import { VoxelPaletteArchiveReader } from "../../../Voxels/Archive/VoxelPaletteArchiveReader";
 
 class ImportedSectorPalettes {

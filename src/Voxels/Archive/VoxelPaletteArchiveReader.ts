@@ -4,7 +4,7 @@ import {
   ArchivedVoxelDataForPalette,
   VoxelArchivePaletteData,
 } from "./VoxelArchive.types";
-import { BinaryBuffer } from "../../Util/BinaryBuffer/BinaryBuffer";
+import { BinaryBuffer } from "@amodx/binary/Buffer/BinaryBuffer";
 
 export class VoxelPaletteArchiveReader {
   temp: [id: string, state: number, mod: number] = ["", 0, 0];

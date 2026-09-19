@@ -1,5 +1,5 @@
-import { BinaryBufferFormat } from "../../Util/BinaryBuffer";
-import { BinaryBuffer } from "../../Util/BinaryBuffer/BinaryBuffer";
+import { BinaryBufferFormat } from "@amodx/binary/Buffer";
+import { BinaryBuffer } from "@amodx/binary/Buffer/BinaryBuffer";
 import { StringPalette } from "../../Util/StringPalette";
 import { VoxelLUT } from "../Data/VoxelLUT";
 import { VoxelSchemas } from "../State/VoxelSchemas";

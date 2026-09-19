@@ -8,7 +8,7 @@ import {
   compressBinaryObject,
   expandBinaryObject,
 } from "../../Util/BinaryObject";
-import { BinaryBufferData } from "../../Util/BinaryBuffer/index";
+import { BinaryBufferData } from "@amodx/binary/Buffer";
 
 function runArchiveSector(
   location: LocationData

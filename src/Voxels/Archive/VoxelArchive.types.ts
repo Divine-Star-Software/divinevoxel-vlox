@@ -1,7 +1,7 @@
 import {
   BinaryBufferData,
   JSONBinaryBufferData,
-} from "../../Util/BinaryBuffer/BinaryBuffer.types";
+} from "@amodx/binary/Buffer/BinaryBuffer.types";
 import { VoxelBinaryStateSchemaNode } from "../../Voxels/State/State.types";
 export interface ArchivedVoxelDataForPalette {
   id: string;

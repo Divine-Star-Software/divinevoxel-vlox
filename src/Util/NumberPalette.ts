@@ -19,6 +19,7 @@ export class NumberPalette {
   }
 
   register(value: number) {
+    if (this._map[value] !== undefined) return this._map[value];
     const id = this._count;
     this._palette[id] = value;
     this._map[value] = id;

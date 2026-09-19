@@ -1,4 +1,4 @@
-import { BinaryBufferData } from "../../../Util/BinaryBuffer/BinaryBuffer.types";
+import { BinaryBufferData } from "@amodx/binary/Buffer/BinaryBuffer.types";
 import { VoxelArchivePaletteData } from "../../../Voxels/Archive/VoxelArchive.types";
 import {
   ArchivedLightSegments,

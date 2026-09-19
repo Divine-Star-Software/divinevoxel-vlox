@@ -4,7 +4,7 @@ import {
   BinaryBuffer,
   BinaryBufferData,
   BinaryBufferFormat,
-} from "../../../Util/BinaryBuffer/index";
+} from "@amodx/binary/Buffer";
 import { ImportedSector } from "./ImportedSector";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import {

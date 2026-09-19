@@ -6,7 +6,7 @@ import {
 import {
   BinaryBufferData,
   JSONBinaryBufferData,
-} from "../../Util/BinaryBuffer/BinaryBuffer.types";
+} from "@amodx/binary/Buffer/BinaryBuffer.types";
 import { IVoxelTemplateData } from "../VoxelTemplates.types";
 import { IndexOrderingTypes } from "../../Math/Indexing";
 

@@ -1,4 +1,4 @@
-import { BinaryBuffer } from "../../../../Util/BinaryBuffer";
+import { BinaryBuffer } from "@amodx/binary/Buffer";
 import { ArchivedSectionData, ArchivedSectorData } from "../../Types/index";
 import { uint16To4CharString } from "../Shared/IntToString";
 import { lightSegments } from "../Shared";

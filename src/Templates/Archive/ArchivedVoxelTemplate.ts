@@ -8,7 +8,7 @@ import { IVoxelTemplate } from "../../Templates/VoxelTemplates.types";
 import {
   BinaryBuffer,
   BinaryBufferFormat,
-} from "../../Util/BinaryBuffer/index";
+} from "@amodx/binary/Buffer";
 import { VoxelPaletteArchiveReader } from "../../Voxels/Archive/VoxelPaletteArchiveReader";
 import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 
