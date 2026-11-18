@@ -1,7 +1,7 @@
 import { VoxelFaces } from "../../../../Math";
 import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
 import { TransformBox } from "../../../../Mesher/Geometry/Transform/TransformBox";
-import { CompiledQuadVoxelGeometryNode } from "Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
+import { CompiledQuadVoxelGeometryNode } from "Mesher/Voxels/Models/Nodes/Types/QuadVoxelGeometryNodeTypes";
 import { BuildCompiledQuad } from "./BuildCompiledQuad";
 import { VoxelBoxGeometryNode } from "../../../Geometry/VoxelGeometry.types";
 import { Box } from "../../../../Mesher/Geometry/Shapes/Box";

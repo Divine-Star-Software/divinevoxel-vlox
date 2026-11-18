@@ -95,10 +95,10 @@ const farmlandModel: VoxelModelData = {
     },
   },
 
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
-    dve_simulation_behavior: "dve_frarmland",
+    dve_simulation_behavior: "dve_farmland",
   },
   stateNodes: {
     "moist=false,rotation=0": [
@@ -269,7 +269,7 @@ const cropModel: VoxelModelData = {
     dve_placing_strategy: "*",
     dve_simulation_behavior: "dve_crop",
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "level=0": [
       {

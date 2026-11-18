@@ -32,7 +32,7 @@ export abstract class VoxelCursorInterface {
 
   /**
    *
-   * @param mode 0 for add 1 for remove 2 for the voxel needs a buried and logic check only, 3 for propagatin check only
+   * @param mode 0 for add 1 for remove 2 for the voxel needs a buried and logic check only, 3 for propagation check only
    */
   abstract updateVoxel(mode: 0 | 1 | 2): void;
   _lightData = new VoxelLightData();
@@ -275,7 +275,7 @@ export abstract class VoxelCursorInterface {
 
   setName(name: string, state = 0, mod = 0) {
     return this.setVoxelId(
-      VoxelLUT.voxelIds.getNumberId(VoxelLUT.voxelNametoIdMap.get(name)!),
+      VoxelLUT.voxelIds.getNumberId(VoxelLUT.voxelNameToIdMap.get(name)!),
       state,
       mod,
     );

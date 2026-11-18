@@ -9,7 +9,7 @@ import {
 } from "./Archive.types";
 import { ArchiveAreaPalettesData } from "./ArchiveArea.types";
 
-export interface ArchivedSectorDuplicteJSONData {
+export interface ArchivedSectorDuplicateJSONData {
   sections?: Record<string, ArchivedSectionJSONData>;
 }
 
@@ -62,5 +62,5 @@ export interface ArchivedAreaSectorJSONData extends BaseArchivedSectorData {
   palettes: ArchivedAreaSectorPaletteJSONData;
   /** Array of archived section data or references to section data. */
   sections: (ArchivedSectionJSONData | string)[];
-  duplicates: ArchivedSectorDuplicteJSONData;
+  duplicates: ArchivedSectorDuplicateJSONData;
 }

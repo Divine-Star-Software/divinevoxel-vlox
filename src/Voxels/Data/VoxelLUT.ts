@@ -6,14 +6,14 @@ export type VoxelLUTExport = {
   substance: string[];
   substanceMap: number[];
   voxelIds: string[];
-  voxelNametoIdMap: [string, string][];
+  voxelNameToIdMap: [string, string][];
   voxelIdToNameMap: [string, string][];
   models: string[];
   modelsIndex: number[];
   totalStates: ArrayBufferLike;
   totalMods: ArrayBufferLike;
-  totalReltionalStates: ArrayBufferLike;
-  totalReltionalMods: ArrayBufferLike;
+  totalRelationalStates: ArrayBufferLike;
+  totalRelationalMods: ArrayBufferLike;
   totalVoxelIds: number;
   totalRelationalVoxelIds: number;
   totalCombinedIds: number;
@@ -36,7 +36,7 @@ export type VoxelLUTExport = {
   conditionalGeometryIndex: [
     geometryId: number,
     modelState: number,
-    modelReltionalState: boolean[]
+    modelRelationalState: boolean[]
   ][][];
   conditionalGeometryInputIndex: number[][][];
 };
@@ -51,7 +51,7 @@ export class VoxelLUT {
   //maps voxel string ids to their true id
   static voxelIds = new StringPalette();
   //maps voxel names to their ids
-  static voxelNametoIdMap = new Map<string, string>();
+  static voxelNameToIdMap = new Map<string, string>();
   //maps voxel ids to their names
   static voxelIdToNameMap = new Map<string, string>();
 
@@ -65,10 +65,10 @@ export class VoxelLUT {
   static totalStates: Uint16Array;
   //maps true voxel ids to the total number of mod states
   static totalMods: Uint16Array;
-  //maps true voxel ids to the total number of reltional states
-  static totalReltionalStates: Uint16Array;
-  //maps true voxel ids to the total number of reltional mod states
-  static totalReltionalMods: Uint16Array;
+  //maps true voxel ids to the total number of relational states
+  static totalRelationalStates: Uint16Array;
+  //maps true voxel ids to the total number of relational mod states
+  static totalRelationalMods: Uint16Array;
   static totalVoxelIds = 1;
   static totalRelationalVoxelIds = 1;
   /** totalVoxelIds * totalRelationalVoxelIds */
@@ -111,17 +111,17 @@ export class VoxelLUT {
   static relationalVoxelRecord: Uint16Array;
 
   //GEOMETRY
-  //maps [voxel id x reltional voxel id] to the geometry index
+  //maps [voxel id x relational voxel id] to the geometry index
   static geometryIndex: Uint16Array;
-  //maps [voxel id x reltional voxel id] to the geometry inputs index
+  //maps [voxel id x relational voxel id] to the geometry inputs index
   static geometryInputsIndex: Uint16Array;
-  //maps model id to its conditional nodes and the needed voxel id and reltional voxel id
+  //maps model id to its conditional nodes and the needed voxel id and relational voxel id
   static conditionalGeometryIndex: [
     geometryId: number,
     modelState: number,
-    modelReltionalState: boolean[]
+    modelRelationalState: boolean[]
   ][][] = [];
-  //maps [geometry id x voxel id x reltional voxel id] to the geometry index
+  //maps [geometry id x voxel id x relational voxel id] to the geometry index
   static conditionalGeometryInputIndex: number[][][] = [];
 
   static getStateIndex(x: number, y: number, boundsX: number) {
@@ -148,7 +148,7 @@ export class VoxelLUT {
     return this.getVoxelId(this.voxelIds.getNumberId(id), state, mod);
   }
 
-  static getReltionalVoxelId(
+  static getRelationalVoxelId(
     trueId: number,
     relationalState: number = 0,
     relationalMod: number = 0
@@ -160,7 +160,7 @@ export class VoxelLUT {
             relationalState
           )!,
           this.voxelRelationalModMaps[trueId].get(relationalMod)!,
-          this.totalReltionalStates[trueId]
+          this.totalRelationalStates[trueId]
         )
     ];
   }
@@ -188,7 +188,7 @@ export class VoxelLUT {
   ): [
     geometryId: number,
     modelState: number,
-    modelReltionalState: boolean[]
+    modelRelationalState: boolean[]
   ][] {
     return this.conditionalGeometryIndex[trueVoxelId];
   }
@@ -208,14 +208,14 @@ export class VoxelLUT {
       substance: this.substance._palette,
       substanceMap: this.substanceMap,
       voxelIds: this.voxelIds._palette,
-      voxelNametoIdMap: [...this.voxelNametoIdMap],
+      voxelNameToIdMap: [...this.voxelNameToIdMap],
       voxelIdToNameMap: [...this.voxelIdToNameMap],
       models: this.models._palette,
       modelsIndex: this.modelsIndex,
       totalStates: this.totalStates.buffer,
       totalMods: this.totalMods.buffer,
-      totalReltionalStates: this.totalReltionalStates.buffer,
-      totalReltionalMods: this.totalReltionalMods.buffer,
+      totalRelationalStates: this.totalRelationalStates.buffer,
+      totalRelationalMods: this.totalRelationalMods.buffer,
       totalVoxelIds: this.totalVoxelIds,
       totalRelationalVoxelIds: this.totalRelationalVoxelIds,
       totalCombinedIds: this.totalCombinedIds,
@@ -249,14 +249,14 @@ export class VoxelLUT {
     this.substance.load(exported.substance);
     this.substanceMap = exported.substanceMap;
     this.voxelIds.load(exported.voxelIds);
-    this.voxelNametoIdMap = new Map(exported.voxelNametoIdMap);
+    this.voxelNameToIdMap = new Map(exported.voxelNameToIdMap);
     this.voxelIdToNameMap = new Map(exported.voxelIdToNameMap);
     this.models.load(exported.models);
     this.modelsIndex = exported.modelsIndex;
     this.totalStates = new Uint16Array(exported.totalStates);
     this.totalMods = new Uint16Array(exported.totalMods);
-    this.totalReltionalStates = new Uint16Array(exported.totalReltionalStates);
-    this.totalReltionalMods = new Uint16Array(exported.totalReltionalMods);
+    this.totalRelationalStates = new Uint16Array(exported.totalRelationalStates);
+    this.totalRelationalMods = new Uint16Array(exported.totalRelationalMods);
     this.totalVoxelIds = exported.totalVoxelIds;
     this.totalRelationalVoxelIds = exported.totalRelationalVoxelIds;
     this.totalCombinedIds = exported.totalCombinedIds;

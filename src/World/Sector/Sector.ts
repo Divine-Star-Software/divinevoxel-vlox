@@ -9,6 +9,7 @@ import { SectorState, SectorStateDefaultBitFlags } from "./SectorState.js";
 import { forceMultipleOf4 } from "../../Util/Binary/BinaryFunctions.js";
 import { WorldRegister } from "../WorldRegister.js";
 import { EngineSettings } from "../../Settings/EngineSettings.js";
+import { PerfLog } from "../../Util/PerfLog.js";
 
 export interface SectorData {
   buffer: ArrayBufferLike;
@@ -21,6 +22,10 @@ export interface SectorData {
 export interface Sector extends SectorData {}
 
 const temp: Vec2Array = [0, 0];
+/**Maps flag names used by older archives to their current names. */
+const LegacyStoredFlagNames: Record<string, string> = {
+  dve_is_world_progation_done: "dve_is_world_propagation_done",
+};
 export class Sector {
   static FlagIds = SectorState.Flags;
   static TimeStampIds = SectorState.TimeStamps;
@@ -59,9 +64,24 @@ export class Sector {
   }
 
   private _checkedOut = false;
+  private _checkedOutAt = 0;
+  private _checkInWaiters: ((checkedIn: boolean) => void)[] = [];
   /**Set if the sector is checked out into another thread.  */
   setCheckedOut(checkedOut: boolean) {
+    if (checkedOut && !this._checkedOut) {
+      this._checkedOutAt = PerfLog.now();
+      PerfLog.count("sector.checkOut");
+    }
+    if (!checkedOut && this._checkedOut && this._checkedOutAt) {
+      PerfLog.end("sector.checkedOutFor", this._checkedOutAt);
+      this._checkedOutAt = 0;
+    }
     this._checkedOut = checkedOut;
+    if (!checkedOut && this._checkInWaiters.length) {
+      const waiters = this._checkInWaiters;
+      this._checkInWaiters = [];
+      for (let i = 0; i < waiters.length; i++) waiters[i](true);
+    }
   }
   /**Will return true if the sector is checked out into another thread. */
   isCheckedOut() {
@@ -70,17 +90,17 @@ export class Sector {
   /**Returns a promise that will resolve when the sector is no longer checked out. */
   waitTillCheckedIn() {
     if (!this._checkedOut) return true;
+    const start = PerfLog.now();
     return new Promise<boolean>((resolve) => {
-      const inte = () => {
-        if (!this._checkedOut) return resolve(true);
-        setTimeout(inte, 10);
-      };
-      inte();
+      this._checkInWaiters.push((checkedIn) => {
+        PerfLog.end("sector.waitTillCheckedIn", start);
+        resolve(checkedIn);
+      });
     });
   }
 
   private _locked = false;
-  /**Set if the secotr is locked and can't be checked out.*/
+  /**Set if the sector is locked and can't be checked out.*/
   setLocked(locked: boolean) {
     this._locked = locked;
   }
@@ -94,11 +114,12 @@ export class Sector {
     this.flagArray = new Uint8Array(buffer, 0, 12);
     this.timeStampArray = new Uint32Array(buffer, 12, 12);
     this.bufferView = new Uint8Array(buffer);
-    const totalSections = WorldSpaces.sector.sectionVolumne;
+    const totalSections = WorldSpaces.sector.sectionVolume;
     for (let i = 0; i < totalSections; i++) {
-      this.sections[i] = WorldRegister._pools._sections.length
-        ? WorldRegister._pools._sections.shift()!
-        : new Section();
+      if (!this.sections[i])
+        this.sections[i] = WorldRegister._pools._sections.length
+          ? WorldRegister._pools._sections.pop()!
+          : new Section();
 
       this.sections[i].setBuffer(this, buffer, i);
     }
@@ -158,7 +179,7 @@ export class Sector {
     return this.timeStampArray[index];
   }
 
-  *getRenerableSections(): Generator<Section> {
+  *getRenderableSections(): Generator<Section> {
     for (const section of this.sections) {
       const [min, max] = section.getMinMax();
       if (min == Infinity || max == -Infinity) continue;
@@ -176,7 +197,8 @@ export class Sector {
 
   loadFlags(flags: Record<string, boolean>) {
     for (const flag in flags) {
-      const storedIndex = SectorState.StoredFlags[flag];
+      const storedIndex =
+        SectorState.StoredFlags[LegacyStoredFlagNames[flag] || flag];
       if (storedIndex === undefined) {
         console.warn(`${flag} does not exist on stored flags for sector`);
         continue;

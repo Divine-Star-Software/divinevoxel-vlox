@@ -1,4 +1,4 @@
-import { QuadVerticies } from "../../../../Geometry/Geometry.types";
+import { QuadVertices } from "../../../../Geometry/Geometry.types";
 import { VoxelFaces, VoxelFacesArray } from "../../../../../Math";
 import { Vec4Array } from "@amodx/math";
 import { VoxelRelativeCubeIndex } from "../../../../../Voxels/Geometry/VoxelRelativeCubeIndex";
@@ -6,11 +6,11 @@ import { VoxelLightData } from "../../../../../Voxels/Cursor/VoxelLightData";
 
 export const GradientCheckSets: Record<
   VoxelFaces,
-  Record<QuadVerticies, number[]>
+  Record<QuadVertices, number[]>
 > = [] as any;
 
 GradientCheckSets[VoxelFaces.Up] = [] as any;
-GradientCheckSets[VoxelFaces.Up][QuadVerticies.TopRight] = [
+GradientCheckSets[VoxelFaces.Up][QuadVertices.TopRight] = [
   //1
   1, 1, 0,
   //2
@@ -18,7 +18,7 @@ GradientCheckSets[VoxelFaces.Up][QuadVerticies.TopRight] = [
   //3
   1, 1, 1,
 ];
-GradientCheckSets[VoxelFaces.Up][QuadVerticies.TopLeft] = [
+GradientCheckSets[VoxelFaces.Up][QuadVertices.TopLeft] = [
   //1
   -1, 1, 0,
   //2
@@ -26,7 +26,7 @@ GradientCheckSets[VoxelFaces.Up][QuadVerticies.TopLeft] = [
   //3
   -1, 1, 1,
 ];
-GradientCheckSets[VoxelFaces.Up][QuadVerticies.BottomLeft] = [
+GradientCheckSets[VoxelFaces.Up][QuadVertices.BottomLeft] = [
   //1
   -1, 1, 0,
   //2
@@ -34,7 +34,7 @@ GradientCheckSets[VoxelFaces.Up][QuadVerticies.BottomLeft] = [
   //3
   -1, 1, -1,
 ];
-GradientCheckSets[VoxelFaces.Up][QuadVerticies.BottomRight] = [
+GradientCheckSets[VoxelFaces.Up][QuadVertices.BottomRight] = [
   //1
   1, 1, 0,
   //2
@@ -44,7 +44,7 @@ GradientCheckSets[VoxelFaces.Up][QuadVerticies.BottomRight] = [
 ];
 
 GradientCheckSets[VoxelFaces.Down] = [] as any;
-GradientCheckSets[VoxelFaces.Down][QuadVerticies.TopRight] = [
+GradientCheckSets[VoxelFaces.Down][QuadVertices.TopRight] = [
   //1
   -1, -1, 0,
   //2
@@ -52,7 +52,7 @@ GradientCheckSets[VoxelFaces.Down][QuadVerticies.TopRight] = [
   //3
   -1, -1, 1,
 ];
-GradientCheckSets[VoxelFaces.Down][QuadVerticies.TopLeft] = [
+GradientCheckSets[VoxelFaces.Down][QuadVertices.TopLeft] = [
   //1
   1, -1, 0,
   //2
@@ -60,7 +60,7 @@ GradientCheckSets[VoxelFaces.Down][QuadVerticies.TopLeft] = [
   //3
   1, -1, 1,
 ];
-GradientCheckSets[VoxelFaces.Down][QuadVerticies.BottomLeft] = [
+GradientCheckSets[VoxelFaces.Down][QuadVertices.BottomLeft] = [
   //1
   1, -1, 0,
   //2
@@ -68,7 +68,7 @@ GradientCheckSets[VoxelFaces.Down][QuadVerticies.BottomLeft] = [
   //3
   1, -1, -1,
 ];
-GradientCheckSets[VoxelFaces.Down][QuadVerticies.BottomRight] = [
+GradientCheckSets[VoxelFaces.Down][QuadVertices.BottomRight] = [
   //1
   -1, -1, 0,
   //2
@@ -78,7 +78,7 @@ GradientCheckSets[VoxelFaces.Down][QuadVerticies.BottomRight] = [
 ];
 
 GradientCheckSets[VoxelFaces.East] = [] as any;
-GradientCheckSets[VoxelFaces.East][QuadVerticies.TopRight] = [
+GradientCheckSets[VoxelFaces.East][QuadVertices.TopRight] = [
   //1
   1, 0, 1,
   //2
@@ -86,7 +86,7 @@ GradientCheckSets[VoxelFaces.East][QuadVerticies.TopRight] = [
   //3
   1, 1, 1,
 ];
-GradientCheckSets[VoxelFaces.East][QuadVerticies.TopLeft] = [
+GradientCheckSets[VoxelFaces.East][QuadVertices.TopLeft] = [
   //1
   1, 0, -1,
   //2
@@ -94,7 +94,7 @@ GradientCheckSets[VoxelFaces.East][QuadVerticies.TopLeft] = [
   //3
   1, 1, -1,
 ];
-GradientCheckSets[VoxelFaces.East][QuadVerticies.BottomLeft] = [
+GradientCheckSets[VoxelFaces.East][QuadVertices.BottomLeft] = [
   //1
   1, 0, -1,
   //2
@@ -102,7 +102,7 @@ GradientCheckSets[VoxelFaces.East][QuadVerticies.BottomLeft] = [
   //3
   1, -1, -1,
 ];
-GradientCheckSets[VoxelFaces.East][QuadVerticies.BottomRight] = [
+GradientCheckSets[VoxelFaces.East][QuadVertices.BottomRight] = [
   //1
   1, 0, 1,
   //2
@@ -112,7 +112,7 @@ GradientCheckSets[VoxelFaces.East][QuadVerticies.BottomRight] = [
 ];
 
 GradientCheckSets[VoxelFaces.West] = [] as any;
-GradientCheckSets[VoxelFaces.West][QuadVerticies.TopRight] = [
+GradientCheckSets[VoxelFaces.West][QuadVertices.TopRight] = [
   //1
   -1, 0, -1,
   //2
@@ -120,7 +120,7 @@ GradientCheckSets[VoxelFaces.West][QuadVerticies.TopRight] = [
   //3
   -1, 1, -1,
 ];
-GradientCheckSets[VoxelFaces.West][QuadVerticies.TopLeft] = [
+GradientCheckSets[VoxelFaces.West][QuadVertices.TopLeft] = [
   //1
   -1, 0, 1,
   //2
@@ -128,7 +128,7 @@ GradientCheckSets[VoxelFaces.West][QuadVerticies.TopLeft] = [
   //3
   -1, 1, 1,
 ];
-GradientCheckSets[VoxelFaces.West][QuadVerticies.BottomLeft] = [
+GradientCheckSets[VoxelFaces.West][QuadVertices.BottomLeft] = [
   //1
   -1, 0, 1,
   //2
@@ -136,7 +136,7 @@ GradientCheckSets[VoxelFaces.West][QuadVerticies.BottomLeft] = [
   //3
   -1, -1, 1,
 ];
-GradientCheckSets[VoxelFaces.West][QuadVerticies.BottomRight] = [
+GradientCheckSets[VoxelFaces.West][QuadVertices.BottomRight] = [
   //1
   -1, 0, -1,
   //2
@@ -146,7 +146,7 @@ GradientCheckSets[VoxelFaces.West][QuadVerticies.BottomRight] = [
 ];
 
 GradientCheckSets[VoxelFaces.South] = [] as any;
-GradientCheckSets[VoxelFaces.South][QuadVerticies.TopRight] = [
+GradientCheckSets[VoxelFaces.South][QuadVertices.TopRight] = [
   //1
   1, 0, -1,
   //2
@@ -154,7 +154,7 @@ GradientCheckSets[VoxelFaces.South][QuadVerticies.TopRight] = [
   //3
   1, 1, -1,
 ];
-GradientCheckSets[VoxelFaces.South][QuadVerticies.TopLeft] = [
+GradientCheckSets[VoxelFaces.South][QuadVertices.TopLeft] = [
   //1
   -1, 0, -1,
   //2
@@ -162,7 +162,7 @@ GradientCheckSets[VoxelFaces.South][QuadVerticies.TopLeft] = [
   //3
   -1, 1, -1,
 ];
-GradientCheckSets[VoxelFaces.South][QuadVerticies.BottomLeft] = [
+GradientCheckSets[VoxelFaces.South][QuadVertices.BottomLeft] = [
   //1
   -1, 0, -1,
   //2
@@ -170,7 +170,7 @@ GradientCheckSets[VoxelFaces.South][QuadVerticies.BottomLeft] = [
   //3
   -1, -1, -1,
 ];
-GradientCheckSets[VoxelFaces.South][QuadVerticies.BottomRight] = [
+GradientCheckSets[VoxelFaces.South][QuadVertices.BottomRight] = [
   //1
   1, 0, -1,
   //2
@@ -180,7 +180,7 @@ GradientCheckSets[VoxelFaces.South][QuadVerticies.BottomRight] = [
 ];
 
 GradientCheckSets[VoxelFaces.North] = [] as any;
-GradientCheckSets[VoxelFaces.North][QuadVerticies.TopRight] = [
+GradientCheckSets[VoxelFaces.North][QuadVertices.TopRight] = [
   //1
   -1, 0, 1,
   //2
@@ -188,7 +188,7 @@ GradientCheckSets[VoxelFaces.North][QuadVerticies.TopRight] = [
   //3
   -1, 1, 1,
 ];
-GradientCheckSets[VoxelFaces.North][QuadVerticies.TopLeft] = [
+GradientCheckSets[VoxelFaces.North][QuadVertices.TopLeft] = [
   //1
   1, 0, 1,
   //2
@@ -196,7 +196,7 @@ GradientCheckSets[VoxelFaces.North][QuadVerticies.TopLeft] = [
   //3
   1, 1, 1,
 ];
-GradientCheckSets[VoxelFaces.North][QuadVerticies.BottomLeft] = [
+GradientCheckSets[VoxelFaces.North][QuadVertices.BottomLeft] = [
   //1
   1, 0, 1,
   //2
@@ -204,7 +204,7 @@ GradientCheckSets[VoxelFaces.North][QuadVerticies.BottomLeft] = [
   //3
   1, -1, 1,
 ];
-GradientCheckSets[VoxelFaces.North][QuadVerticies.BottomRight] = [
+GradientCheckSets[VoxelFaces.North][QuadVertices.BottomRight] = [
   //1
   -1, 0, 1,
   //2
@@ -214,11 +214,11 @@ GradientCheckSets[VoxelFaces.North][QuadVerticies.BottomRight] = [
 ];
 
 export const GradientCheckSetsArray = new Int8Array(6 * 4 * 9);
-const verts: QuadVerticies[] = [
-  QuadVerticies.TopRight,
-  QuadVerticies.TopLeft,
-  QuadVerticies.BottomLeft,
-  QuadVerticies.BottomRight,
+const verts: QuadVertices[] = [
+  QuadVertices.TopRight,
+  QuadVertices.TopLeft,
+  QuadVertices.BottomLeft,
+  QuadVertices.BottomRight,
 ];
 
 const faceLength = 9 * 4;
@@ -233,7 +233,7 @@ for (const face of VoxelFacesArray) {
 
 export const GeometryCheckSetIndexes: Record<
   VoxelFaces,
-  Record<QuadVerticies, [number, number, number]>
+  Record<QuadVertices, [number, number, number]>
 > = [] as any;
 
 for (const face of VoxelFacesArray) {

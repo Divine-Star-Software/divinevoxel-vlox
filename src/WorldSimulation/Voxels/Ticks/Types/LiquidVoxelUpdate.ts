@@ -158,8 +158,9 @@ VoxelTickUpdateRegister.registerType({
         simulation.brush
           .setXYZ(x, y - 1, z)
           .setId(voxel.getStringId())
+          //falling water is always level state 1 so it only stays while there is water above it
           .setLevel((!below?.isAir() && !below?.isSameVoxel(voxel)) ? 7 : 0)
-          .setLevelState((below?.isAir()||below?.isSameVoxel(voxel)) ? 1 : 0)
+          .setLevelState(1)
           .paint()
           .clear();
         addToTick = true;
@@ -194,11 +195,12 @@ VoxelTickUpdateRegister.registerType({
       const nState = nVoxel.getLevelState();
       if (nState == 2) continue;
       if (vLevel + 1 < currentLevel) {
+        //spread as normal flowing water one level below this voxel
         simulation.brush
           .setId(voxel.getStringId())
           .setXYZ(nx, ny, nz)
-          .setLevel(vLevel + 1)
-          .setLevelState(1)
+          .setLevel(currentLevel - 1)
+          .setLevelState(0)
           .paint();
         simulation.bounds.updateDisplay(nx, ny, nz);
         if (currentLevel - 1 > 0) {

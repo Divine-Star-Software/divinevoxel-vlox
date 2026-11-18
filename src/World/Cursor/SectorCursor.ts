@@ -78,14 +78,31 @@ export class SectorCursor
 
   getVoxel(x: number, y: number, z: number) {
     if (!this._current) return null;
-    const section = this.getSection(x, y, z);
+    const sectionSpace = WorldSpaces.section;
+    const sectorSpace = WorldSpaces.sector;
+    const sectionPower = sectionSpace.power2Axes;
+    const sectionIndex =
+      ((z >> sectionPower.z) & sectorSpace.sectionZMask) |
+      (((x >> sectionPower.x) & sectorSpace.sectionXMask) <<
+        sectorSpace.sectionPower2Axes.z) |
+      (((y >> sectionPower.y) & sectorSpace.sectionYMask) <<
+        sectorSpace.sectionXZPower);
+    const section = this._current.sections[sectionIndex];
+    if (!section) {
+      this.getSection(x, y, z);
+      return null;
+    }
     this._section = section;
-    WorldSpaces.voxel.getPosition(x, y, z, this._voxelPosition);
-    this._voxelIndex = WorldSpaces.voxel.getIndexFromPosition(
-      this._voxelPosition.x,
-      this._voxelPosition.y,
-      this._voxelPosition.z,
-    );
+
+    const lx = x & sectionSpace.xMask;
+    const ly = y & sectionSpace.yMask;
+    const lz = z & sectionSpace.zMask;
+    const voxelPosition = this._voxelPosition;
+    voxelPosition.x = lx;
+    voxelPosition.y = ly;
+    voxelPosition.z = lz;
+    this._voxelIndex =
+      lz | (lx << sectionPower.z) | (ly << sectionSpace.xzPower);
 
     this.voxel.loadIn();
     return this.voxel;

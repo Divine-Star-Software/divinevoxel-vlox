@@ -2,7 +2,7 @@ import { VoxelFaces } from "../../../Math";
 import { Quad } from "../../../Mesher/Geometry";
 import {
   QuadUVData,
-  QuadVerticiesArray,
+  QuadVerticesArray,
   VoxelGeometryTransform,
 } from "../../../Mesher/Geometry/Geometry.types";
 import {
@@ -76,7 +76,7 @@ export const getQuadWeights = (
   direction: VoxelFaces
 ): QuadVertexWeights => {
   const returnArray: QuadVertexWeights = [] as any;
-  for (const vertex of QuadVerticiesArray) {
+  for (const vertex of QuadVerticesArray) {
     const { x, y, z } = quad.positions.vertices[vertex];
     returnArray[vertex] = getVertexWeights(direction, x, y, z);
   }

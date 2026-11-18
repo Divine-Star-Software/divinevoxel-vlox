@@ -6,7 +6,7 @@ import { Vector3Like } from "@amodx/math";
 import { VoxelLUT } from "../../../../Voxels/Data/VoxelLUT";
 import { VoxelTagsRegister } from "../../../../Voxels/Data/VoxelTagsRegister";
 import { BinaryBufferFormat } from "@amodx/binary/Buffer";
-import { lightSemgnetSet } from "../../Functions/Shared/LightSegments";
+import { lightSegmentSet } from "../../Functions/Shared/LightSegments";
 
 type RunData = {
   version?: number;
@@ -25,7 +25,7 @@ export default function ImportSector(
   sector.position[2] = archivedSector.position.z;
 
   if (archiveData.healLight) {
-    archivedSector.flags["dve_is_world_progation_done"] = false;
+    archivedSector.flags["dve_is_world_propagation_done"] = false;
     archivedSector.flags["dve_is_world_sun_done"] = false;
   }
 
@@ -35,7 +35,7 @@ export default function ImportSector(
   const importedSector = new ImportedSector(archivedSector);
 
   const position = Vector3Like.Create();
-  const sectionVolume = WorldSpaces.section.volumne;
+  const sectionVolume = WorldSpaces.section.volume;
 
   for (const importedSection of importedSector.sections) {
     const archivedSection = importedSection.section;
@@ -100,19 +100,19 @@ export default function ImportSector(
 
     if (sunIsValue && redIsValue && greenIsValue && blueIsValue) {
       let finalLight = 0;
-      finalLight = lightSemgnetSet.sun(
+      finalLight = lightSegmentSet.sun(
         lightBuffers.sun.getValue(0),
         finalLight,
       );
-      finalLight = lightSemgnetSet.red(
+      finalLight = lightSegmentSet.red(
         lightBuffers.red.getValue(0),
         finalLight,
       );
-      finalLight = lightSemgnetSet.green(
+      finalLight = lightSegmentSet.green(
         lightBuffers.green.getValue(0),
         finalLight,
       );
-      finalLight = lightSemgnetSet.blue(
+      finalLight = lightSegmentSet.blue(
         lightBuffers.blue.getValue(0),
         finalLight,
       );
@@ -212,9 +212,9 @@ export default function ImportSector(
           if (!sunIsNibble && sunPalette) {
             sunValue = sunPalette.getValue(sunValue);
           }
-          finalLight = lightSemgnetSet.sun(sunValue, finalLight);
+          finalLight = lightSegmentSet.sun(sunValue, finalLight);
         } else {
-          finalLight = lightSemgnetSet.sun(
+          finalLight = lightSegmentSet.sun(
             lightBuffers.sun.getValue(0),
             finalLight,
           );
@@ -225,9 +225,9 @@ export default function ImportSector(
           if (!redIsNibble && redPalette) {
             redValue = redPalette.getValue(redValue);
           }
-          finalLight = lightSemgnetSet.red(redValue, finalLight);
+          finalLight = lightSegmentSet.red(redValue, finalLight);
         } else {
-          finalLight = lightSemgnetSet.red(
+          finalLight = lightSegmentSet.red(
             lightBuffers.red.getValue(0),
             finalLight,
           );
@@ -238,9 +238,9 @@ export default function ImportSector(
           if (!greenIsNibble && greenPalette) {
             greenValue = greenPalette.getValue(greenValue);
           }
-          finalLight = lightSemgnetSet.green(greenValue, finalLight);
+          finalLight = lightSegmentSet.green(greenValue, finalLight);
         } else {
-          finalLight = lightSemgnetSet.green(
+          finalLight = lightSegmentSet.green(
             lightBuffers.green.getValue(0),
             finalLight,
           );
@@ -251,9 +251,9 @@ export default function ImportSector(
           if (!blueIsNibble && bluePalette) {
             blueValue = bluePalette.getValue(blueValue);
           }
-          finalLight = lightSemgnetSet.blue(blueValue, finalLight);
+          finalLight = lightSegmentSet.blue(blueValue, finalLight);
         } else {
-          finalLight = lightSemgnetSet.blue(
+          finalLight = lightSegmentSet.blue(
             lightBuffers.blue.getValue(0),
             finalLight,
           );

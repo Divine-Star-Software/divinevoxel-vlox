@@ -13,7 +13,7 @@ export const VoxelShapeTemplateFillModesArray: VoxelShapeTemplateFillModes[] = [
   "shell",
 ];
 
-export interface IVoxelshapeTemplateBaseData {
+export interface IVoxelShapeTemplateBaseData {
   fillVoxel: PaintVoxelData;
   faceVoxel: PaintVoxelData;
   edgeVoxel: PaintVoxelData;
@@ -24,4 +24,4 @@ export interface IVoxelshapeTemplateBaseData {
 
 export interface VoxelShapeTemplateData
   extends IVoxelTemplateData<"shape">,
-    IVoxelshapeTemplateBaseData {}
+    IVoxelShapeTemplateBaseData {}

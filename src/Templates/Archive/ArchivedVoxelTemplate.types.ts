@@ -1,6 +1,6 @@
 import {
   VoxelArchivePaletteData,
-  VoxelArchiPaveletteExportedJSONData,
+  VoxelArchivePaletteExportedJSONData,
   ArchivedVoxelPaletteDataKey,
 } from "../../Voxels/Archive/VoxelArchive.types";
 import {
@@ -45,12 +45,12 @@ export interface ArchivedVoxelTemplateData extends BaseVoxelTemplateData {
 }
 
 export interface ArchivedVoxelTemplatePaletteDataExportedJSONData
-  extends VoxelArchiPaveletteExportedJSONData {
+  extends VoxelArchivePaletteExportedJSONData {
   level?: JSONBinaryBufferData;
   secondary?: JSONBinaryBufferData;
 }
 
-export interface ArchivedVoxelTemplateBuffersExportdJSONData {
+export interface ArchivedVoxelTemplateBuffersExportedJSONData {
   ids?: JSONBinaryBufferData;
   level?: JSONBinaryBufferData;
   secondary?: JSONBinaryBufferData;
@@ -59,5 +59,5 @@ export interface ArchivedVoxelTemplateBuffersExportdJSONData {
 export interface ArchivedVoxelTemplateExportedJSONData
   extends BaseVoxelTemplateData {
   palettes: ArchivedVoxelTemplatePaletteDataExportedJSONData;
-  buffers: ArchivedVoxelTemplateBuffersExportdJSONData;
+  buffers: ArchivedVoxelTemplateBuffersExportedJSONData;
 }

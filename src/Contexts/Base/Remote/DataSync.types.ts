@@ -3,13 +3,13 @@ import { EngineSettingsData } from "../../../Settings/EngineSettings.types";
 import { VoxelLUTExport } from "../../../Voxels/Data/VoxelLUT";
 import { GeometryLUTExport } from "../../../Voxels/Data/GeometryLUT";
 import { VoxelSchemasExport } from "../../../Voxels/State/VoxelSchemas";
-import { CompiledvVxelTags } from "Voxels/Types/VoxelModelCompiledData.types";
+import { CompiledVoxelTags } from "Voxels/Types/VoxelModelCompiledData.types";
 export type DataSyncData = {
   settings: EngineSettingsData;
   threads: {
     nexus: boolean;
   };
-  tags: CompiledvVxelTags;
+  tags: CompiledVoxelTags;
   luts: {
     voxel: VoxelLUTExport;
     geometry: GeometryLUTExport;

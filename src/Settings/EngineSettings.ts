@@ -9,7 +9,7 @@ type EngineSettingsEvents = {
  * Handles common settings for all contexts
  */
 class EngineSettingsClass extends TypedEventTarget<EngineSettingsEvents> {
-  enviorment: "node" | "browser" = Environment.isNode() ? "node" : "browser";
+  environment: "node" | "browser" = Environment.isNode() ? "node" : "browser";
   settings = new EngineSettingsData();
   version = "0.0.72";
 
@@ -38,18 +38,18 @@ class EngineSettingsClass extends TypedEventTarget<EngineSettingsEvents> {
   }
 
   syncSettings(data: EngineSettingsData) {
-    //safetly set data without prototype pollution
+    //safely set data without prototype pollution
     for (const settingsKey of Object.keys(data)) {
       if (settingsKey.includes("__")) {
         throw new Error(
-          "Can not include properties with multpile underscores."
+          "Can not include properties with multiple underscores."
         );
       }
       if ((this as any).settings[settingsKey] !== undefined) {
         for (const propertyKey of Object.keys((data as any)[settingsKey])) {
           if (propertyKey.includes("__")) {
             throw new Error(
-              "Can not include properties with multpile underscores."
+              "Can not include properties with multiple underscores."
             );
           }
           if ((this as any).settings[settingsKey][propertyKey] !== undefined) {

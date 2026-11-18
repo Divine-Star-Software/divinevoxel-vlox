@@ -17,15 +17,15 @@ class Sectors {
     const sector = MeshManager._sectorPool.length
       ? MeshManager._sectorPool.shift()!
       : new SectorMesh();
-    const posoiton = WorldSpaces.sector.getPositionVec3Array(
+    const position = WorldSpaces.sector.getPositionVec3Array(
       x,
       y,
       z,
       tempVec3Array
     );
-    sector.position[0] = posoiton[0];
-    sector.position[1] = posoiton[1];
-    sector.position[2] = posoiton[2];
+    sector.position[0] = position[0];
+    sector.position[1] = position[1];
+    sector.position[2] = position[2];
 
     dimension.set(WorldSpaces.hash.hashVec3Array(sector.position), sector);
     return sector;
@@ -84,7 +84,7 @@ class Dimensions {
     const dimension = MeshRegister._dimensions.get(id);
     if (!dimension) return false;
     for (const [, sector] of dimension) {
-      sector.dipose();
+      sector.dispose();
     }
     MeshRegister._dimensions.delete(id);
     return true;

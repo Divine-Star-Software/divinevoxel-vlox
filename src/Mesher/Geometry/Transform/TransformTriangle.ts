@@ -1,4 +1,4 @@
-import { TriangleVerticies, VoxelGeometryTransform } from "../Geometry.types";
+import { TriangleVertices, VoxelGeometryTransform } from "../Geometry.types";
 import { AMath, Vector3Like } from "@amodx/math";
 import { Triangle } from "../Primitives/Triangle";
 
@@ -6,9 +6,9 @@ export function TransformTriangle(
   quad: Triangle,
   transform: VoxelGeometryTransform
 ): Triangle {
-  const p1 = { ...quad.positions.vertices[TriangleVerticies.One] };
-  const p2 = { ...quad.positions.vertices[TriangleVerticies.Two] };
-  const p3 = { ...quad.positions.vertices[TriangleVerticies.Three] };
+  const p1 = { ...quad.positions.vertices[TriangleVertices.One] };
+  const p2 = { ...quad.positions.vertices[TriangleVertices.Two] };
+  const p3 = { ...quad.positions.vertices[TriangleVertices.Three] };
 
   // Create an array of vertices
   const vertices = [p1, p2, p3];

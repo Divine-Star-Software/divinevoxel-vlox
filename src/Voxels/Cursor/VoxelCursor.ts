@@ -12,12 +12,12 @@ export class VoxelCursor extends VoxelCursorInterface {
     let stringId = data.id
       ? data.id
       : data.name
-        ? VoxelLUT.voxelNametoIdMap.get(data.name)!
+        ? VoxelLUT.voxelNameToIdMap.get(data.name)!
         : "dve_air";
     let secondaryStringId = data.id
       ? data.id
       : data.name
-        ? VoxelLUT.voxelNametoIdMap.get(data.name)!
+        ? VoxelLUT.voxelNameToIdMap.get(data.name)!
         : "dve_air";
 
     const id =
@@ -36,13 +36,13 @@ export class VoxelCursor extends VoxelCursorInterface {
           data.mod || 0
         )) ||
       0;
-    let levleData = 0;
+    let levelData = 0;
     if (data.level !== undefined)
-      levleData = VoxelLevelReader.setLevel(levleData, data.level);
+      levelData = VoxelLevelReader.setLevel(levelData, data.level);
     if (data.levelState !== undefined)
-      levleData = VoxelLevelReader.setLevelState(levleData, data.levelState);
+      levelData = VoxelLevelReader.setLevelState(levelData, data.levelState);
 
-    return [id, light, levleData, secondaryId];
+    return [id, light, levelData, secondaryId];
   }
 
   ids: number[] = [];

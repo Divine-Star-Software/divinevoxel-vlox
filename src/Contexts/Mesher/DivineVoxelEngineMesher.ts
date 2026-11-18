@@ -1,6 +1,6 @@
 //threadcomm
 import { Threads } from "@amodx/threads/";
-import { MesherThreadsManager } from "./MesherTheads.js";
+import { MesherThreadsManager } from "./MesherThreads.js";
 
 export class DivineVoxelEngineMesher {
   static environment: "node" | "browser" = "browser";

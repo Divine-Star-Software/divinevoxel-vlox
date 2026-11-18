@@ -461,8 +461,8 @@ export const halfWestCube: VoxelGeometryData = {
   ],
 };
 
-export const quaterCubeWestEast: VoxelGeometryData = {
-  id: "dve_quater_cube_west_east",
+export const quarterCubeWestEast: VoxelGeometryData = {
+  id: "dve_quarter_cube_west_east",
   arguments: {
     upTex: {
       type: "texture",
@@ -574,8 +574,8 @@ export const quaterCubeWestEast: VoxelGeometryData = {
   ],
 };
 
-export const quaterCubeSouthNorth: VoxelGeometryData = {
-  id: "dve_quater_cube_south_north",
+export const quarterCubeSouthNorth: VoxelGeometryData = {
+  id: "dve_quarter_cube_south_north",
   arguments: {
     upTex: {
       type: "texture",
@@ -687,8 +687,8 @@ export const quaterCubeSouthNorth: VoxelGeometryData = {
   ],
 };
 
-export const quaterCubeUpDown: VoxelGeometryData = {
-  id: "dve_quater_cube_up_down",
+export const quarterCubeUpDown: VoxelGeometryData = {
+  id: "dve_quarter_cube_up_down",
   arguments: {
     upTex: {
       type: "texture",

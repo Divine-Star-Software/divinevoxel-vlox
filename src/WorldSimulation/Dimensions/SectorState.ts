@@ -3,37 +3,37 @@ import { SimulationSector } from "./SimulationSector";
 export class SectorState {
   isLoaded = true;
   isGenerated = true;
-  genAlldone = true;
+  genAllDone = true;
   allLoaded = true;
   nWorldGenAllDone = true;
   nDecorAllDone = true;
   nSunAllDone = true;
-  nPropagtionAllDone = true;
+  nPropagationAllDone = true;
 
   constructor(public simSector: SimulationSector) {}
-  resset() {
+  reset() {
     this.isLoaded = true;
     this.isGenerated = true;
-    this.genAlldone = true;
+    this.genAllDone = true;
     this.allLoaded = true;
     this.nWorldGenAllDone = true;
     this.nDecorAllDone = true;
     this.nSunAllDone = true;
-    this.nPropagtionAllDone = true;
+    this.nPropagationAllDone = true;
   }
 
   update() {
     if (!this.simSector.sector) throw new Error(`Sector must be set`);
     const state = this;
-    state.resset();
+    state.reset();
 
     for (const simSector of this.simSector.neighbors) {
       const sector = simSector.sector;
 
       if (!sector || sector.isCheckedOut()) {
-        state.genAlldone = false;
+        state.genAllDone = false;
         state.nWorldGenAllDone = false;
-        state.nPropagtionAllDone = false;
+        state.nPropagationAllDone = false;
         state.nSunAllDone = false;
         state.nDecorAllDone = false;
         state.allLoaded = false;
@@ -51,7 +51,7 @@ export class SectorState {
         state.nSunAllDone = false;
       }
       if (!sector.getBitFlag(Sector.FlagIds.isWorldPropagationDone)) {
-        state.nPropagtionAllDone = false;
+        state.nPropagationAllDone = false;
       }
     }
     return this;

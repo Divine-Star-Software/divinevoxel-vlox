@@ -106,11 +106,11 @@ export class VoxelIndex {
   }
 
   private findState(
-    conatiner: VoxelNamedStateContainer,
+    container: VoxelNamedStateContainer,
     mod: number,
     state: number
   ) {
-    for (const modelState of conatiner?.stateArray) {
+    for (const modelState of container?.stateArray) {
       if (
         (mod == modelState.compiled.mod || modelState.compiled.modAny) &&
         (state == modelState.compiled.state || modelState.compiled.stateAny)
@@ -121,10 +121,10 @@ export class VoxelIndex {
   }
 
   getStateFromPaintData(data: PaintVoxelData): VoxelNamedState | false {
-    const conatiner = this.states.get(data.id);
-    if (!conatiner) return false;
+    const container = this.states.get(data.id);
+    if (!container) return false;
     const { mod, state } = data;
-    return this.findState(conatiner, mod, state);
+    return this.findState(container, mod, state);
   }
 
   getStateFromRawData(data: RawVoxelData): VoxelNamedState | false {
@@ -133,8 +133,8 @@ export class VoxelIndex {
     const state = VoxelLUT.voxelIdToState[id];
     const mod = VoxelLUT.voxelIdToMod[id];
 
-    const conatiner = this.states.get(VoxelLUT.voxelIds.getStringId(trueId));
-    if (!conatiner) return false;
-    return this.findState(conatiner, mod, state);
+    const container = this.states.get(VoxelLUT.voxelIds.getStringId(trueId));
+    if (!container) return false;
+    return this.findState(container, mod, state);
   }
 }

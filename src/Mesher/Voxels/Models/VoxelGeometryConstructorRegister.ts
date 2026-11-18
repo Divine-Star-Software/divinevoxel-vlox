@@ -1,13 +1,13 @@
-import { GeoemtryNodeConstructor } from "./Nodes/GeometryNode";
+import { GeometryNodeConstructor } from "./Nodes/GeometryNode";
 import { VoxelGeometryConstructor } from "./Nodes/VoxelGeometryConstructor";
 import { GeometryLUT } from "../../../Voxels/Data/GeometryLUT";
 
 export class VoxelGeometryConstructorRegister {
   static geometry: VoxelGeometryConstructor[] = [];
-  static customNodes = new Map<string, GeoemtryNodeConstructor<any, any>>();
+  static customNodes = new Map<string, GeometryNodeConstructor<any, any>>();
   static registerCustomNode(
     id: string,
-    node: GeoemtryNodeConstructor<any, any>
+    node: GeometryNodeConstructor<any, any>
   ) {
     this.customNodes.set(id, node);
   }

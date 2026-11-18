@@ -2,7 +2,7 @@ import { Vec3Array, Vec3ArrayLike, Vector3Like } from "@amodx/math";
 import { IVoxelSelection, IVoxelSelectionData } from "./VoxelSelection";
 import { VoxelShapeTemplate } from "../Shapes/VoxelShapeTemplate";
 import { BoxVoxelShapeSelection } from "../Shapes/Selections/BoxVoxelShapeSelection";
-import { IVoxelshapeTemplateBaseData } from "../Shapes/VoxelShapeTemplate.types";
+import { IVoxelShapeTemplateBaseData } from "../Shapes/VoxelShapeTemplate.types";
 import { DataCursorInterface } from "../../Voxels/Cursor/DataCursor.interface";
 import { BoundingBox } from "@amodx/math/Geometry/Bounds/BoundingBox";
 const getMinMax = (...points: Vec3Array[]): [Vec3Array, Vec3Array] => {
@@ -122,7 +122,7 @@ export class VoxelBoundsSelection
     return newSelection;
   }
 
-  toTemplate(data?: Partial<IVoxelshapeTemplateBaseData>) {
+  toTemplate(data?: Partial<IVoxelShapeTemplateBaseData>) {
     return new VoxelShapeTemplate(
       VoxelShapeTemplate.CreateNew({
         shapeSelection: BoxVoxelShapeSelection.CreateNew({

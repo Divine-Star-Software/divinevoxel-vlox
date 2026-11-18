@@ -2,6 +2,7 @@ import { Distance3D, Vec3Array } from "@amodx/math";
 import { LocationData } from "../../Math";
 import { WorldSpaces } from "../../World/WorldSpaces";
 import { DimensionSegment } from "../Dimensions/DimensionSegment";
+import { PerfLog } from "../../Util/PerfLog";
 const pool: LocationData[] = [];
 
 const sortPosition: Vec3Array = [0, 0, 0];
@@ -25,6 +26,8 @@ const sort = (a: LocationData, b: LocationData) => {
   return bd - ad;
 };
 export class TaskSegment {
+  id = "";
+  _startTimes = new Map<number, number>();
   _hash = new Set();
   nodes: LocationData[] = [];
 
@@ -43,7 +46,11 @@ export class TaskSegment {
 
   clearAll() {
     this.nodes = [];
+    this._hash.clear();
     this._task.clear();
+    this._subTask.clear();
+    this._mainDone.clear();
+    this._startTimes.clear();
   }
 
   _getLocationData(dimension: number, x: number, y: number, z: number) {
@@ -55,9 +62,22 @@ export class TaskSegment {
     return location;
   }
 
+  /** Tasks whose main run finished while sub tasks were still pending. */
+  _mainDone = new Set<number>();
+
+  /**
+   * Marks the main run of a task done. The task only completes once every sub
+   * task has completed too, so an async main run can't be finished early by a
+   * synchronous sub task.
+   */
   completeTask(id: number) {
     const subTaskCount = this._subTask.get(id);
-    if (subTaskCount !== undefined && subTaskCount > 0) return false;
+    if (subTaskCount !== undefined && subTaskCount > 0) {
+      this._mainDone.add(id);
+      return false;
+    }
+    this._mainDone.delete(id);
+    this._subTask.delete(id);
     const locationData = this._task.get(id);
     if (!locationData) return false;
     this._hash.delete(
@@ -70,6 +90,12 @@ export class TaskSegment {
     this._task.delete(id);
     pool.push(locationData);
     this.waitingFor--;
+    const start = this._startTimes.get(id);
+    if (start !== undefined) {
+      PerfLog.end(`${this.id}.roundTrip`, start);
+      PerfLog.count(`${this.id}.completed`);
+      this._startTimes.delete(id);
+    }
 
     return true;
   }
@@ -78,21 +104,22 @@ export class TaskSegment {
     const subTaskCount = this._subTask.get(id);
     if (subTaskCount === undefined) return false;
 
-    const newSubTaskCount = subTaskCount - 1;
-    if (newSubTaskCount <= 0) {
-      this._subTask.set(id, 0);
-      this.completeTask(id);
-    } else {
-      this._subTask.set(id, newSubTaskCount);
+    const newSubTaskCount = Math.max(subTaskCount - 1, 0);
+    this._subTask.set(id, newSubTaskCount);
+    if (newSubTaskCount === 0 && this._mainDone.has(id)) {
+      return this.completeTask(id);
     }
+    return false;
   }
 
   addTask(x: number, y: number, z: number, subTaskCount: number) {
     const id = this._taskCount;
+    this._hash.add(WorldSpaces.hash.hashXYZ(x, y, z));
     this._task.set(id, this._getLocationData(this.dimension.id, x, y, z));
     this._subTask.set(id, subTaskCount);
     this._taskCount++;
     this.waitingFor++;
+    this._startTimes.set(id, PerfLog.now());
     return id;
   }
 

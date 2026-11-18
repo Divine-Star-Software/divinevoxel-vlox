@@ -1,4 +1,3 @@
-import { Vector3Like } from "@amodx/math";
 import { DimensionSegment } from "../Dimensions/DimensionSegment";
 import {
   VoxelTickUpdateRegister,
@@ -10,6 +9,12 @@ const tickArrayPool: VoxelTickUpdate[][] = [];
 export class TickQueue {
   constructor(public dimension: DimensionSegment) {}
   ticks = new Map<number, VoxelTickUpdate[]>();
+  /**
+   * Keys of the updates already scheduled for each tick. Deduping by scanning
+   * the tick's array made scheduling O(n) per update, so a big liquid flow
+   * (hundreds of updates in one tick) cost O(n^2).
+   */
+  private keys = new Map<number, Set<string>>();
 
   getTotalTicks() {
     const tick = this.dimension.getTick();
@@ -23,32 +28,31 @@ export class TickQueue {
 
   addTick(data: VoxelTickUpdate, delay = 0) {
     const trueTick = this.dimension.getTick() + 1 + delay;
-    if (!this.ticks.get(trueTick)) {
-      this.ticks.set(
-        trueTick,
-        tickArrayPool.length ? tickArrayPool.shift()! : []
-      );
+    let ticks = this.ticks.get(trueTick);
+    let keys = this.keys.get(trueTick);
+    if (!ticks) {
+      ticks = tickArrayPool.length ? tickArrayPool.pop()! : [];
+      this.ticks.set(trueTick, ticks);
     }
-    const ticks = this.ticks.get(trueTick)!;
-    for (let i = 0; i < ticks.length; i++) {
-      if (this.compareTick(data, ticks[i])) {
-        return;
-      }
+    if (!keys) {
+      keys = new Set();
+      this.keys.set(trueTick, keys);
     }
+    const key = this.getKey(data);
+    if (keys.has(key)) return;
+    keys.add(key);
     ticks.push(data);
   }
 
-  private compareTick(tick: VoxelTickUpdate, otherTick: VoxelTickUpdate) {
-    if (!(tick.type == otherTick.type && Vector3Like.Equals(otherTick, tick)))
-      return false;
-    if (!tick.data) return true;
-    if (typeof tick.data == "number") {
-      return tick.data == otherTick.data;
-    }
-    if (typeof tick.data == "string") {
-      return tick.data == otherTick.data;
-    }
-    return JSON.stringify(tick.data) == JSON.stringify(otherTick.data);
+  /** Same identity the old compareTick used: type, position and data. */
+  private getKey(tick: VoxelTickUpdate) {
+    const data = tick.data;
+    const dataKey = !data
+      ? ""
+      : typeof data == "number" || typeof data == "string"
+        ? String(data)
+        : JSON.stringify(data);
+    return `${tick.type}|${tick.x},${tick.y},${tick.z}|${dataKey}`;
   }
 
   run() {
@@ -58,13 +62,17 @@ export class TickQueue {
 
     if (!updates) return false;
 
-    while (updates.length) {
-      const update = updates.shift()!;
+    // Updates always schedule into later ticks, so this array can't grow
+    // while it is being run.
+    for (let i = 0; i < updates.length; i++) {
+      const update = updates[i];
       const type = VoxelTickUpdateRegister.getUpdateType(update.type);
       type.run(this.dimension.simulation, update);
     }
 
+    updates.length = 0;
     this.ticks.delete(tick);
+    this.keys.delete(tick);
     tickArrayPool.push(updates);
 
     return true;

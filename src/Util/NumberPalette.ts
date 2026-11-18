@@ -9,11 +9,11 @@ export class NumberPalette {
     return this._count;
   }
 
-  constructor(inital?: ArrayLike<number>) {
-    if (inital) {
-      let length = inital.length;
+  constructor(initial?: ArrayLike<number>) {
+    if (initial) {
+      let length = initial.length;
       for (let i = 0; i < length; i++) {
-        this.register(inital[i]);
+        this.register(initial[i]);
       }
     }
   }

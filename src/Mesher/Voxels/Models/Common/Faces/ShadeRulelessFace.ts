@@ -1,11 +1,11 @@
-import { QuadVerticies } from "../../../../Geometry/Geometry.types";
+import { QuadVertices } from "../../../../Geometry/Geometry.types";
 import { VoxelModelBuilder } from "../../../Models/VoxelModelBuilder";
 import { getInterpolationValue } from "../Calc/CalcConstants";
 import { Vec4Array } from "@amodx/math";
 
 export function ShadeRulelessFace(
   builder: VoxelModelBuilder,
-  lightData: Record<QuadVerticies, number>,
+  lightData: Record<QuadVertices, number>,
   vertexWeights: Vec4Array[],
   verticesStride: number
 ) {

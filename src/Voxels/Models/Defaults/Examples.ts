@@ -55,7 +55,7 @@ export const chainModel: VoxelModelData = {
       values: ["y", "x", "z"],
     },
   ],
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "axis=y": [
       {
@@ -149,7 +149,7 @@ export const carpetModel: VoxelModelData = {
   },
   relationsSchema: [],
   stateSchema: [],
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "*": [
       {
@@ -316,7 +316,7 @@ export const fenceEastWest: VoxelGeometryData = {
   ],
 };
 
-export const fenceNorthsouth: VoxelGeometryData = {
+export const fenceNorthSouth: VoxelGeometryData = {
   id: "dve_fence_north_south",
   divisor: [16, 16, 16],
   arguments: {
@@ -472,7 +472,7 @@ export const fence: VoxelModelData = {
   ],
   stateSchema: [],
 
-  conditonalNodes: {
+  conditionalNodes: {
     "*|same-south=true": [
       {
         geometryId: "dve_fence_north_south",
@@ -900,7 +900,7 @@ export const candlesModel: VoxelModelData = {
       },
     },
   ],
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "num_candles=0,lit=false": [
       {
@@ -1188,7 +1188,7 @@ export const leverModel: VoxelModelData = {
       values: ["off", "on"],
     },
   ],
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "placement=down,direction=north,state=off": [
       {
@@ -1319,7 +1319,7 @@ export const leverModel: VoxelModelData = {
       },
     ],
 
-    //placment up
+    //placement up
     "placement=up,direction=north,state=off": [
       {
         rotation: [0, 0, 180],
@@ -2241,7 +2241,7 @@ export const diamondModel: VoxelModelData = {
       type: "texture",
     },
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
   },

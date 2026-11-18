@@ -29,7 +29,7 @@ export class BinarySchema {
   readString(stateString: string) {
     if (stateString == "*") return 0;
     const split = stateString.split(",");
-    let ecnoded = 0;
+    let encoded = 0;
     for (const pair of split) {
       const [key, v] = pair.split("=");
       if (v == "*") continue;
@@ -41,12 +41,12 @@ export class BinarySchema {
           throw new Error(
             `Binary schema string node value with id ${v} does not exist.`
           );
-        ecnoded = node.setValue(ecnoded, value);
+        encoded = node.setValue(encoded, value);
       } else {
-        ecnoded = node.setValue(ecnoded, Number(v));
+        encoded = node.setValue(encoded, Number(v));
       }
     }
-    return ecnoded;
+    return encoded;
   }
 
   fromStateObject(stateObject: StateObject) {
@@ -88,7 +88,7 @@ export class BinarySchema {
     return stateArray;
   }
 
-  compareString(stateString: string, ecnoded: number): boolean {
+  compareString(stateString: string, encoded: number): boolean {
     if (stateString == "*") return true;
     const split = stateString.split(",");
     for (const pair of split) {
@@ -102,11 +102,11 @@ export class BinarySchema {
           throw new Error(
             `Binary schema string node value  with id ${key} does not exist.`
           );
-        if (node.getValue(ecnoded) !== value) {
+        if (node.getValue(encoded) !== value) {
           return false;
         }
       } else {
-        if (node.getValue(ecnoded) !== Number(v)) {
+        if (node.getValue(encoded) !== Number(v)) {
           return false;
         }
       }

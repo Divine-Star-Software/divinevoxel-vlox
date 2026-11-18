@@ -16,7 +16,7 @@ templateCursor.setTemplate(template);
 const space = new VoxelGeometryBuilderCacheSpace({ x: 3, y: 3, z: 3 });
 export function MeshVoxel(
   rawVoxelData: RawVoxelData
-): [mesh: CompactMeshData, tranfers: any[]] | false {
+): [mesh: CompactMeshData, transfers: any[]] | false {
 
   const index = template.getIndex(1, 1, 1);
   template.ids[index] = rawVoxelData[0];

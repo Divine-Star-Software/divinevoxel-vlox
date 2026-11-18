@@ -1,2 +1,2 @@
 export * from "./WorldSimulation"
-export * from "./Procedures/InitalLoad"
+export * from "./Procedures/InitialLoad"

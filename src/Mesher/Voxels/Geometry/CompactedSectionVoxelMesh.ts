@@ -11,9 +11,9 @@ export class CompactedMeshData {
   vertexCount = 0;
   indexCount = 0;
   vertexIndex: [start: number, length: number] = [0, 0];
-  indiceIndex: [start: number, length: number] = [0, 0];
+  indicesIndex: [start: number, length: number] = [0, 0];
 
-  verticies: Float32Array;
+  vertices: Float32Array;
   indices: Uint32Array;
 }
 
@@ -30,7 +30,11 @@ export class CompactedSectionVoxelMesh {
       4 +
       //total meshes
       1 +
-      //other mehes
+      //bvh byte offset uint32, 0 if the section has no bvh
+      4 +
+      //light byte offset uint32, 0 if the section has no light data
+      4 +
+      //other meshes
       totalMeshes * this.GetMeshHeaderByteSize()
     );
   }
@@ -54,9 +58,9 @@ export class CompactedSectionVoxelMesh {
       4 +
       //Vertex Length
       4 +
-      //Indice Start Byte uint32
+      //Indices Start Byte uint32
       4 +
-      //Indice Length
+      //Indices Length
       4
     );
   }
@@ -74,8 +78,69 @@ export class CompactedSectionVoxelMesh {
     return this.data.getUint8(14);
   }
 
-  setLocation(dimesion: number, x: number, y: number, z: number) {
-    this.data.setInt16(0, dimesion);
+  /**Byte offset of the section BVH data or 0 if none was sent. */
+  setBVHByteOffset(offset: number) {
+    this.data.setUint32(15, offset);
+  }
+
+  getBVHByteOffset() {
+    return this.data.getUint32(15);
+  }
+
+  hasBVH() {
+    return this.getBVHByteOffset() > 0;
+  }
+
+  /**Byte offset of the section light data or 0 if none was sent. */
+  setLightByteOffset(offset: number) {
+    this.data.setUint32(19, offset);
+  }
+
+  getLightByteOffset() {
+    return this.data.getUint32(19);
+  }
+
+  /**
+   * The section's voxel light if it was sent (see EngineSettings mesher.sendLightData).
+   * One uint16 per voxel, sun bits 0-3, r 4-7, g 8-11, b 12-15, indexed z + x * 16 + y * 256.
+   */
+  getLightData(): Uint16Array | null {
+    const offset = this.getLightByteOffset();
+    if (!offset) return null;
+    return new Uint16Array(this.data.buffer, offset, CompactedSectionVoxelMesh.LightSize);
+  }
+
+  static LightSize = 4096;
+
+  /**
+   * Returns views of the section BVH if it was sent (see EngineSettings mesher.buildBVH).
+   * tree: 8191 nodes of [minX, minY, minZ, active | voxelIndex, maxX, maxY, maxZ, nodeType] in section local space.
+   * indices: per voxel [indicesStart | (materialIndex << 24), indicesEnd].
+   */
+  getBVH(): { tree: Float32Array; indices: Uint32Array } | null {
+    const offset = this.getBVHByteOffset();
+    if (!offset) return null;
+    const tree = new Float32Array(
+      this.data.buffer,
+      offset,
+      CompactedSectionVoxelMesh.BVHTreeFloatSize
+    );
+    const indices = new Uint32Array(
+      this.data.buffer,
+      offset + CompactedSectionVoxelMesh.BVHTreeFloatSize * 4,
+      CompactedSectionVoxelMesh.BVHIndicesSize
+    );
+    return { tree, indices };
+  }
+
+  static BVHTreeFloatSize = 8191 * 8;
+  static BVHIndicesSize = 4096 * 2;
+  static GetBVHByteSize() {
+    return (this.BVHTreeFloatSize + this.BVHIndicesSize) * 4;
+  }
+
+  setLocation(dimension: number, x: number, y: number, z: number) {
+    this.data.setInt16(0, dimension);
     this.data.setInt32(2, x);
     this.data.setInt32(6, y);
     this.data.setInt32(10, z);
@@ -95,7 +160,7 @@ export class CompactedSectionVoxelMesh {
       minBounds,
       maxBounds,
       vertexIndex,
-      indiceIndex,
+      indicesIndex,
     } = mesh;
     let startByte =
       CompactedSectionVoxelMesh.GetHeaderByteSize(0) +
@@ -125,10 +190,10 @@ export class CompactedSectionVoxelMesh {
     startByte += 4;
     this.data.setUint32(startByte, vertexIndex[1]);
     startByte += 4;
-    //indice index
-    this.data.setUint32(startByte, indiceIndex[0]);
+    //indices index
+    this.data.setUint32(startByte, indicesIndex[0]);
     startByte += 4;
-    this.data.setUint32(startByte, indiceIndex[1]);
+    this.data.setUint32(startByte, indicesIndex[1]);
     startByte += 4;
   }
 
@@ -164,18 +229,18 @@ export class CompactedSectionVoxelMesh {
     mesh.vertexIndex[1] = this.data.getUint32(startByte);
     startByte += 4;
 
-    // indice index
-    mesh.indiceIndex[0] = this.data.getUint32(startByte);
+    // indices index
+    mesh.indicesIndex[0] = this.data.getUint32(startByte);
     startByte += 4;
-    mesh.indiceIndex[1] = this.data.getUint32(startByte);
+    mesh.indicesIndex[1] = this.data.getUint32(startByte);
     startByte += 4;
 
-    mesh.verticies = new Float32Array(this.data.buffer, ...mesh.vertexIndex);
-    mesh.indices = new Uint32Array(this.data.buffer, ...mesh.indiceIndex);
+    mesh.vertices = new Float32Array(this.data.buffer, ...mesh.vertexIndex);
+    mesh.indices = new Uint32Array(this.data.buffer, ...mesh.indicesIndex);
 
     mesh.vertexCount =
       mesh.vertexIndex[1] / VoxelMeshVertexStructCursor.VertexFloatSize;
-    mesh.indexCount = mesh.indiceIndex[1];
+    mesh.indexCount = mesh.indicesIndex[1];
     return mesh;
   }
 }

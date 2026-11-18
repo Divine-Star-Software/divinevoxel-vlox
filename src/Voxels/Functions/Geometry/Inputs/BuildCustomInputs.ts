@@ -43,10 +43,10 @@ export function BuildCustomInputs(
                 textureProcedure.texture
               ) as any;
             }
-            if (textureProcedure.textureRecrod) {
-              for (const key in textureProcedure.textureRecrod) {
-                textureProcedure.textureRecrod[key] = processTexture(
-                  textureProcedure.textureRecrod[key] as any
+            if (textureProcedure.textureRecord) {
+              for (const key in textureProcedure.textureRecord) {
+                textureProcedure.textureRecord[key] = processTexture(
+                  textureProcedure.textureRecord[key] as any
                 ) as any;
               }
             }

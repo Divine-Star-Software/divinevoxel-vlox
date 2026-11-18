@@ -82,14 +82,19 @@ export class SculptTool extends BuilderToolBase<SculptToolEvents> {
     if (!this._started && placerMode == "start" && picked) {
       this.boxSelection.offset = 0;
       Vector3Like.Copy(this.boxSelection.planeNormal, picked.normal);
+      const positiveNormal =
+        picked.normal.x > 0 || picked.normal.y > 0 || picked.normal.z > 0;
+      //put the drag plane on the picked face so the cursor lines up with the selection
       if (
         this.mode == SculptToolModes.Fill ||
         this.mode == SculptToolModes.Extrude
       ) {
         Vector3Like.Copy(this.boxSelection.planeOrigin, picked.normalPosition);
+        this.boxSelection.planeOffset = positiveNormal ? 0 : 1;
       }
       if (this.mode == SculptToolModes.Remove) {
         Vector3Like.Copy(this.boxSelection.planeOrigin, picked.position);
+        this.boxSelection.planeOffset = positiveNormal ? 1 : 0;
       }
       this.boxSelection.update();
       this._started = true;

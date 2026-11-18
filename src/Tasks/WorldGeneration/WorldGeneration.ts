@@ -7,6 +7,7 @@ import { WorldGenInterface } from "./WorldGen.types.js";
 import { WorldRegister } from "../../World/WorldRegister.js";
 import { LocationData } from "../../Math/index.js";
 import { Sector } from "../../World/index.js";
+import { PerfLog } from "../../Util/PerfLog.js";
 
 export class WorldGeneration {
   static worldGen: WorldGenInterface | null = null;
@@ -35,21 +36,29 @@ export class WorldGeneration {
     const sector = WorldRegister.sectors.get(...data);
     if (!sector) {
       console.error(
-        `Error when attempting wolrd gen at [${data.join(",")}] Sector does not exist`
+        `Error when attempting world gen at [${data.join(",")}] Sector does not exist`
       );
       return;
     }
 
+    const computeStart = PerfLog.now();
     if (mode == "generate") {
       await this.worldGen.generate(...data);
     }
     if (mode == "decorate") {
       await this.worldGen.decorate(...data);
     }
+    PerfLog.end(`gen.${mode}.compute`, computeStart);
 
-    if (!WorldGenRegister.attemptRequestFullFill(requestsId)) {
+    const fullFillStart = PerfLog.now();
+    const fullFilled = WorldGenRegister.attemptRequestFullFill(requestsId);
+    PerfLog.end(`gen.${mode}.requestFullFill`, fullFillStart);
+    if (!fullFilled) {
+      PerfLog.count(`gen.${mode}.requestsPending`);
+      const waitStart = PerfLog.now();
       const readyCheck = () => {
         if (WorldGenRegister.attemptRequestFullFill(requestsId)) {
+          PerfLog.end(`gen.${mode}.requestWait`, waitStart);
           if (mode == "generate") {
             sector.setBitFlag(Sector.FlagIds.isWorldGenDone, true);
           }

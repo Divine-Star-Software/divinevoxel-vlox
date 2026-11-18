@@ -48,7 +48,7 @@ export const diagonalFlatPanelEastWest: VoxelGeometryData = {
       type: "int",
       default: 0,
     },
-    transaprent: {
+    transparent: {
       type: "boolean",
       default: false,
     },

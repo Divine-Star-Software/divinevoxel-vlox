@@ -1,4 +1,4 @@
-import { QuadVerticies } from "../Geometry/Geometry.types";
+import { QuadVertices } from "../Geometry/Geometry.types";
 import { Quad } from "../Geometry/Primitives/Quad";
 import { ItemModelBuilder } from "./Models/ItemModelBuilder";
 import { addItemQuad } from "./Geometry/ItemGeometryBuilder";
@@ -25,17 +25,17 @@ const addUvs = (
   const vT = ey * factor;
   const vB = sy * factor;
 
-  quad.uvs.vertices[QuadVerticies.TopRight].x = uR;
-  quad.uvs.vertices[QuadVerticies.TopRight].y = vT;
+  quad.uvs.vertices[QuadVertices.TopRight].x = uR;
+  quad.uvs.vertices[QuadVertices.TopRight].y = vT;
 
-  quad.uvs.vertices[QuadVerticies.TopLeft].x = uL;
-  quad.uvs.vertices[QuadVerticies.TopLeft].y = vT;
+  quad.uvs.vertices[QuadVertices.TopLeft].x = uL;
+  quad.uvs.vertices[QuadVertices.TopLeft].y = vT;
 
-  quad.uvs.vertices[QuadVerticies.BottomLeft].x = uL;
-  quad.uvs.vertices[QuadVerticies.BottomLeft].y = vB;
+  quad.uvs.vertices[QuadVertices.BottomLeft].x = uL;
+  quad.uvs.vertices[QuadVertices.BottomLeft].y = vB;
 
-  quad.uvs.vertices[QuadVerticies.BottomRight].x = uR;
-  quad.uvs.vertices[QuadVerticies.BottomRight].y = vB;
+  quad.uvs.vertices[QuadVertices.BottomRight].x = uR;
+  quad.uvs.vertices[QuadVertices.BottomRight].y = vB;
 };
 
 class TextureVoxelData {
@@ -89,10 +89,10 @@ export function MeshTexture(
   // North face
   {
     const backPositionZ = factor;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.TopRight].z = backPositionZ;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.TopLeft].z = backPositionZ;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.BottomLeft].z = backPositionZ;
-    Quads[VoxelFaces.North].positions.vertices[QuadVerticies.BottomRight].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVertices.TopRight].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVertices.TopLeft].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVertices.BottomLeft].z = backPositionZ;
+    Quads[VoxelFaces.North].positions.vertices[QuadVertices.BottomRight].z = backPositionZ;
 
     tool.vars.textureIndex = textureId;
     addItemQuad(tool, Quads[VoxelFaces.North]);

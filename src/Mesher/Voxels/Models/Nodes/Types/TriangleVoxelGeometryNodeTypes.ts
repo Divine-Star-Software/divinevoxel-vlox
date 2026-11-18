@@ -1,6 +1,6 @@
 import { Vec2Array, Vec3Array, Vec4Array } from "@amodx/math";
 import { VoxelFaces } from "../../../../../Math";
-export type TriangleVoxelGometryArgs = [
+export type TriangleVoxelGeometryArgs = [
   //upp
   enabled: boolean,
   texture: any,
@@ -24,10 +24,10 @@ export type CompiledTriangleVoxelGeometryNode = {
   trueFaceIndex?: number;
 };
 
-export class TriangleVoxelGometryInputs {
+export class TriangleVoxelGeometryInputs {
   static ArgIndexes = ArgIndexes;
-  static CreateArgs(): TriangleVoxelGometryArgs {
-    const args = [] as any as TriangleVoxelGometryArgs;
+  static CreateArgs(): TriangleVoxelGeometryArgs {
+    const args = [] as any as TriangleVoxelGeometryArgs;
     args[ArgIndexes.Enabled] = true;
     args[ArgIndexes.Texture] = 0;
     args[ArgIndexes.Rotation] = 0;

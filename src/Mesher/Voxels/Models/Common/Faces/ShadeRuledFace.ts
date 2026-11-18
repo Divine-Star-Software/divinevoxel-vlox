@@ -3,13 +3,13 @@ import { VoxelModelBuilder } from "../../VoxelModelBuilder";
 import { GeometryLUT } from "../../../../../Voxels/Data/GeometryLUT";
 import { getInterpolationValue } from "../Calc/CalcConstants";
 import { Vec4Array } from "@amodx/math";
-import { QuadVerticies } from "../../../../Geometry/Geometry.types";
+import { QuadVertices } from "../../../../Geometry/Geometry.types";
 import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
 
-export function ShadeRulledFace(
+export function ShadeRuledFace(
   builder: VoxelModelBuilder,
   trueFaceIndex: number,
-  lightData: Record<QuadVerticies, number>,
+  lightData: Record<QuadVertices, number>,
   vertexWeights: Vec4Array[],
   vertexStride: number,
 ) {
@@ -64,8 +64,8 @@ export function ShadeRulledFace(
         if (space.getNoCastAO(hashed, secondary)) continue;
 
         const voxelId = space.getVoxelId(hashed, secondary);
-        const reltionalVoxelId = space.getRelationalVoxelId(hashed, secondary);
-        const geoIdx = VoxelLUT.getGeometryIndex(voxelId, reltionalVoxelId);
+        const relationalVoxelId = space.getRelationalVoxelId(hashed, secondary);
+        const geoIdx = VoxelLUT.getGeometryIndex(voxelId, relationalVoxelId);
         const baseGeo = geometryIndex[geoIdx];
 
         let shaded = false;
@@ -89,22 +89,22 @@ export function ShadeRulledFace(
         if (shaded) continue;
 
         const trueVoxelId = space.getTrueVoxelId(hashed, secondary);
-        const offsetConditonalGeometry =
+        const offsetConditionalGeometry =
           VoxelLUT.getConditionalGeometryNodes(trueVoxelId);
 
-        if (offsetConditonalGeometry) {
+        if (offsetConditionalGeometry) {
           const modelState = voxelIdToState[voxelId];
           const relationalModState = space.getRelationalState(
             hashed,
             secondary,
           );
 
-          for (let j = 0; j < offsetConditonalGeometry.length; j++) {
-            const [geoId, requiredModelState, requiredReltionalModelState] =
-              offsetConditonalGeometry[j];
+          for (let j = 0; j < offsetConditionalGeometry.length; j++) {
+            const [geoId, requiredModelState, requiredRelationalModelState] =
+              offsetConditionalGeometry[j];
             if (
               requiredModelState !== modelState ||
-              !requiredReltionalModelState[relationalModState]
+              !requiredRelationalModelState[relationalModState]
             )
               continue;
 

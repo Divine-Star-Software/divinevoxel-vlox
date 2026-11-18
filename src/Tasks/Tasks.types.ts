@@ -15,8 +15,8 @@ export type VoxelUpdateData = {
   includedAreas?: [min: Vec3Array, max: Vec3Array][];
   /**An array of excluded areas to update in. If not set will be ignored.*/
   excludeAreas?: [min: Vec3Array, max: Vec3Array][];
-  /**Define what happens when painting a voxel and must replace it. Default is destory which will replace the voxel. Keep will keep the current voxel and not update. */
-  paintMode?: "keep" | "destory";
+  /**Define what happens when painting a voxel and must replace it. Default is destroy which will replace the voxel. Keep will keep the current voxel and not update. */
+  paintMode?: "keep" | "destroy";
 };
 
 export type PaintVoxelTask = Parameters<typeof PaintVoxel>;

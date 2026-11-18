@@ -18,7 +18,7 @@ const lightData = new VoxelLightData();
 export function MeshTemplate(
   fullVoxelData: FullVoxelTemplateData,
   baseLightValue = lightData.setS(0xf, 0),
-): [mesh: CompactMeshData, tranfers: any[]] | false {
+): [mesh: CompactMeshData, transfers: any[]] | false {
   const template = new FullVoxelTemplate(fullVoxelData);
   templateCursor.setTemplate(template);
   const space = new VoxelGeometryBuilderCacheSpace({

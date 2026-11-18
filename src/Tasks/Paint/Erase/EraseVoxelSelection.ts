@@ -39,5 +39,5 @@ export default function EraseVoxelSelection(
     }
   }
 
-  updateArea(tasks, ox, oy, oz, ox + sx, oy + sy, oz + sz);
+  updateArea(tasks, ox, oy, oz, ox + sx - 1, oy + sy - 1, oz + sz - 1);
 }

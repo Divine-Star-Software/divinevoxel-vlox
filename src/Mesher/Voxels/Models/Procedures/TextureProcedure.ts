@@ -6,7 +6,7 @@ import { TextureId } from "../../../../Textures";
 export interface BaseVoxelGeometryTextureProcedureData {
   type: string;
   texture?: TextureId | number;
-  textureRecrod?: Record<string, TextureId | number>;
+  textureRecord?: Record<string, TextureId | number>;
   [key: string]: any;
 }
 

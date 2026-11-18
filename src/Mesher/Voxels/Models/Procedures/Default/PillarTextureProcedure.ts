@@ -16,7 +16,7 @@ import { VoxelLUT } from "../../../../../Voxels/Data/VoxelLUT";
 export interface PillarTextureProcedureData extends BaseVoxelGeometryTextureProcedureData {
   type: "pillar";
   texture: TextureId | number;
-  textureRecrod: {
+  textureRecord: {
     sideConnectedTex: TextureId | number;
     sideDisconnectedTex: TextureId | number;
     sideUpTex: TextureId | number;
@@ -36,11 +36,11 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
   ): number {
     if (data.direction == "up-down") {
       if (closestFace == VoxelFaces.Up)
-        return data.textureRecrod.upTex as number;
+        return data.textureRecord.upTex as number;
       if (closestFace == VoxelFaces.Down)
-        return data.textureRecrod.downTex as number;
+        return data.textureRecord.downTex as number;
 
-      let sideTexture = data.textureRecrod.sideDisconnectedTex as number;
+      let sideTexture = data.textureRecord.sideDisconnectedTex as number;
       const currentState = VoxelLUT.voxelIdToState[builder.voxel.getId()];
 
       const topVoxel = builder.nVoxel.getVoxel(
@@ -64,15 +64,15 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
         : false;
 
       if (topSame && !bottomSame) {
-        sideTexture = data.textureRecrod.sideDownTex as number;
+        sideTexture = data.textureRecord.sideDownTex as number;
       }
 
       if (!topSame && bottomSame) {
-        sideTexture = data.textureRecrod.sideUpTex as number;
+        sideTexture = data.textureRecord.sideUpTex as number;
       }
 
       if (topSame && bottomSame) {
-        sideTexture = data.textureRecrod.sideConnectedTex as number;
+        sideTexture = data.textureRecord.sideConnectedTex as number;
       }
 
       if (
@@ -86,11 +86,11 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
 
     if (data.direction == "north-south") {
       if (closestFace == VoxelFaces.North)
-        return data.textureRecrod.upTex as number;
+        return data.textureRecord.upTex as number;
       if (closestFace == VoxelFaces.South)
-        return data.textureRecrod.downTex as number;
+        return data.textureRecord.downTex as number;
 
-      let sideTexture = data.textureRecrod.sideDisconnectedTex as number;
+      let sideTexture = data.textureRecord.sideDisconnectedTex as number;
       const currentState = VoxelLUT.voxelIdToState[builder.voxel.getId()];
 
       const northVoxel = builder.nVoxel.getVoxel(
@@ -114,15 +114,15 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
         : false;
 
       if (northSame && !southSame) {
-        sideTexture = data.textureRecrod.sideDownTex as number;
+        sideTexture = data.textureRecord.sideDownTex as number;
       }
 
       if (!northSame && southSame) {
-        sideTexture = data.textureRecrod.sideUpTex as number;
+        sideTexture = data.textureRecord.sideUpTex as number;
       }
 
       if (northSame && southSame) {
-        sideTexture = data.textureRecrod.sideConnectedTex as number;
+        sideTexture = data.textureRecord.sideConnectedTex as number;
       }
 
       if (
@@ -136,11 +136,11 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
 
     if (data.direction == "east-west") {
       if (closestFace == VoxelFaces.East)
-        return data.textureRecrod.upTex as number;
+        return data.textureRecord.upTex as number;
       if (closestFace == VoxelFaces.West)
-        return data.textureRecrod.downTex as number;
+        return data.textureRecord.downTex as number;
 
-      let sideTexture = data.textureRecrod.sideDisconnectedTex as number;
+      let sideTexture = data.textureRecord.sideDisconnectedTex as number;
       const currentState = VoxelLUT.voxelIdToState[builder.voxel.getId()];
 
       const eastVoxel = builder.nVoxel.getVoxel(
@@ -164,15 +164,15 @@ export class PillarTextureProcedure extends TextureProcedure<PillarTextureProced
         : false;
 
       if (eastSame && !westSame) {
-        sideTexture = data.textureRecrod.sideDownTex as number;
+        sideTexture = data.textureRecord.sideDownTex as number;
       }
 
       if (!eastSame && westSame) {
-        sideTexture = data.textureRecrod.sideUpTex as number;
+        sideTexture = data.textureRecord.sideUpTex as number;
       }
 
       if (eastSame && westSame) {
-        sideTexture = data.textureRecrod.sideConnectedTex as number;
+        sideTexture = data.textureRecord.sideConnectedTex as number;
       }
 
       if (

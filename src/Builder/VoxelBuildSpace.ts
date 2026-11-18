@@ -146,8 +146,8 @@ export class VoxelBuildSpace {
     }
     return await this.pick(
       provider.origin,
-      this.rayProvider.direction,
-      this.rayProvider.length,
+      provider.direction,
+      provider.length,
     );
   }
 
@@ -185,30 +185,37 @@ export class VoxelBuildSpace {
 
   async getExtrudedSelectionTemplate(
     selection: IVoxelSelectionData<any>,
-    nomral: Vector3Like,
+    normal: Vector3Like,
   ) {
     const templateData = await this.DVER.threads.world.runTaskAsync(
       "get-extruded-voxel-selection-template",
-      [selection, nomral],
+      [selection, normal],
     );
     return new FullVoxelTemplate(templateData);
   }
 
+  /**Get the paint data with the state set by the voxel's placing strategy.
+   * Returns a new object, the passed in data is not modified.
+   */
   getPlaceState(
     data: PaintVoxelData,
     picked: VoxelPickResult,
     alt: number | null = null,
-  ) {
+  ): PaintVoxelData {
     const strategy = VoxelPlacingStrategyRegister.get(data.id);
     if (!strategy) return data;
+    //stateString overrides state when converting to raw data so clear it
+    const newData: PaintVoxelData = { ...data, stateString: "" };
     const state = strategy.getState(picked, alt);
     if (!state) {
-      data.state = 0;
-      return data;
+      newData.state = 0;
+      return newData;
     }
 
-    const schema = VoxelSchemas.getStateSchema(data.id)!;
-    data.state = schema.readString(state);
+    const schema = VoxelSchemas.getStateSchema(data.id);
+    if (!schema) return newData;
+    newData.state = schema.readString(state);
+    return newData;
   }
 
   async clear() {

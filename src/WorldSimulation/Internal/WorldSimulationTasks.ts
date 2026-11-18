@@ -9,6 +9,7 @@ import { SnapShots } from "../../World/SnapShot/SnapShots";
 import LockSectors from "../../World/Lock/Function/LockSectors";
 import UnLockSectors from "../../World/Lock/Function/UnLockSectors";
 import { TaskSegment } from "WorldSimulation/Tasks/TaskSegment";
+import { PerfLog } from "../../Util/PerfLog";
 function createAndTransferSnapShot(
   task: TaskSegment,
   taskId: number,
@@ -18,7 +19,9 @@ function createAndTransferSnapShot(
   z: number,
 ) {
   task.completeTask(taskId);
+  const start = PerfLog.now();
   const snapShot = SnapShots.createSnapShot(dim, x, y, z);
+  PerfLog.end("build.createSnapShot", start);
   WorldSimulationTools.taskTool.build.sectionSnapShot.run(
     ...snapShot.transfer(),
   );
@@ -33,7 +36,7 @@ export class WorldSimulationTasks {
     id: "load",
     generationTask: true,
     checkInRequired: false,
-    async run(dimesnion, location, taskId, task) {
+    async run(dimensionSegment, location, taskId, task) {
       const [dimension, x, y, z] = location;
       const sector = WorldRegister.sectors.get(location[0], x, y, z);
       if (sector) return task.completeTask(taskId);
@@ -77,9 +80,7 @@ export class WorldSimulationTasks {
       WorldSimulationTools.taskTool.generation.generate.run(
         location,
         null,
-        () => {
-          simSector.checkIn(generator);
-        },
+        undefined,
         generator,
       );
     },
@@ -104,9 +105,7 @@ export class WorldSimulationTasks {
       WorldSimulationTools.taskTool.generation.decorate.run(
         location,
         null,
-        () => {
-          simSector.checkIn(generator);
-        },
+        undefined,
         generator,
       );
     },
@@ -132,9 +131,7 @@ export class WorldSimulationTasks {
       WorldSimulationTools.taskTool.generation.propagation.run(
         location,
         null,
-        () => {
-          simSector.checkIn(generator);
-        },
+        undefined,
         generator,
       );
     },
@@ -143,7 +140,7 @@ export class WorldSimulationTasks {
    * ---
    */
   static readonly worldSunTasks = TaskRegister.addTasks({
-    id: "wolrd_sun",
+    id: "world_sun",
     generationTask: true,
     checkInRequired: true,
     checkDone(location) {
@@ -159,9 +156,7 @@ export class WorldSimulationTasks {
       WorldSimulationTools.taskTool.generation.worldSun.run(
         location,
         null,
-        () => {
-          simSector.checkIn(generator);
-        },
+        undefined,
         generator,
       );
     },
@@ -185,12 +180,30 @@ export class WorldSimulationTasks {
   static readonly unloadTasks = TaskRegister.addTasks({
     id: "unload",
     checkInRequired: false,
+    // Unload tasks are queued because the sector left the active sectors.
+    requiresActiveSector: false,
     async run(dimension, location, taskId, task) {
+      // The player came back before the task ran; keep the sector.
+      if (dimension.activeSectors.get(location[1], location[2], location[3]))
+        return task.completeTask(taskId);
       if (!WorldSimulationTools.worldStorage) {
         WorldRegister.sectors.removeAt(location);
         return task.completeTask(taskId);
       }
-      await WorldSimulationTools.worldStorage.unloadSector(location);
+      const storage = WorldSimulationTools.worldStorage;
+      try {
+        await storage.saveSector(location);
+        // The player may have come back while it was saving. Removing it now
+        // would leave the new SimulationSector bound to a freed sector.
+        if (
+          !dimension.activeSectors.get(location[1], location[2], location[3])
+        ) {
+          // Already saved, so this only removes it.
+          await storage.unloadSector(location);
+        }
+      } catch (error) {
+        console.error(`Unloading sector ${location} failed`, error);
+      }
       task.completeTask(taskId);
     },
   });
@@ -203,9 +216,17 @@ export class WorldSimulationTasks {
     sort: true,
     checkInRequired: false,
     run(dimension, location, taskId, task, simSector) {
-      simSector
-        .sector!?.getSection(location[1], location[2], location[3])
-        ?.setInProgress(true);
+      const sector = simSector.sector;
+      const section = sector?.getSection(location[1], location[2], location[3]);
+      if (section && sector && !sector.isCheckedOut()) {
+        const [minY, maxY] = section.getMinMax();
+        if (minY == Infinity && maxY == -Infinity) {
+          PerfLog.count("build.skippedEmpty");
+          task.completeTask(taskId);
+          return;
+        }
+      }
+      section?.setInProgress(true);
       if (EngineSettings.settings.memoryAndCPU.useSharedMemory) {
         WorldSimulationTools.taskTool.build.section
           .runAsync(location)
@@ -216,7 +237,9 @@ export class WorldSimulationTasks {
       }
       const [dim, x, y, z] = location;
 
+      const lockStart = PerfLog.now();
       LockSectors(dim, SnapShots.getSnapShotBounds(x, y, z)).then(() => {
+        PerfLog.end("build.lockWait", lockStart);
         createAndTransferSnapShot(task, taskId, dim, x, y, z);
       });
     },
@@ -225,15 +248,14 @@ export class WorldSimulationTasks {
     id: "unbuild",
     sort: true,
     checkInRequired: false,
-    run(dimension, location, taskId, task) {
+    // The sector may have left the active sectors before this ran; its
+    // meshes still need removing.
+    requiresActiveSector: false,
+    run(dimension, location, taskId, task, simSector) {
       const view = Threads.createBinaryTask(16);
       setLocationData(view, location);
       WorldSimulationTools.parent.runBinaryTask("remove-sector", view);
-      dimension.activeSectors.get(
-        location[1],
-        location[2],
-        location[3],
-      )!._rendered = false;
+      if (simSector) simSector._rendered = false; // null when no longer active
       task.completeTask(taskId);
     },
   });

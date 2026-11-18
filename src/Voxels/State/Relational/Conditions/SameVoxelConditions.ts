@@ -1,16 +1,16 @@
 import { SameVoxelRelationsConditionData } from "../../State.types";
 import { ShapeStateSchemaRelationsCondition } from "./ShapeStateSchemaRelationsCondition";
-import { ReltionalStateBuilder } from "../ReltionalStateBuilder";
+import { RelationalStateBuilder } from "../RelationalStateBuilder";
 
 export class SameVoxelCondition extends ShapeStateSchemaRelationsCondition {
   constructor(
-    builder: ReltionalStateBuilder,
+    builder: RelationalStateBuilder,
     public data: SameVoxelRelationsConditionData
   ) {
     super(builder);
   }
 
-  evulate(): boolean {
+  evaluate(): boolean {
     const nx = this.builder.position.x + this.data.direction[0];
     const ny = this.builder.position.y + this.data.direction[1];
     const nz = this.builder.position.z + this.data.direction[2];

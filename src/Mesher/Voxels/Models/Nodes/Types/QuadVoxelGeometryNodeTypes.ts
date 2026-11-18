@@ -1,7 +1,7 @@
 import { Vec2Array, Vec3Array, Vec4Array } from "@amodx/math";
 import { QuadUVData } from "../../../../Geometry/Geometry.types";
 import { VoxelFaces } from "../../../../../Math";
-export type QuadVoxelGometryArgs = [
+export type QuadVoxelGeometryArgs = [
   //upp
   enabled: boolean,
   texture: any,
@@ -26,10 +26,10 @@ export type CompiledQuadVoxelGeometryNode = {
   trueFaceIndex?: number;
 };
 
-export class QuadVoxelGometryInputs {
+export class QuadVoxelGeometryInputs {
   static ArgIndexes = ArgIndexes;
-  static CreateArgs(): QuadVoxelGometryArgs {
-    const args = [] as any as QuadVoxelGometryArgs;
+  static CreateArgs(): QuadVoxelGeometryArgs {
+    const args = [] as any as QuadVoxelGeometryArgs;
     args[ArgIndexes.Enabled] = true;
     args[ArgIndexes.Texture] = 0;
     args[ArgIndexes.Rotation] = 0;

@@ -4,50 +4,120 @@ import { WorldSpaces } from "../World/WorldSpaces";
 import { LocationData } from "../Math";
 import { WorldRegister } from "../World/WorldRegister";
 
+const NEAR_BITS = 10;
+const NEAR_OFFSET = 1 << (NEAR_BITS - 1);
+const NEAR_MASK = (1 << NEAR_BITS) - 1;
+const FAR_OFFSET = 1 << 16;
+const FAR_WIDTH = 1 << 17;
+
 export class TaskMap {
-  _map: boolean[] = [];
+  private _near = new Set<number>();
+  private _far = new Set<number>();
   get size() {
-    return this._map.length;
+    return this._near.size + this._far.size;
   }
   origin = Vector3Like.Create();
   start(x: number, y: number, z: number) {
-    this._map.length = 0;
+    this.clear();
     this.origin.x = x;
     this.origin.y = y;
     this.origin.z = z;
   }
-  has(x: number, y: number, z: number) {
+  private _nearKey(dx: number, dy: number, dz: number) {
+    dx += NEAR_OFFSET;
+    dy += NEAR_OFFSET;
+    dz += NEAR_OFFSET;
+    if ((dx | dy | dz) & ~NEAR_MASK) return -1;
+    return dx | (dz << NEAR_BITS) | (dy << (NEAR_BITS * 2));
+  }
+  private _farKey(dx: number, dy: number, dz: number) {
     return (
-      this._map[
-        Vector3Like.HashXYZ(
-          x - this.origin.x,
-          y - this.origin.y,
-          z - this.origin.z
-        )
-      ] !== undefined
+      dx +
+      FAR_OFFSET +
+      (dz + FAR_OFFSET) * FAR_WIDTH +
+      (dy + FAR_OFFSET) * FAR_WIDTH * FAR_WIDTH
     );
   }
+  has(x: number, y: number, z: number) {
+    const dx = x - this.origin.x;
+    const dy = y - this.origin.y;
+    const dz = z - this.origin.z;
+    const key = this._nearKey(dx, dy, dz);
+    if (key > -1) return this._near.has(key);
+    return this._far.has(this._farKey(dx, dy, dz));
+  }
   add(x: number, y: number, z: number) {
-    this._map[
-      Vector3Like.HashXYZ(
-        x - this.origin.x,
-        y - this.origin.y,
-        z - this.origin.z
-      )
-    ] = true;
+    const dx = x - this.origin.x;
+    const dy = y - this.origin.y;
+    const dz = z - this.origin.z;
+    const key = this._nearKey(dx, dy, dz);
+    if (key > -1) this._near.add(key);
+    else this._far.add(this._farKey(dx, dy, dz));
   }
   delete(x: number, y: number, z: number) {
-    //@ts-ignore
-    this._map[
-      Vector3Like.HashXYZ(
-        x - this.origin.x,
-        y - this.origin.y,
-        z - this.origin.z
-      )
-    ] = undefined;
+    const dx = x - this.origin.x;
+    const dy = y - this.origin.y;
+    const dz = z - this.origin.z;
+    const key = this._nearKey(dx, dy, dz);
+    if (key > -1) this._near.delete(key);
+    else this._far.delete(this._farKey(dx, dy, dz));
   }
   clear() {
-    this._map.length = 0;
+    if (this._near.size) this._near.clear();
+    if (this._far.size) this._far.clear();
+  }
+}
+
+export class VoxelPositionQueue {
+  data = new Int32Array(3 * 1024);
+  head = 0;
+  tail = 0;
+  x = 0;
+  y = 0;
+  z = 0;
+  get size() {
+    return (this.tail - this.head) / 3;
+  }
+  isEmpty() {
+    return this.head >= this.tail;
+  }
+  push(x: number, y: number, z: number) {
+    if (this.tail + 3 > this.data.length) this._makeRoom();
+    const data = this.data;
+    const tail = this.tail;
+    data[tail] = x;
+    data[tail + 1] = y;
+    data[tail + 2] = z;
+    this.tail = tail + 3;
+  }
+  next() {
+    const head = this.head;
+    if (head >= this.tail) {
+      this.head = this.tail = 0;
+      return false;
+    }
+    const data = this.data;
+    this.x = data[head];
+    this.y = data[head + 1];
+    this.z = data[head + 2];
+    this.head = head + 3;
+    return true;
+  }
+  clear() {
+    this.head = 0;
+    this.tail = 0;
+  }
+  private _makeRoom() {
+    const used = this.tail - this.head;
+    if (this.head >= this.data.length >> 1) {
+      this.data.copyWithin(0, this.head, this.tail);
+    } else {
+      const grown = new Int32Array(this.data.length * 2);
+      grown.set(this.data.subarray(this.head, this.tail));
+      this.data = grown;
+    }
+    this.head = 0;
+    this.tail = used;
   }
 }
 
@@ -182,6 +252,8 @@ export class VoxelUpdateTask {
     this.sun.removeMap.start(x, y, z);
     this.rgb.updateMap.start(x, y, z);
     this.sun.updateMap.start(x, y, z);
+    this.power.removeMap.start(x, y, z);
+    this.power.updateMap.start(x, y, z);
     this.flow.update.map.start(x, y, z);
     this.flow.remove.map.start(x, y, z);
     this.flow.remove.noRemoveMap.start(x, y, z);
@@ -194,6 +266,7 @@ export class VoxelUpdateTask {
   clear() {
     this.rgb.clear();
     this.sun.clear();
+    this.power.clear();
     this.flow.clear();
   }
 }
@@ -218,28 +291,28 @@ class FlowQueues {
 }
 
 class LightQueue {
-  update: number[] = [];
-  remove: number[] = [];
+  update = new VoxelPositionQueue();
+  remove = new VoxelPositionQueue();
   removeMap = new TaskMap();
   updateMap = new TaskMap();
 
   clear() {
-    this.update.length = 0;
-    this.remove.length = 0;
+    this.update.clear();
+    this.remove.clear();
     this.removeMap.clear();
     this.updateMap.clear();
   }
 }
 
 class PowerQueue {
-  update: number[] = [];
-  remove: number[] = [];
+  update = new VoxelPositionQueue();
+  remove = new VoxelPositionQueue();
   removeMap = new TaskMap();
   updateMap = new TaskMap();
 
   clear() {
-    this.update.length = 0;
-    this.remove.length = 0;
+    this.update.clear();
+    this.remove.clear();
     this.removeMap.clear();
     this.updateMap.clear();
   }

@@ -88,14 +88,14 @@ export class SectionSnapShot {
     }
   }
 
-  private _isTransfered = false;
+  private _isTransferred = false;
 
-  isTransfered() {
-    return this._isTransfered;
+  isTransferred() {
+    return this._isTransferred;
   }
 
   transfer(): [SectionSnapShotTransferData, ArrayBuffer[]] {
-    this._isTransfered = true;
+    this._isTransferred = true;
     return [
       {
         location: this.location,
@@ -110,7 +110,7 @@ export class SectionSnapShot {
     this.sections = data.sections;
     this.location = data.location;
     this._used = data.used;
-    this._isTransfered = false;
+    this._isTransferred = false;
     for (let i = 0; i < this.sections.length; i++) {
       this._buffers[i] = this.sections[i].buffer as ArrayBuffer;
     }

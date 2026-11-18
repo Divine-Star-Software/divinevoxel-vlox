@@ -10,6 +10,7 @@ import { WorldStorageInterface } from "./Types/WorldStorage.interface.js";
 import { EngineSettings } from "../Settings/EngineSettings.js";
 import { SnapShots } from "./SnapShot/SnapShots.js";
 import { SectionSnapShotTransferData } from "./SnapShot/SectionSnapShot.js";
+import { PerfLog } from "../Util/PerfLog.js";
 
 export default function ({
   threads,
@@ -18,7 +19,7 @@ export default function ({
   threads: Thread[];
   worldStorage?: WorldStorageInterface;
 }) {
-  WorldRegister.sectors.setSecotrBufferPool(true);
+  WorldRegister.sectors.setSectorBufferPool(true);
   const loadInMap = new Map<string, boolean>();
 
   Threads.registerTask<SectionSnapShotTransferData>(
@@ -32,24 +33,24 @@ export default function ({
 
   //normal array buffers only
   if (!EngineSettings.settings.memoryAndCPU.useSharedMemory) {
-    Threads.registerTask<[LocationData, ArrayBufferLike]>(
-      WorldDataSyncIds.CheckInSector,
-      async (data) => {
-        const sector = WorldRegister.sectors.get(...data[0]);
-
+    Threads.registerTask<
+      [task: LocationData, locations: LocationData[], buffers: ArrayBufferLike[]]
+    >(WorldDataSyncIds.CheckInSectors, ([, locations, buffers]) => {
+      for (let i = 0; i < locations.length; i++) {
+        const sector = WorldRegister.sectors.get(...locations[i]);
         if (!sector) {
           console.warn(
             "Tried checking in sector that is not loaded in world",
-            data
+            locations[i]
           );
-          return;
+          continue;
         }
-        sector.setBuffer(data[1]);
+        sector.setBuffer(buffers[i]);
         sector.setCheckedOut(false);
       }
-    );
+    });
   }
-  //shared memeory only
+  //shared memory only
   if (EngineSettings.settings.memoryAndCPU.useSharedMemory) {
     /*
 [sectors]
@@ -76,7 +77,8 @@ export default function ({
     };
   }
 
-  Threads.registerTask("add-sector", async (location: LocationData) => {
+  Threads.registerTask<LocationData>("add-sector", async (location, origin) => {
+    PerfLog.count("world.addSectorRequest");
     const sector = WorldRegister.sectors.get(
       location[0],
       location[1],
@@ -86,9 +88,10 @@ export default function ({
 
     if (sector) {
       if (EngineSettings.settings.memoryAndCPU.useSharedMemory) {
-        for (const thread of threads) {
-          thread.runTask(WorldDataSyncIds.SyncSector, [location, sector]);
-        }
+        origin.runTask(WorldDataSyncIds.SyncSector, [
+          [location[0], ...sector.position],
+          sector.buffer,
+        ]);
       }
       return;
     }

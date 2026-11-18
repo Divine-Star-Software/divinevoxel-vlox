@@ -1,6 +1,6 @@
 import { VoxelModelData } from "../VoxelModel.types";
 
-export const simpleThinPannel: VoxelModelData = {
+export const simpleThinPanel: VoxelModelData = {
   id: "dve_simple_thin_panel",
   relationsSchema: [],
   stateSchema: [
@@ -22,7 +22,7 @@ export const simpleThinPannel: VoxelModelData = {
   properties: {
     dve_placing_strategy: "*",
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "placement=south": [
       {
@@ -114,7 +114,7 @@ export const simpleThinPannel: VoxelModelData = {
     ],
   },
 };
-export const simpleTransparentThinPannel: VoxelModelData = {
+export const simpleTransparentThinPanel: VoxelModelData = {
   id: "dve_simple_transparent_thin_panel",
   relationsSchema: [],
   stateSchema: [
@@ -136,7 +136,7 @@ export const simpleTransparentThinPannel: VoxelModelData = {
   properties: {
     dve_placing_strategy: "*",
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "placement=south": [
       {
@@ -246,7 +246,7 @@ export const simpleTransparentThinPannel: VoxelModelData = {
     ],
   },
 };
-export const simpleCrossedPannel: VoxelModelData = {
+export const simpleCrossedPanel: VoxelModelData = {
   id: "dve_simple_crossed_panels",
   relationsSchema: [],
   stateSchema: [],
@@ -262,7 +262,7 @@ export const simpleCrossedPannel: VoxelModelData = {
       default: false,
     },
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "*": [
       {
@@ -285,7 +285,7 @@ export const simpleCrossedPannel: VoxelModelData = {
   },
 };
 
-export const orientedCrossedPannel: VoxelModelData = {
+export const orientedCrossedPanel: VoxelModelData = {
   id: "dve_oriented_crossed_panels",
   relationsSchema: [],
   properties: {
@@ -314,7 +314,7 @@ export const orientedCrossedPannel: VoxelModelData = {
       default: false,
     },
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
 
   stateNodes: {
     "placement=down,direction=north": [

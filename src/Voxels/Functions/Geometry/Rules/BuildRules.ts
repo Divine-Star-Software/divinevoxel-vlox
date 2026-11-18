@@ -10,7 +10,7 @@ import { EngineSettings } from "../../../../Settings/EngineSettings";
 import { EngineStats } from "../../../../Stats/EngineStats";
 import { GeometryLUT } from "../../../Data/GeometryLUT";
 
-class OcculsionBox {
+class OcclusionBox {
   constructor(
     public p1: Vec3Array = [0, 0, 0],
     public p2: Vec3Array = [0, 0, 0],
@@ -19,7 +19,7 @@ class OcculsionBox {
   ) {}
 }
 
-const mainBox = new OcculsionBox();
+const mainBox = new OcclusionBox();
 const size = 0.01;
 // Calculate half the size of the box
 const halfSize = size / 2;
@@ -37,7 +37,7 @@ const offsetPoint: Vec3Array = [0, 0, 0];
 const tangent: Vec3Array = [0, 0, 0];
 const bitangent: Vec3Array = [0, 0, 0];
 
-function updateOcculsionBox(point: Vec3Array, normal: Vec3Array): OcculsionBox {
+function updateOcclusionBox(point: Vec3Array, normal: Vec3Array): OcclusionBox {
   offsetPoint[0] = point[0] + normal[0] * offset;
   offsetPoint[1] = point[1] + normal[1] * offset;
   offsetPoint[2] = point[2] + normal[2] * offset;
@@ -148,10 +148,10 @@ export function BuildRules() {
   const cubeIndexSize = VoxelRelativeCubeIndex.flatIndex.size;
   const totalFaces = OcclusionFaceRegister.faces.size;
   const geometryPaletteSize = GeometryLUT.compiledGeometry.length;
-  const totalAOReusltsSize =
+  const totalAOResultsSize =
     totalFaces * 4 * cubeIndexSize * geometryPaletteSize;
 
-  const aoIndexBufferSize = Math.ceil(totalAOReusltsSize / 8);
+  const aoIndexBufferSize = Math.ceil(totalAOResultsSize / 8);
   const aoIndex = new AOOcclusionFaceIndex({
     buffer: EngineSettings.settings.memoryAndCPU.useSharedMemory
       ? new SharedArrayBuffer(aoIndexBufferSize)
@@ -238,7 +238,7 @@ export function BuildRules() {
               if (Vec3ArrayLike.Equals(otherFace.normal, faceNormal)) continue;
 
               for (let v = 0; v < facePoints.length; v++) {
-                updateOcculsionBox(facePoints[v], faceNormal);
+                updateOcclusionBox(facePoints[v], faceNormal);
                 vertexHitMap[faceIndex][v] ??= [];
 
                 if (doesBoxIntersectFace(otherFace)) {

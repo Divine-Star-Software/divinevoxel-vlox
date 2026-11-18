@@ -2,22 +2,22 @@ import { Vec4Array } from "@amodx/math";
 import { VoxelFaceDirections, VoxelFaces } from "../../../../../Math";
 import { Quad } from "../../../../Geometry/Primitives/Quad";
 import { addVoxelQuad } from "../../../Geometry/VoxelGeometryBuilder";
-import { GeoemtryNode } from "../GeometryNode";
+import { GeometryNode } from "../GeometryNode";
 import {
   CompiledQuadVoxelGeometryNode,
-  QuadVoxelGometryArgs,
-  QuadVoxelGometryInputs,
-} from "../Types/QuadVoxelGometryNodeTypes";
+  QuadVoxelGeometryArgs,
+  QuadVoxelGeometryInputs,
+} from "../Types/QuadVoxelGeometryNodeTypes";
 import { GetTexture } from "../../Common/GetTexture";
-import { CullRulledFace } from "../../Common/Faces/CullRulledFace";
-import { ShadeRulledFace } from "../../Common/Faces/ShadeRulledFace";
+import { CullRuledFace } from "../../Common/Faces/CullRuledFace";
+import { ShadeRuledFace } from "../../Common/Faces/ShadeRuledFace";
 import { ShadeRulelessFace } from "../../Common/Faces/ShadeRulelessFace";
 
-const ArgIndexes = QuadVoxelGometryInputs.ArgIndexes;
+const ArgIndexes = QuadVoxelGeometryInputs.ArgIndexes;
 
-export class QuadVoxelGometryNode extends GeoemtryNode<
+export class QuadVoxelGeometryNode extends GeometryNode<
   CompiledQuadVoxelGeometryNode,
-  QuadVoxelGometryArgs
+  QuadVoxelGeometryArgs
 > {
   quad: Quad;
   vertexWeights: [Vec4Array, Vec4Array, Vec4Array, Vec4Array];
@@ -33,21 +33,21 @@ export class QuadVoxelGometryNode extends GeoemtryNode<
       this.trueFaceIndex = this.data.trueFaceIndex;
   }
 
-  add(args: QuadVoxelGometryArgs) {
+  add(args: QuadVoxelGeometryArgs) {
     if (!args[ArgIndexes.Enabled]) return false;
 
     const builder = this.builder;
 
     if (
       this.trueFaceIndex !== undefined &&
-      !CullRulledFace(builder, this.trueFaceIndex)
+      !CullRuledFace(builder, this.trueFaceIndex)
     )
       return false;
 
     builder.calculateFaceData(this.closestFace);
 
     this.trueFaceIndex !== undefined
-      ? ShadeRulledFace(
+      ? ShadeRuledFace(
           builder,
           this.trueFaceIndex,
           builder.lightData[this.closestFace],

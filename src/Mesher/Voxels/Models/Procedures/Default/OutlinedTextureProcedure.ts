@@ -13,7 +13,7 @@ import { VoxelFaceDirections, VoxelFaces } from "../../../../../Math/index.js";
 export interface OutlinedTextureProcedureData extends BaseVoxelGeometryTextureProcedureData {
   type: "outlined";
   texture: TextureId | number;
-  textureRecrod: {
+  textureRecord: {
     top: TextureId | number;
     "corner-top-right": TextureId | number;
     "corner-top-left": TextureId | number;
@@ -246,16 +246,16 @@ export class OutlinedTextureProcedure extends TextureProcedure<OutlinedTexturePr
     const dirWest: keyof typeof uvsSets = isTopOrBottom ? "west" : "left";
 
     const x = generateCheck(dirNorth, builder, normal, set.north);
-    if (x) ref.x = (data as any).textureRecrod[x];
+    if (x) ref.x = (data as any).textureRecord[x];
 
     const y = generateCheck(dirSouth, builder, normal, set.south);
-    if (y) ref.y = (data as any).textureRecrod[y];
+    if (y) ref.y = (data as any).textureRecord[y];
 
     const z = generateCheck(dirEast, builder, normal, set.east);
-    if (z) ref.z = (data as any).textureRecrod[z];
+    if (z) ref.z = (data as any).textureRecord[z];
 
     const w = generateCheck(dirWest, builder, normal, set.west);
-    if (w) ref.w = (data as any).textureRecrod[w];
+    if (w) ref.w = (data as any).textureRecord[w];
 
     return ref;
   }

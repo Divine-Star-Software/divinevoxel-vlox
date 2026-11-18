@@ -1,12 +1,12 @@
-import { QuadVoxelGometryNode } from "./Default/QuadVoxelGeometryNode";
+import { QuadVoxelGeometryNode } from "./Default/QuadVoxelGeometryNode";
 import { TriangleVoxelGeometryNode } from "./Default/TriangleVoxelGeometryNode";
-import { GeoemtryNode } from "./GeometryNode";
+import { GeometryNode } from "./GeometryNode";
 import { VoxelGeometryConstructorRegister } from "../VoxelGeometryConstructorRegister";
 import { CullingProcedureData } from "../../../../Voxels/Geometry/VoxelGeometry.types";
 import { GeometryLUT } from "../../../../Voxels/Data/GeometryLUT";
 
 export class VoxelGeometryConstructor {
-  nodes: GeoemtryNode<any, any>[] = [];
+  nodes: GeometryNode<any, any>[] = [];
   cullingProcedure: CullingProcedureData;
   constructor(public geometryPaletteId: number) {
     this.cullingProcedure =
@@ -24,7 +24,7 @@ export class VoxelGeometryConstructor {
         this.nodes.push(newNode);
       }
       if (node.type == "quad") {
-        const newNode = new QuadVoxelGometryNode(geometryPaletteId, this, node);
+        const newNode = new QuadVoxelGeometryNode(geometryPaletteId, this, node);
         newNode.init();
         this.nodes.push(newNode);
       }

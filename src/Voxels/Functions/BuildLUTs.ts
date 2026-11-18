@@ -6,10 +6,10 @@ import { VoxelBinaryStateSchemaNode } from "../State/State.types";
 import { VoxelSchemas } from "../State/VoxelSchemas";
 import { EngineStats } from "../../Stats/EngineStats";
 import { VoxelGeometryData } from "../Geometry/VoxelGeometry.types";
-import { BuildGeomeetryLUT } from "./Geometry/BuildGeometryLUT";
+import { BuildGeometryLUT } from "./Geometry/BuildGeometryLUT";
 import { VoxelMaterialData } from "../Types/VoxelMaterial.types";
 import { VoxelSubstanceData } from "../Types/VoxelSubstances.types";
-import { ReltionalStateBuilder } from "../State/Reltional/ReltionalStateBuilder";
+import { RelationalStateBuilder } from "../State/Relational/RelationalStateBuilder";
 import { EngineSettings } from "../../Settings/EngineSettings";
 
 function recurse(
@@ -37,7 +37,7 @@ function getAllCombinations(valuePairs: [string, string[]][]) {
   return result;
 }
 
-function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
+function buildSchemas(voxels: VoxelData[], models: VoxelModelData[]) {
   const totalModelStates = new Map<string, number>();
   const totalModelRelationalStates = new Map<string, number>();
   VoxelLUT.models.register("dve_air");
@@ -65,8 +65,8 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
     VoxelSchemas.state.set(model.id, stateSchema);
     totalModelStates.set(model.id, stateSchema.totalStates());
 
-    //build reltional state schema
-    const reltionalSchemaNodes: VoxelBinaryStateSchemaNode[] = [];
+    //build relational state schema
+    const relationalSchemaNodes: VoxelBinaryStateSchemaNode[] = [];
     let bitIndex = 0;
     for (const schemaNode of model.relationsSchema) {
       const node: VoxelBinaryStateSchemaNode = {
@@ -76,17 +76,17 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
         values: ["false", "true"],
       };
       bitIndex++;
-      reltionalSchemaNodes.push(node);
+      relationalSchemaNodes.push(node);
     }
-    const reltionalStateSchema = new BinarySchema(reltionalSchemaNodes);
-    VoxelSchemas.relationalState.set(model.id, reltionalStateSchema);
+    const relationalStateSchema = new BinarySchema(relationalSchemaNodes);
+    VoxelSchemas.relationalState.set(model.id, relationalStateSchema);
     totalModelRelationalStates.set(model.id, stateSchema.totalStates());
 
-    const reltionalStateBuilder = new ReltionalStateBuilder(
-      reltionalStateSchema,
+    const relationalStateBuilder = new RelationalStateBuilder(
+      relationalStateSchema,
       model.relationsSchema
     );
-    VoxelSchemas.reltionalStateBuilder.set(model.id, reltionalStateBuilder);
+    VoxelSchemas.relationalStateBuilder.set(model.id, relationalStateBuilder);
   }
 
   //build mod schemas
@@ -94,7 +94,7 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
     const modelData = voxel.properties["dve_model_data"];
     const trueVoxelId = VoxelLUT.voxelIds.register(voxel.id);
     VoxelLUT.voxelIdToNameMap.set(voxel.id, voxel.name || voxel.id);
-    VoxelLUT.voxelNametoIdMap.set(voxel.name || voxel.id, voxel.id);
+    VoxelLUT.voxelNameToIdMap.set(voxel.name || voxel.id, voxel.id);
 
     VoxelLUT.materialMap[trueVoxelId] = VoxelLUT.material.getNumberId(
       voxel.properties["dve_rendered_material"] || "dve_solid"
@@ -127,8 +127,8 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
       (totalModelStates.get(modelData.id)! || 1) *
       (stateSchema.totalStates() || 1);
 
-    //build reltional mod schema
-    const reltionalSchemaNodes: VoxelBinaryStateSchemaNode[] = [];
+    //build relational mod schema
+    const relationalSchemaNodes: VoxelBinaryStateSchemaNode[] = [];
     if (modelData.modRelationSchema) {
       let bitIndex = 0;
       for (const schemaNode of modelData.modRelationSchema) {
@@ -139,20 +139,20 @@ function buildScehmas(voxels: VoxelData[], models: VoxelModelData[]) {
           values: ["false", "true"],
         };
         bitIndex++;
-        reltionalSchemaNodes.push(node);
+        relationalSchemaNodes.push(node);
       }
     }
-    const reltionalStateSchema = new BinarySchema(reltionalSchemaNodes);
-    VoxelSchemas.relationalMod.set(voxel.id, reltionalStateSchema);
+    const relationalStateSchema = new BinarySchema(relationalSchemaNodes);
+    VoxelSchemas.relationalMod.set(voxel.id, relationalStateSchema);
     VoxelLUT.totalRelationalVoxelIds +=
       (totalModelRelationalStates.get(modelData.id)! || 1) *
-      (reltionalStateSchema.totalStates() || 1);
+      (relationalStateSchema.totalStates() || 1);
 
-    const reltionalModBuilder = new ReltionalStateBuilder(
-      reltionalStateSchema,
+    const relationalModBuilder = new RelationalStateBuilder(
+      relationalStateSchema,
       modelData.modRelationSchema || []
     );
-    VoxelSchemas.reltionalModBuilder.set(voxel.id, reltionalModBuilder);
+    VoxelSchemas.relationalModBuilder.set(voxel.id, relationalModBuilder);
   }
 
   VoxelSchemas.buildMaps();
@@ -279,16 +279,16 @@ function buildStatePalette(voxels: VoxelData[], models: VoxelModelData[]) {
   EngineStats.palette.paletteSize = VoxelLUT.totalVoxelIds;
 }
 
-function buildReltionalStatePalette(
+function buildRelationalStatePalette(
   voxels: VoxelData[],
   models: VoxelModelData[]
 ) {
   const modelStateArray = new Map<string, number[]>();
 
-  VoxelLUT.totalReltionalMods = new Uint16Array(
+  VoxelLUT.totalRelationalMods = new Uint16Array(
     getUint16Buffer(VoxelLUT.voxelIds.size)
   );
-  VoxelLUT.totalReltionalStates = new Uint16Array(
+  VoxelLUT.totalRelationalStates = new Uint16Array(
     getUint16Buffer(VoxelLUT.voxelIds.size)
   );
   VoxelLUT.relationalVoxelIdToTrueId = new Uint16Array(
@@ -366,8 +366,8 @@ function buildReltionalStatePalette(
 
     const statePalette = modelStateArray.get(modelData.id)!;
 
-    VoxelLUT.totalReltionalStates[voxelId] = statePalette.length;
-    VoxelLUT.totalReltionalMods[voxelId] = modPalette.length;
+    VoxelLUT.totalRelationalStates[voxelId] = statePalette.length;
+    VoxelLUT.totalRelationalMods[voxelId] = modPalette.length;
     VoxelLUT.relationalVoxelRecordStartIndex[voxelId] = voxelRecordStateIndex;
 
     for (let modIndex = 0; modIndex < modPalette.length; modIndex++) {
@@ -387,7 +387,7 @@ function buildReltionalStatePalette(
       (modPalette.length || 1) * (statePalette.length || 1);
   }
 
-  EngineStats.palette.reltionalPaletteSize = VoxelLUT.totalRelationalVoxelIds;
+  EngineStats.palette.relationalPaletteSize = VoxelLUT.totalRelationalVoxelIds;
 }
 
 export function BuildLUTs(
@@ -404,9 +404,9 @@ export function BuildLUTs(
     VoxelLUT.substance.register(substance.id);
   }
 
-  buildScehmas(voxels, models);
+  buildSchemas(voxels, models);
   buildStatePalette(voxels, models);
-  buildReltionalStatePalette(voxels, models);
+  buildRelationalStatePalette(voxels, models);
 
   VoxelLUT.totalCombinedIds =
     VoxelLUT.totalVoxelIds * VoxelLUT.totalRelationalVoxelIds;
@@ -424,75 +424,75 @@ export function BuildLUTs(
     finalModelConditionalMap,
     finalVoxelStateInputMap,
     finalVoxelConditionalInputMap,
-  } = BuildGeomeetryLUT(voxels, geometry, models);
+  } = BuildGeometryLUT(voxels, geometry, models);
 
   for (const voxel of voxels) {
     const voxelModelData = voxel.properties["dve_model_data"];
     if (!voxelModelData) continue;
     const trueVoxelId = VoxelLUT.voxelIds.getNumberId(voxel.id);
     const modelStateMap = finalModelStateMap.get(voxelModelData.id);
-    const modelConditonalMap = finalModelConditionalMap.get(voxelModelData.id)!;
+    const modelConditionalMap = finalModelConditionalMap.get(voxelModelData.id)!;
     const stateSchema = VoxelSchemas.state.get(voxelModelData.id);
-    const reltionalStateSchema = VoxelSchemas.relationalState.get(
+    const relationalStateSchema = VoxelSchemas.relationalState.get(
       voxelModelData.id
     );
     const modSchema = VoxelSchemas.mod.get(voxel.id);
-    const reltionalModSchema = VoxelSchemas.relationalMod.get(voxel.id);
+    const relationalModSchema = VoxelSchemas.relationalMod.get(voxel.id);
     const inputs = finalVoxelStateInputMap.get(voxel.id)!;
-    const conditonalInputs = finalVoxelConditionalInputMap.get(voxel.id)!;
+    const conditionalInputs = finalVoxelConditionalInputMap.get(voxel.id)!;
 
     for (const modKey in voxelModelData.inputs) {
-      const [modString, modReltionalString] = modKey.split("|");
+      const [modString, modRelationalString] = modKey.split("|");
       const modValue = modSchema ? modSchema.readString(modString) : 0;
-      const reltionalModValue =
-        modReltionalString && reltionalModSchema
-          ? reltionalModSchema.readString(modReltionalString)
+      const relationalModValue =
+        modRelationalString && relationalModSchema
+          ? relationalModSchema.readString(modRelationalString)
           : 0;
 
       for (const stateKey in modelStateMap) {
-        const [stateString, reltionalString] = stateKey.split("|");
+        const [stateString, relationalString] = stateKey.split("|");
         const stateValue = stateSchema
           ? stateSchema.readString(stateString)
           : 0;
-        const reltionalStateValue =
-          reltionalString && reltionalStateSchema
-            ? reltionalStateSchema.readString(reltionalString)
+        const relationalStateValue =
+          relationalString && relationalStateSchema
+            ? relationalStateSchema.readString(relationalString)
             : 0;
 
         const voxelId = VoxelLUT.getVoxelId(trueVoxelId, stateValue, modValue);
-        const reltionalVoxelId = VoxelLUT.getReltionalVoxelId(
+        const relationalVoxelId = VoxelLUT.getRelationalVoxelId(
           trueVoxelId,
-          reltionalStateValue,
-          reltionalModValue
+          relationalStateValue,
+          relationalModValue
         );
 
-        const totalReltionalStates = reltionalStateSchema
-          ? Math.pow(2, reltionalStateSchema.nodes.length)
+        const totalRelationalStates = relationalStateSchema
+          ? Math.pow(2, relationalStateSchema.nodes.length)
           : 0;
-        if (!totalReltionalStates) {
+        if (!totalRelationalStates) {
           VoxelLUT.geometryIndex[
             VoxelLUT.getStateIndex(
               voxelId,
-              reltionalVoxelId,
+              relationalVoxelId,
               VoxelLUT.totalVoxelIds
             )
           ] = modelStateMap[stateKey];
           VoxelLUT.geometryInputsIndex[
             VoxelLUT.getStateIndex(
               voxelId,
-              reltionalVoxelId,
+              relationalVoxelId,
               VoxelLUT.totalVoxelIds
             )
           ] = inputs[modKey][stateKey];
         } else {
-          const baseReltionalVoxelId = VoxelLUT.getReltionalVoxelId(
+          const baseRelationalVoxelId = VoxelLUT.getRelationalVoxelId(
             trueVoxelId,
             0,
             0
           );
           for (
-            let i = baseReltionalVoxelId;
-            i < baseReltionalVoxelId + totalReltionalStates;
+            let i = baseRelationalVoxelId;
+            i < baseRelationalVoxelId + totalRelationalStates;
             i++
           ) {
             VoxelLUT.geometryIndex[
@@ -505,79 +505,79 @@ export function BuildLUTs(
         }
       }
 
-      for (const stateKey in modelConditonalMap) {
-        const [stateString, reltionalString] = stateKey.split("|");
+      for (const stateKey in modelConditionalMap) {
+        const [stateString, relationalString] = stateKey.split("|");
 
         const stateValue = stateSchema
           ? stateSchema.readString(stateString)
           : 0;
-        const reltionalStateValue =
-          reltionalString && reltionalStateSchema
-            ? reltionalStateSchema.readString(reltionalString)
+        const relationalStateValue =
+          relationalString && relationalStateSchema
+            ? relationalStateSchema.readString(relationalString)
             : 0;
 
-        const geoId = modelConditonalMap[stateKey];
+        const geoId = modelConditionalMap[stateKey];
         const voxelId = VoxelLUT.getVoxelId(trueVoxelId, stateValue, modValue);
-        const reltionalVoxelId = VoxelLUT.getReltionalVoxelId(
+        const relationalVoxelId = VoxelLUT.getRelationalVoxelId(
           trueVoxelId,
-          reltionalStateValue,
-          reltionalModValue
+          relationalStateValue,
+          relationalModValue
         );
 
-        const totalReltionalStates = reltionalStateSchema
-          ? Math.pow(2, reltionalStateSchema.nodes.length)
+        const totalRelationalStates = relationalStateSchema
+          ? Math.pow(2, relationalStateSchema.nodes.length)
           : 0;
 
         VoxelLUT.conditionalGeometryInputIndex[geoId] ??= [];
         VoxelLUT.conditionalGeometryInputIndex[geoId][voxelId] ??= [];
-        if (!totalReltionalStates) {
+        if (!totalRelationalStates) {
           VoxelLUT.conditionalGeometryInputIndex[geoId][voxelId][
-            reltionalVoxelId
-          ] = conditonalInputs[modKey][stateKey];
+            relationalVoxelId
+          ] = conditionalInputs[modKey][stateKey];
         } else {
-          const baseReltionalVoxelId = VoxelLUT.getReltionalVoxelId(
+          const baseRelationalVoxelId = VoxelLUT.getRelationalVoxelId(
             trueVoxelId,
             0,
             0
           );
           for (
-            let i = baseReltionalVoxelId;
-            i < baseReltionalVoxelId + totalReltionalStates;
+            let i = baseRelationalVoxelId;
+            i < baseRelationalVoxelId + totalRelationalStates;
             i++
           ) {
             VoxelLUT.conditionalGeometryInputIndex[geoId][voxelId][i] =
-              conditonalInputs[modKey][stateKey];
+              conditionalInputs[modKey][stateKey];
           }
         }
       }
     }
 
-    for (const stateKey in modelConditonalMap) {
-      const [stateString, reltionalString] = stateKey.split("|");
+    for (const stateKey in modelConditionalMap) {
+      const [stateString, relationalString] = stateKey.split("|");
 
       const stateValue = stateSchema ? stateSchema.readString(stateString) : 0;
 
-      const totalReltionalStates = reltionalStateSchema
-        ? Math.pow(2, reltionalStateSchema.nodes.length) *
-          (reltionalModSchema
-            ? Math.pow(2, reltionalModSchema.nodes.length)
+      const totalRelationalStates = relationalStateSchema
+        ? Math.pow(2, relationalStateSchema.nodes.length) *
+          (relationalModSchema
+            ? Math.pow(2, relationalModSchema.nodes.length)
             : 1)
         : 0;
 
-      const enabledArray: boolean[] = new Array(totalReltionalStates || 1).fill(
+      const enabledArray: boolean[] = new Array(totalRelationalStates || 1).fill(
         true
       );
 
-      if (reltionalStateSchema) {
-        const reltionalNodes = <[key: string, value: string][]>(
-          (reltionalString ? reltionalString.split(",") : []).map((v) =>
+      if (relationalStateSchema) {
+        const relationalNodes = <[key: string, value: string][]>(
+          (relationalString ? relationalString.split(",") : []).map((v) =>
             v.split("=")
           )
         );
-        for (let i = 0; i < totalReltionalStates; i++) {
-          reltionalStateSchema.startEncoding(i);
-          for (const [key, value] of reltionalNodes) {
-            if (reltionalStateSchema.getValue(key) !== value) {
+        for (let i = 0; i < totalRelationalStates; i++) {
+          relationalStateSchema.startEncoding(i);
+          for (const [key, value] of relationalNodes) {
+            if (relationalStateSchema.getValue(key) !== value) {
               enabledArray[i] = false;
             }
           }
@@ -587,7 +587,7 @@ export function BuildLUTs(
       const modelId = VoxelLUT.models.getNumberId(voxelModelData.id);
       VoxelLUT.conditionalGeometryIndex[modelId] ??= [];
       VoxelLUT.conditionalGeometryIndex[modelId].push([
-        modelConditonalMap[stateKey],
+        modelConditionalMap[stateKey],
         stateValue,
         enabledArray,
       ]);

@@ -20,7 +20,7 @@ export type RichWorldDimensions = Map<string, Map<string, RichRegion>>;
 
 export type SetRichVoxel = [
  id: string,
- dimesnion: string,
+ dimension: string,
  x: number,
  y: number,
  z: number

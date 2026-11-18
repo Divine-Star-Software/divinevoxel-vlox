@@ -4,7 +4,7 @@ import {
   BaseArchivedDataBase,
 } from "../../Types/Archive.types";
 import { EngineSettings } from "../../../../Settings/EngineSettings";
-import { VoxelArchivePalette } from "../../../../Voxels/Archive/VoxelPaletteArechive";
+import { VoxelArchivePalette } from "../../../../Voxels/Archive/VoxelPaletteArchive";
 
 export function getBaseData(dimension: string): BaseArchivedDataBase {
   return {

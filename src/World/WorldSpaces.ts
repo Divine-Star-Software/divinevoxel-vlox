@@ -92,13 +92,14 @@ class WorldBounds {
 class SectorSpace {
   static power2Axes = Vector3Like.Create();
   static bounds = Vector3Like.Create();
-  static volumne = 0;
+  static volume = 0;
   static sectionBounds = Vector3Like.Create();
   static sectionPower2Axes = Vector3Like.Create();
   static sectionXZPower = 0;
   static sectionZMask = 0;
   static sectionXMask = 0;
-  static sectionVolumne = 0;
+  static sectionYMask = 0;
+  static sectionVolume = 0;
 
   static getPosition(
     x: number,
@@ -153,10 +154,11 @@ class SectorSpace {
 class SectionSpace {
   static power2Axes = Vector3Like.Create();
   static bounds = Vector3Like.Create();
-  static volumne = 0;
+  static volume = 0;
   static xzPower = 0;
   static zMask = 0;
   static xMask = 0;
+  static yMask = 0;
 
   static getPosition(
     x: number,
@@ -401,7 +403,7 @@ EngineSettings.addEventListener("synced", (event) => {
   SectorSpace.bounds.x = 1 << SectorSpace.power2Axes.x;
   SectorSpace.bounds.y = 1 << SectorSpace.power2Axes.y;
   SectorSpace.bounds.z = 1 << SectorSpace.power2Axes.z;
-  SectorSpace.volumne =
+  SectorSpace.volume =
     SectorSpace.bounds.x * SectorSpace.bounds.y * SectorSpace.bounds.z;
 
   SectionSpace.power2Axes.x = settings.world.sectionPower2Size.x;
@@ -410,11 +412,12 @@ EngineSettings.addEventListener("synced", (event) => {
   SectionSpace.bounds.x = 1 << SectionSpace.power2Axes.x;
   SectionSpace.bounds.y = 1 << SectionSpace.power2Axes.y;
   SectionSpace.bounds.z = 1 << SectionSpace.power2Axes.z;
-  SectionSpace.volumne =
+  SectionSpace.volume =
     SectionSpace.bounds.x * SectionSpace.bounds.y * SectionSpace.bounds.z;
   SectionSpace.xzPower = SectionSpace.power2Axes.x + SectionSpace.power2Axes.z;
   SectionSpace.zMask = SectionSpace.bounds.z - 1;
   SectionSpace.xMask = SectionSpace.bounds.x - 1;
+  SectionSpace.yMask = SectionSpace.bounds.y - 1;
 
   SectorSpace.sectionBounds.x =
     SectorSpace.bounds.x >> SectionSpace.power2Axes.x;
@@ -422,7 +425,7 @@ EngineSettings.addEventListener("synced", (event) => {
     SectorSpace.bounds.y >> SectionSpace.power2Axes.y;
   SectorSpace.sectionBounds.z =
     SectorSpace.bounds.z >> SectionSpace.power2Axes.z;
-  SectorSpace.sectionVolumne =
+  SectorSpace.sectionVolume =
     SectorSpace.sectionBounds.x *
     SectorSpace.sectionBounds.y *
     SectorSpace.sectionBounds.z;
@@ -436,4 +439,5 @@ EngineSettings.addEventListener("synced", (event) => {
     SectorSpace.sectionPower2Axes.x + SectorSpace.sectionPower2Axes.z;
   SectorSpace.sectionZMask = SectorSpace.sectionBounds.z - 1;
   SectorSpace.sectionXMask = SectorSpace.sectionBounds.x - 1;
+  SectorSpace.sectionYMask = SectorSpace.sectionBounds.y - 1;
 });

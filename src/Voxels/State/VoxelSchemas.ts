@@ -1,5 +1,5 @@
 import { VoxelLUT } from "../Data/VoxelLUT";
-import { ReltionalStateBuilder } from "./Reltional/ReltionalStateBuilder";
+import { RelationalStateBuilder } from "./Relational/RelationalStateBuilder";
 import { BinarySchema } from "./Schema/BinarySchema";
 import {
   VoxelBinaryStateSchemaNode,
@@ -10,36 +10,36 @@ export type VoxelSchemasExport = {
   state: [key: string, VoxelBinaryStateSchemaNode[]][];
   mod: [key: string, VoxelBinaryStateSchemaNode[]][];
   relationalState: [key: string, VoxelBinaryStateSchemaNode[]][];
-  reltionalStateBuilder: [key: string, VoxelModelRelationsSchemaNodes[]][];
+  relationalStateBuilder: [key: string, VoxelModelRelationsSchemaNodes[]][];
   relationalMod: [key: string, VoxelBinaryStateSchemaNode[]][];
-  reltionalModBuilder: [key: string, VoxelModelRelationsSchemaNodes[]][];
+  relationalModBuilder: [key: string, VoxelModelRelationsSchemaNodes[]][];
 };
 
 export class VoxelSchemas {
-  //maps voxel model ids to the their state scehma
+  //maps voxel model ids to the their state schema
   static state = new Map<string, BinarySchema>();
   //maps voxel model number ids to their state schemas
   static stateMap: BinarySchema[] = [];
-  //maps voxel ids to their mod schemao
+  //maps voxel ids to their mod schema
   static mod = new Map<string, BinarySchema>();
   //maps voxel  number ids to their state schemas
   static modMap: BinarySchema[] = [];
-  //maps voxel model ids to their reltional state schema
+  //maps voxel model ids to their relational state schema
   static relationalState = new Map<string, BinarySchema>();
-  //maps voxel model number ids to their reltional state schema
+  //maps voxel model number ids to their relational state schema
   static relationalStateMap: BinarySchema[] = [];
-  //maps voxel model ids = their reltional state builder
-  static reltionalStateBuilder = new Map<string, ReltionalStateBuilder>();
-  //maps voxel model number ids = their reltional state builder
-  static reltionalStateBuilderMap: ReltionalStateBuilder[] = [];
-  //maps voxel ids to their reltional mod schema
+  //maps voxel model ids = their relational state builder
+  static relationalStateBuilder = new Map<string, RelationalStateBuilder>();
+  //maps voxel model number ids = their relational state builder
+  static relationalStateBuilderMap: RelationalStateBuilder[] = [];
+  //maps voxel ids to their relational mod schema
   static relationalMod = new Map<string, BinarySchema>();
-  //maps voxel number ids to their reltional mod schema
+  //maps voxel number ids to their relational mod schema
   static relationalModMap: BinarySchema[] = [];
-  //maps voxel ids to their reltional mod builder
-  static reltionalModBuilder = new Map<string, ReltionalStateBuilder>();
-  //maps voxel number ids to their reltional mod builder
-  static reltionalModBuilderMap: ReltionalStateBuilder[] = [];
+  //maps voxel ids to their relational mod builder
+  static relationalModBuilder = new Map<string, RelationalStateBuilder>();
+  //maps voxel number ids to their relational mod builder
+  static relationalModBuilderMap: RelationalStateBuilder[] = [];
   static getStateSchema(voxelId: string) {
     const modelId = VoxelLUT.models.getStringId(
       VoxelLUT.modelsIndex[VoxelLUT.voxelIds.getNumberId(voxelId)]
@@ -54,8 +54,8 @@ export class VoxelSchemas {
     for (const [key, schema] of this.relationalState) {
       this.relationalStateMap[VoxelLUT.models.getNumberId(key)] = schema;
     }
-    for (const [key, schema] of this.reltionalStateBuilder) {
-      this.reltionalStateBuilderMap[VoxelLUT.models.getNumberId(key)] = schema;
+    for (const [key, schema] of this.relationalStateBuilder) {
+      this.relationalStateBuilderMap[VoxelLUT.models.getNumberId(key)] = schema;
     }
     for (const [key, schema] of this.mod) {
       this.modMap[VoxelLUT.voxelIds.getNumberId(key)] = schema;
@@ -63,8 +63,8 @@ export class VoxelSchemas {
     for (const [key, schema] of this.relationalMod) {
       this.relationalModMap[VoxelLUT.voxelIds.getNumberId(key)] = schema;
     }
-    for (const [key, schema] of this.reltionalModBuilder) {
-      this.reltionalModBuilderMap[VoxelLUT.voxelIds.getNumberId(key)] = schema;
+    for (const [key, schema] of this.relationalModBuilder) {
+      this.relationalModBuilderMap[VoxelLUT.voxelIds.getNumberId(key)] = schema;
     }
   }
   static export(): VoxelSchemasExport {
@@ -75,14 +75,14 @@ export class VoxelSchemas {
         key,
         value.getSchema(),
       ]),
-      reltionalStateBuilder: [...this.reltionalStateBuilder].map(
+      relationalStateBuilder: [...this.relationalStateBuilder].map(
         ([key, value]) => [key, value.getSchema()]
       ),
       relationalMod: [...this.relationalMod].map(([key, value]) => [
         key,
         value.getSchema(),
       ]),
-      reltionalModBuilder: [...this.reltionalModBuilder].map(([key, value]) => [
+      relationalModBuilder: [...this.relationalModBuilder].map(([key, value]) => [
         key,
         value.getSchema(),
       ]),
@@ -102,10 +102,10 @@ export class VoxelSchemas {
         new BinarySchema(nodes),
       ])
     );
-    this.reltionalStateBuilder = new Map(
-      exported.reltionalStateBuilder.map(([key, nodes]) => [
+    this.relationalStateBuilder = new Map(
+      exported.relationalStateBuilder.map(([key, nodes]) => [
         key,
-        new ReltionalStateBuilder(this.relationalState.get(key)!, nodes),
+        new RelationalStateBuilder(this.relationalState.get(key)!, nodes),
       ])
     );
     this.relationalMod = new Map(
@@ -114,10 +114,10 @@ export class VoxelSchemas {
         new BinarySchema(nodes),
       ])
     );
-    this.reltionalModBuilder = new Map(
-      exported.reltionalModBuilder.map(([key, nodes]) => [
+    this.relationalModBuilder = new Map(
+      exported.relationalModBuilder.map(([key, nodes]) => [
         key,
-        new ReltionalStateBuilder(this.relationalMod.get(key)!, nodes),
+        new RelationalStateBuilder(this.relationalMod.get(key)!, nodes),
       ])
     );
     this.buildMaps();

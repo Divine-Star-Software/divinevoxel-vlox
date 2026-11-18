@@ -78,7 +78,7 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
   }
 
   *traverse(
-    curosr: TemplateCursor = {
+    cursor: TemplateCursor = {
       position: [0, 0, 0],
       raw: [0, 0, 0, 0],
     }
@@ -86,16 +86,16 @@ export class ArchivedVoxelTemplate implements IVoxelTemplate {
     for (let x = 0; x < this.bounds.size.x; x++) {
       for (let y = 0; y < this.bounds.size.y; y++) {
         for (let z = 0; z < this.bounds.size.z; z++) {
-          curosr.position[0] = x;
-          curosr.position[1] = y;
-          curosr.position[2] = z;
+          cursor.position[0] = x;
+          cursor.position[1] = y;
+          cursor.position[2] = z;
           const vindex = this.index.getIndexXYZ(x, y, z);
-          curosr.raw[0] = this.getId(vindex);
-          curosr.raw[1] = 0;
-          curosr.raw[2] = this.getLevel(vindex);
-          curosr.raw[3] = this.getSecondary(vindex);
-          if (curosr.raw[0] < 1 && curosr.raw[3] < 1) continue;
-          yield curosr;
+          cursor.raw[0] = this.getId(vindex);
+          cursor.raw[1] = 0;
+          cursor.raw[2] = this.getLevel(vindex);
+          cursor.raw[3] = this.getSecondary(vindex);
+          if (cursor.raw[0] < 1 && cursor.raw[3] < 1) continue;
+          yield cursor;
         }
       }
     }

@@ -5,7 +5,7 @@ import {
   VoxelGeometryData,
 } from "../../../Geometry/VoxelGeometry.types";
 
-import { QuadVoxelGometryInputs } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
+import { QuadVoxelGeometryInputs } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGeometryNodeTypes";
 import { cleanArgString, isArgString, processTexture } from "./BaseFunctions";
 import { BaseVoxelGeometryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
 import { mapQuadUvs } from "../CalcFunctions";
@@ -20,8 +20,8 @@ export function BuildQuadInputs(
   model: VoxelModelData,
   geometry: VoxelGeometryData
 ) {
-  const ArgIndexes = QuadVoxelGometryInputs.ArgIndexes;
-  const inputs = QuadVoxelGometryInputs.CreateArgs();
+  const ArgIndexes = QuadVoxelGeometryInputs.ArgIndexes;
+  const inputs = QuadVoxelGeometryInputs.CreateArgs();
 
   let enabled = quad.enabled || true;
   inputs[ArgIndexes.Enabled] = enabled;
@@ -57,11 +57,11 @@ export function BuildQuadInputs(
         procedureData.texture =
           data.voxelInputs[cleanArgString(procedureData.texture)];
       }
-      if (procedureData.textureRecrod) {
-        for (const key in procedureData.textureRecrod) {
-          const value = procedureData.textureRecrod[key];
+      if (procedureData.textureRecord) {
+        for (const key in procedureData.textureRecord) {
+          const value = procedureData.textureRecord[key];
           if (typeof value == "string" && isArgString(value)) {
-            procedureData.textureRecrod[key] =
+            procedureData.textureRecord[key] =
               data.voxelInputs[cleanArgString(value)];
           }
         }

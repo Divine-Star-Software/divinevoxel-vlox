@@ -31,7 +31,7 @@ export interface Section extends SectionData {}
 const temp: Vec2Array = [0, 0];
 export class Section {
   static GetBufferSize() {
-    const voxelSize = WorldSpaces.section.volumne;
+    const voxelSize = WorldSpaces.section.volume;
     const height = WorldSpaces.section.bounds.y;
     return forceMultipleOf4(
       //----- state
@@ -43,7 +43,7 @@ export class Section {
         height / 8 +
         //dirtyMap
         height / 8 +
-        //bureid
+        //buried
         voxelSize / 8 +
         //---- voxel data arrays
         //ids
@@ -87,7 +87,7 @@ export class Section {
     this.index = index;
     this.sector = sector;
     this.updatePosition();
-    const voxelSize = WorldSpaces.section.volumne;
+    const voxelSize = WorldSpaces.section.volume;
     const height = WorldSpaces.section.bounds.y;
 
     const startingIndex = Section.GetArrayStartIndex(index);

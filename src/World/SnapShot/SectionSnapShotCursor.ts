@@ -70,8 +70,8 @@ export class SectionSnapshotCursor implements DataCursorInterface {
     this.invSectorSizeZ = 1 / WorldSpaces.sector.bounds.z;
   }
   private _snapShot: SectionSnapShot;
-  private _centeralCursor = new SectionCursor();
-  getCenteralCursor() {
+  private _centralCursor = new SectionCursor();
+  getCentralCursor() {
     const [dim, x, y, z] = this._snapShot.location;
 
     const sector = this.sectors[this.getSectorIndex(x, y, z)];
@@ -80,8 +80,8 @@ export class SectionSnapshotCursor implements DataCursorInterface {
     const section = sector.getSection(x, y, z);
 
     if (!section) return null;
-    this._centeralCursor.setSection(section);
-    return this._centeralCursor;
+    this._centralCursor.setSection(section);
+    return this._centralCursor;
   }
 
   setSectionSnapShot(snapShot: SectionSnapShot) {
@@ -107,15 +107,15 @@ export class SectionSnapshotCursor implements DataCursorInterface {
           const sectorIndex = x + y * 3 + z * 9;
           const sector = this.sectors[sectorIndex];
           if (!sector) continue;
-          const secotrPosition = WorldSpaces.sector.getPosition(
+          const sectorPosition = WorldSpaces.sector.getPosition(
             this.sectorOrigin.x + (x - 1) * sectorSizeX,
             this.sectorOrigin.y + (y - 1) * sectorSizeY,
             this.sectorOrigin.z + (z - 1) * sectorSizeZ,
             tempPosition,
           );
-          sector.position[0] = secotrPosition.x;
-          sector.position[1] = secotrPosition.y;
-          sector.position[2] = secotrPosition.z;
+          sector.position[0] = sectorPosition.x;
+          sector.position[1] = sectorPosition.y;
+          sector.position[2] = sectorPosition.z;
           this.cursors[sectorIndex].setSector(sector);
         }
       }

@@ -1,7 +1,7 @@
-import { ReltionalStateBuilder } from "../ReltionalStateBuilder";
+import { RelationalStateBuilder } from "../RelationalStateBuilder";
 
 export abstract class ShapeStateSchemaRelationsCondition {
-  constructor(public builder: ReltionalStateBuilder) {}
+  constructor(public builder: RelationalStateBuilder) {}
 
-  abstract evulate(): boolean;
+  abstract evaluate(): boolean;
 }

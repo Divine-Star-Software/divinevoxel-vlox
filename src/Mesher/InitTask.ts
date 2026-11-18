@@ -9,12 +9,18 @@ import {
   SectionSnapShot,
   SectionSnapShotTransferData,
 } from "../World/SnapShot/SectionSnapShot";
+import { PerfLog } from "../Util/PerfLog";
 
 export default function (rendererThread: Thread) {
   Threads.registerBinaryTask(TasksIds.BuildSection, (view) => {
     const transfers: any[] = [];
+    const start = PerfLog.now();
     const section = MeshSection(getLocationData(view), transfers);
-    if (!section) return;
+    PerfLog.end("mesh.sectionShared", start);
+    if (!section) {
+      PerfLog.count("mesh.emptySection");
+      return;
+    }
     rendererThread.runTask<SetSectionMeshTask>(
       "set-section",
       section,
@@ -26,11 +32,18 @@ export default function (rendererThread: Thread) {
   Threads.registerTask<SectionSnapShotTransferData>(
     TasksIds.BuildSectionSnapShot,
     (data, origin) => {
+      const start = PerfLog.now();
       snapShot.restore(data);
+      PerfLog.end("mesh.restoreSnapShot", start);
+      const meshStart = PerfLog.now();
       const transfers: any[] = [];
       const section = MeshSectionSnapShot(snapShot, transfers);
+      PerfLog.end("mesh.section", meshStart);
       origin.runTask("cache-snap-shot", ...snapShot.transfer());
-      if (!section) return;
+      if (!section) {
+        PerfLog.count("mesh.emptySection");
+        return;
+      }
       rendererThread.runTask<SetSectionMeshTask>(
         "set-section",
         section,

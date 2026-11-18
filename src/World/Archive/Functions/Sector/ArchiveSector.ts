@@ -12,7 +12,7 @@ import {
   BinaryBufferConstants,
   BinaryBufferFormat,
 } from "@amodx/binary/Buffer";
-import { getBaseData, lightSegments, lightSemgnetGet } from "../Shared/index";
+import { getBaseData, lightSegments, lightSegmentGet } from "../Shared/index";
 import { ProcessedSection, SectorPalette } from "../../Classes/ArchiveClasses";
 import { CreateArchivedSection } from "./CreateArchivedSection";
 import { RemoveDuplicateSections } from "./RemoveDuplicateSections";
@@ -35,7 +35,7 @@ export default function ArchiveSector(
 
   if (!sector)
     throw new Error(
-      `Sector at location ${location} does not exist when trying to arhicve it.`
+      `Sector at location ${location} does not exist when trying to archive it.`
     );
 
   const sectorPalettes = new SectorPalette();
@@ -93,7 +93,7 @@ export default function ArchiveSector(
 
       for (let l = 0; l < lightSegments.length; l++) {
         const segment = lightSegments[l];
-        const light = lightSemgnetGet[segment](section.light[i]);
+        const light = lightSegmentGet[segment](section.light[i]);
         if (light != firstLightLevels[segment])
           processedSection.light[segment].allTheSame = false;
         processedSection.light[segment].value = light;
@@ -158,23 +158,23 @@ export default function ArchiveSector(
       neededPalettes.level = true;
     }
 
-    for (const semgnet of lightSegments) {
-      archivedSection.light[semgnet].isPaletted =
-        sectorPalettes.light[semgnet].size <=
+    for (const segment of lightSegments) {
+      archivedSection.light[segment].isPaletted =
+        sectorPalettes.light[segment].size <=
           BinaryBufferConstants.HalfNibbleArrayMax ||
-        archivedSection.palettes.light[semgnet].size <=
+        archivedSection.palettes.light[segment].size <=
           BinaryBufferConstants.HalfNibbleArrayMax;
-      archivedSection.light[semgnet].remapped =
-        sectorPalettes.light[semgnet].size >
+      archivedSection.light[segment].remapped =
+        sectorPalettes.light[segment].size >
           BinaryBufferConstants.HalfNibbleArrayMax &&
-        archivedSection.palettes.light[semgnet].size <=
+        archivedSection.palettes.light[segment].size <=
           BinaryBufferConstants.HalfNibbleArrayMax &&
-        !archivedSection.light[semgnet].allTheSame;
+        !archivedSection.light[segment].allTheSame;
       if (
-        archivedSection.light[semgnet].isPaletted &&
-        !archivedSection.light[semgnet].remapped
+        archivedSection.light[segment].isPaletted &&
+        !archivedSection.light[segment].remapped
       ) {
-        neededPalettes.light[semgnet] = true;
+        neededPalettes.light[segment] = true;
       }
     }
 
@@ -221,7 +221,7 @@ export default function ArchiveSector(
         if (archivedSection.light[segment].remapped) {
           archivedSection.light[segment].buffer[i] =
             archivedSection.palettes.light[segment].getId(
-              lightSemgnetGet[segment](archivedSection.original.light[i])
+              lightSegmentGet[segment](archivedSection.original.light[i])
             );
         }
       }

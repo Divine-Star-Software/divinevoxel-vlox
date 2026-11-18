@@ -1,5 +1,5 @@
 import { Threads } from "@amodx/threads/";
-import { NexusThreads } from "./NexusTheads.js";
+import { NexusThreads } from "./NexusThreads.js";
 export class DivineVoxelEngineNexus {
   static environment: "node" | "browser" = "browser";
   static instance: DivineVoxelEngineNexus;

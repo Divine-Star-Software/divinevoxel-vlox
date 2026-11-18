@@ -1,5 +1,5 @@
-import { CompiledQuadVoxelGeometryNode } from "./QuadVoxelGometryNodeTypes";
-import { CompiledTriangleVoxelGeometryNode } from "./TriangleVoxelGometryNodeTypes";
+import { CompiledQuadVoxelGeometryNode } from "./QuadVoxelGeometryNodeTypes";
+import { CompiledTriangleVoxelGeometryNode } from "./TriangleVoxelGeometryNodeTypes";
 
 export type CompiledCustomGeometryNode = {
   type: "custom";

@@ -7,7 +7,7 @@ import {
   BinaryBuffer,
   BinaryBufferFormat,
 } from "@amodx/binary/Buffer";
-import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArechive";
+import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArchive";
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";

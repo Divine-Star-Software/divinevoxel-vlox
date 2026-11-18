@@ -22,7 +22,7 @@ export class CompiledTexture {
   /**Maps texture ids to their index */
   textureMap: Record<string, number> = {};
   animations: CompiledTextureAnimation[] = [];
-  /**To be used by the renderer to store a refernce to the actual texture used for rendering */
+  /**To be used by the renderer to store a reference to the actual texture used for rendering */
   shaderTexture: any;
   animatedTexture: TextureAnimationTexture;
 

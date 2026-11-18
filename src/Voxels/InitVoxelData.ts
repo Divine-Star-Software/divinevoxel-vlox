@@ -10,7 +10,7 @@ import {
   chainModel,
   fence,
   fenceEastWest,
-  fenceNorthsouth,
+  fenceNorthSouth,
   fencePost,
   leverGeometry,
   leverModel,
@@ -21,9 +21,9 @@ import {
   cube,
   halfDownCube,
   eighthCube,
-  quaterCubeSouthNorth,
-  quaterCubeUpDown,
-  quaterCubeWestEast,
+  quarterCubeSouthNorth,
+  quarterCubeUpDown,
+  quarterCubeWestEast,
   halfSouthCube,
   halfWestCube,
 } from "./Models/Defaults/CubeVoxelGeometry";
@@ -50,9 +50,9 @@ import { VoxelModelData } from "./Models/VoxelModel.types";
 import { VoxelGeometryData } from "./Geometry/VoxelGeometry.types";
 import { VoxelData } from "./Types/Voxel.types";
 import {
-  simpleCrossedPannel,
-  simpleThinPannel,
-  simpleTransparentThinPannel,
+  simpleCrossedPanel,
+  simpleThinPanel,
+  simpleTransparentThinPanel,
 } from "./Models/Defaults/PanelVoxelModels";
 import { VoxelIndex } from "../Voxels/Indexes/VoxelIndex";
 import { CacheManager } from "../Cache/CacheManager";
@@ -65,7 +65,7 @@ import { VoxelLogicRegister } from "./Logic/VoxelLogicRegister";
 import { farmGeometry, farmModels } from "./Models/Defaults/FarmVoxelModels";
 
 import { BuildLUTs } from "./Functions/BuildLUTs";
-import { CompiledvVxelTags } from "./Types/VoxelModelCompiledData.types";
+import { CompiledVoxelTags } from "./Types/VoxelModelCompiledData.types";
 
 export type InitVoxelDataProps = {
   geometry?: VoxelGeometryData[];
@@ -80,9 +80,9 @@ const geometry = [
   halfDownCube,
   halfSouthCube,
   halfWestCube,
-  quaterCubeSouthNorth,
-  quaterCubeUpDown,
-  quaterCubeWestEast,
+  quarterCubeSouthNorth,
+  quarterCubeUpDown,
+  quarterCubeWestEast,
   eighthCube,
 
   thinPanel,
@@ -92,7 +92,7 @@ const geometry = [
 
   fencePost,
   fenceEastWest,
-  fenceNorthsouth,
+  fenceNorthSouth,
 
   chainGeometry,
   carpetGeometry,
@@ -118,11 +118,11 @@ const models = [
   orientedCube,
   simpleHalfCube,
   pillarCube,
-  simpleThinPannel,
-  simpleTransparentThinPannel,
+  simpleThinPanel,
+  simpleTransparentThinPanel,
 
   stair,
-  simpleCrossedPannel,
+  simpleCrossedPanel,
 
   chainModel,
   carpetModel,
@@ -137,7 +137,7 @@ const models = [
   diamondModel
 ];
 
-export function InitVoxelData(data: InitVoxelDataProps): CompiledvVxelTags {
+export function InitVoxelData(data: InitVoxelDataProps): CompiledVoxelTags {
   const lightData = new VoxelLightData();
 
   const materials: VoxelMaterialData[] = [

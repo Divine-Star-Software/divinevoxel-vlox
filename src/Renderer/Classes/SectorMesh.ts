@@ -5,11 +5,11 @@ import { Vec3Array } from "@amodx/math";
 
 export class SectorMesh {
   sections: (SectionMesh | null)[] = new Array(
-    WorldSpaces.sector.sectionVolumne
+    WorldSpaces.sector.sectionVolume
   ).fill(null);
   position: Vec3Array = [0, 0, 0];
 
-  dipose() {
+  dispose() {
     MeshManager._sectorPool.push(this);
     for (const section of this.sections) {
       if (!section) continue;

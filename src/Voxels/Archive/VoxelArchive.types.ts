@@ -10,14 +10,14 @@ export interface ArchivedVoxelDataForPalette {
   modSchema?: VoxelBinaryStateSchemaNode[];
 }
 
-export enum VoxelPaletteCompents {
+export enum VoxelPaletteComponents {
   VoxelId = "voxelId",
   ModValue = "modValue",
   StateValue = "stateValue",
 }
 
 export interface VoxelPaletteComponent {
-  type: VoxelPaletteCompents;
+  type: VoxelPaletteComponents;
   index: number;
 }
 
@@ -38,7 +38,7 @@ export interface VoxelArchivePaletteData {
   stateSchemas: Record<string, VoxelBinaryStateSchemaNode[]>;
 }
 
-export interface VoxelArchiPaveletteExportedJSONData {
+export interface VoxelArchivePaletteExportedJSONData {
   /**Palette of voxel string ids */
   voxels: ArchivedVoxelDataForPalette[];
   /**A palette of voxels and their states and mods in sets 5 of numbers.

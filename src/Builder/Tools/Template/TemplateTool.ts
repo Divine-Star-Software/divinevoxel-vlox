@@ -31,7 +31,7 @@ export class TemplateTool extends BuilderToolBase<TemplateToolEvents> {
   }
 
   set distance(distance: number) {
-    if (this.boxSelection) this.pointSelection.distance = distance;
+    this.pointSelection.distance = Math.max(1, distance);
   }
 
   private _started = false;

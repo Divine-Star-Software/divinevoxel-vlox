@@ -3,7 +3,7 @@ import { Quad } from "../../../../Mesher/Geometry/Primitives/Quad";
 import { getQuadWeights, mapQuadUvs } from "../CalcFunctions";
 import { TransformQuad } from "../../../../Mesher/Geometry/Transform/TransformQuad";
 import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
-import { CompiledQuadVoxelGeometryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGometryNodeTypes";
+import { CompiledQuadVoxelGeometryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/QuadVoxelGeometryNodeTypes";
 import { OcclusionFaceRegister } from "../Rules/OcclusionFaceRegister";
 import { closestVoxelFace } from "../../../../Math/UtilFunctions";
 

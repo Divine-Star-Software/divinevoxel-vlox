@@ -76,7 +76,7 @@ export interface VoxelTags {
   [VoxelTagIds.powerValue]: number;
 }
 
-export enum VoxelSubstanceTagIdds {
+export enum VoxelSubstanceTagIds {
   parent = "dve_parent_substance",
   isSolid = "dve_is_solid",
   isTransparent = "dve_is_transparent",
@@ -85,10 +85,10 @@ export enum VoxelSubstanceTagIdds {
   isWindAffected = "dve_is_wind_affected",
 }
 export interface VoxelSubstanceTags {
-  [VoxelSubstanceTagIdds.parent]: string;
-  [VoxelSubstanceTagIdds.isTransparent]: boolean;
-  [VoxelSubstanceTagIdds.isSolid]: boolean;
-  [VoxelSubstanceTagIdds.isLiquid]: boolean;
-  [VoxelSubstanceTagIdds.flowRate]: number;
-  [VoxelSubstanceTagIdds.isWindAffected]: boolean;
+  [VoxelSubstanceTagIds.parent]: string;
+  [VoxelSubstanceTagIds.isTransparent]: boolean;
+  [VoxelSubstanceTagIds.isSolid]: boolean;
+  [VoxelSubstanceTagIds.isLiquid]: boolean;
+  [VoxelSubstanceTagIds.flowRate]: number;
+  [VoxelSubstanceTagIds.isWindAffected]: boolean;
 }

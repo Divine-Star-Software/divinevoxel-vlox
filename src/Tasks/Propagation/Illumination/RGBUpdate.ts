@@ -13,12 +13,11 @@ export function RGBUpdate(tasks: VoxelUpdateTask) {
   const nDataCursor = tasks.nDataCursor;
   const bounds = tasks.bounds;
 
-  let queueIndex = 0;
 
-  while (queueIndex < queue.length) {
-    const x = queue[queueIndex++];
-    const y = queue[queueIndex++];
-    const z = queue[queueIndex++];
+  while (queue.next()) {
+    const x = queue.x;
+    const y = queue.y;
+    const z = queue.z;
 
     const voxel = sDataCursor.getVoxel(x, y, z);
     if (!voxel) continue;
@@ -102,7 +101,7 @@ export function RGBUpdate(tasks: VoxelUpdateTask) {
     bounds.updateDisplay(x, y, z);
   }
 
-  queue.length = 0;
+  queue.clear();
 }
 
 export function RGBRemove(tasks: VoxelUpdateTask) {
@@ -114,12 +113,11 @@ export function RGBRemove(tasks: VoxelUpdateTask) {
   const nDataCursor = tasks.nDataCursor;
   const bounds = tasks.bounds;
 
-  let removeIndex = 0;
 
-  while (removeIndex < remove.length) {
-    const x = remove[removeIndex++];
-    const y = remove[removeIndex++];
-    const z = remove[removeIndex++];
+  while (remove.next()) {
+    const x = remove.x;
+    const y = remove.y;
+    const z = remove.z;
 
     if (removeMap.has(x, y, z)) continue;
     removeMap.add(x, y, z);
@@ -243,6 +241,6 @@ export function RGBRemove(tasks: VoxelUpdateTask) {
     voxel.setLight(removeRGBLight(sl));
   }
 
-  remove.length = 0;
+  remove.clear();
   removeMap.clear();
 }

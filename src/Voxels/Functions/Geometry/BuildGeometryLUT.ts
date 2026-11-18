@@ -10,7 +10,7 @@ import {
 import { StringPalette } from "../../../Util/StringPalette";
 import { GeometryLUT } from "../../Data/GeometryLUT";
 import { VoxelModelInputs } from "./GeometryLUT.types";
-import { BuildInputs } from "./Inputs/BuldInputs";
+import { BuildInputs } from "./Inputs/BuildInputs";
 import { BuildCompiled } from "./Compile/BuildCompiled";
 import { BuildRules } from "./Rules/BuildRules";
 import { VoxelFaceNameArray } from "../../../Math";
@@ -45,13 +45,13 @@ const getVoxelModelInputId = (data: VoxelModelInputs) => {
   return baseId;
 };
 
-export function BuildGeomeetryLUT(
+export function BuildGeometryLUT(
   voxels: VoxelData[],
-  geomtries: VoxelGeometryData[],
+  geometries: VoxelGeometryData[],
   models: VoxelModelData[]
 ) {
   const geometryMap = new Map<string, VoxelGeometryData>();
-  for (const geometry of geomtries) {
+  for (const geometry of geometries) {
     geometryMap.set(geometry.id, geometry);
 
     const divisor = geometry.divisor;
@@ -143,8 +143,8 @@ export function BuildGeomeetryLUT(
         }
       }
     }
-    for (const stateKey in model.conditonalNodes) {
-      const nodes = model.conditonalNodes[stateKey];
+    for (const stateKey in model.conditionalNodes) {
+      const nodes = model.conditionalNodes[stateKey];
       for (const node of nodes) {
         let d = node.divisor ? node.divisor : model.divisor;
         if (!d) continue;
@@ -220,8 +220,8 @@ export function BuildGeomeetryLUT(
       }
       modelStateMap.set(model.id, stateNodes);
       const conditionalStateNodes: Record<string, number[]> = {};
-      for (const state in model.conditonalNodes) {
-        const nodes = model.conditonalNodes[state];
+      for (const state in model.conditionalNodes) {
+        const nodes = model.conditionalNodes[state];
         const nodeIds: number[] = [];
         for (const node of nodes) {
           const getLinkId = getGeometryLinkId(node);
@@ -249,7 +249,7 @@ export function BuildGeomeetryLUT(
     }
 
     const voxelInputStates: MappedVoxelInputs = {};
-    const conditonalVoxelInputStates: MappedVoxelInputs = {};
+    const conditionalVoxelInputStates: MappedVoxelInputs = {};
     for (const mod in voxelModelData.inputs) {
       const voxelInputs = voxelModelData.inputs[mod];
       const voxelStateInputs: Record<string, VoxelModelInputs[]> = {};
@@ -271,9 +271,9 @@ export function BuildGeomeetryLUT(
         voxelStateInputs[state] = inputs;
       }
       voxelInputStates[mod] = voxelStateInputs;
-      const conditonalVoxelStateInputs: Record<string, VoxelModelInputs[]> = {};
-      for (const state in model.conditonalNodes) {
-        const nodes = model.conditonalNodes[state];
+      const conditionalVoxelStateInputs: Record<string, VoxelModelInputs[]> = {};
+      for (const state in model.conditionalNodes) {
+        const nodes = model.conditionalNodes[state];
         const inputs: VoxelModelInputs[] = [];
         for (const node of nodes) {
           const getLinkId = getGeometryLinkId(node);
@@ -286,13 +286,13 @@ export function BuildGeomeetryLUT(
             modelInputs: node.inputs,
           });
         }
-        conditonalVoxelStateInputs[state] = inputs;
+        conditionalVoxelStateInputs[state] = inputs;
       }
 
-      conditonalVoxelInputStates[mod] = conditonalVoxelStateInputs;
+      conditionalVoxelInputStates[mod] = conditionalVoxelStateInputs;
     }
     inputMap.set(voxel.id, voxelInputStates);
-    conditionalInputMap.set(voxel.id, conditonalVoxelInputStates);
+    conditionalInputMap.set(voxel.id, conditionalVoxelInputStates);
   }
 
   //build final

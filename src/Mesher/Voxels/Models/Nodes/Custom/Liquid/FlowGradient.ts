@@ -1,20 +1,20 @@
 import type { VoxelModelBuilder } from "../../../VoxelModelBuilder";
 import { QuadScalarVertexData } from "../../../../../Geometry/Primitives/QuadVertexData"
-import { QuadVerticies } from "../../../../../Geometry/Geometry.types"
+import { QuadVertices } from "../../../../../Geometry/Geometry.types"
 import { CompassAngles } from "@amodx/math";
 enum FlowStates {
   None = 0,
   Down = 1,
   Up = 2,
 }
-export enum FlowVerticies {
+export enum FlowVertices {
   NorthEast = 0,
   NorthWest = 1,
   SouthWest = 2,
-  SouthEsat = 3,
+  SouthEast = 3,
 }
 const checkSets = {
-  [FlowVerticies.NorthEast]: [
+  [FlowVertices.NorthEast]: [
     //1
     1, 0,
     //2
@@ -22,7 +22,7 @@ const checkSets = {
     //3
     1, 1,
   ],
-  [FlowVerticies.NorthWest]: [
+  [FlowVertices.NorthWest]: [
     //1
     -1, 0,
     //2
@@ -31,7 +31,7 @@ const checkSets = {
     -1, 1,
   ],
 
-  [FlowVerticies.SouthWest]: [
+  [FlowVertices.SouthWest]: [
     //1
     -1, 0,
     //2
@@ -40,7 +40,7 @@ const checkSets = {
     -1, -1,
   ],
 
-  [FlowVerticies.SouthEsat]: [
+  [FlowVertices.SouthEast]: [
     //1
     1, 0,
     //2
@@ -70,10 +70,10 @@ export function getFlowAngle(vertexLevel: QuadScalarVertexData) {
     returnData[1] = FlowStates.None;
     return returnData;
   }
-  const upRight = vertexLevel.vertices[QuadVerticies.TopRight];
-  const upLeft = vertexLevel.vertices[QuadVerticies.TopLeft];
-  const downLeft = vertexLevel.vertices[QuadVerticies.BottomLeft];
-  const downRight = vertexLevel.vertices[QuadVerticies.BottomRight];
+  const upRight = vertexLevel.vertices[QuadVertices.TopRight];
+  const upLeft = vertexLevel.vertices[QuadVertices.TopLeft];
+  const downLeft = vertexLevel.vertices[QuadVertices.BottomLeft];
+  const downRight = vertexLevel.vertices[QuadVertices.BottomRight];
 
   const upEqual = upRight == upLeft;
   const downEqual = downRight == downLeft;
@@ -154,7 +154,7 @@ export function getFlowGradient(
   const cl = tool.voxel.getLevel();
   const cs = tool.voxel.getLevelState();
 
-  for (let vertex = <QuadVerticies>0; vertex <= 3; vertex++) {
+  for (let vertex = <QuadVertices>0; vertex <= 3; vertex++) {
     const checkSet = checkSets[vertex];
 
     let finalLevel = cl;

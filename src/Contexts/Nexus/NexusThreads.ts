@@ -2,7 +2,7 @@ import { Threads } from "@amodx/threads/";
 import { ThreadManager } from "../Base/ThreadManager.js";
 
 export const parent = Threads.parent;
-export const Richworld = Threads.createThread("rich-world");
+export const RichWorld = Threads.createThread("rich-world");
 export const world = Threads.createThread("world");
 
 export class NexusThreads extends ThreadManager {

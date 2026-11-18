@@ -7,7 +7,7 @@ export async function FlowUpdate(tasks: VoxelUpdateTask, rebuild = true) {
   FM.setDimension(dimension);
   const vox = FM.getVoxel(x, y, z);
   if (!vox) return;
-  const flowRate = vox.getSubstnaceData().getFlowRate();
+  const flowRate = vox.getSubstanceData().getFlowRate();
   const level = FM.getLevel(vox.getStringId(), x, y, z);
   if (level < 0) return;
   const levelState = FM.getLevelState(vox.getStringId(), x, y, z);
@@ -76,7 +76,7 @@ function RunFlowPropagation(tasks: VoxelUpdateTask, vox: string) {
 function RunFlowIncrease(tasks: VoxelUpdateTask, vox: string) {
   const que = tasks.flow.update.queue;
   const map = tasks.flow.update.map;
-  const reque: number[][] = [];
+  const requeue: number[][] = [];
   while (que.length != 0) {
     const node = que.shift();
     if (!node) {
@@ -92,12 +92,12 @@ function RunFlowIncrease(tasks: VoxelUpdateTask, vox: string) {
     if (level > -1) {
       FM.setVoxel(tasks, vox, level, levelState, x, y, z);
 
-      reque.push([x, y, z, -1]);
+      requeue.push([x, y, z, -1]);
     }
     tasks.bounds.updateDisplay(x,y,z);
   }
 
   //@ts-ignore
-  tasks.queues.flow.update.queue = reque;
+  tasks.queues.flow.update.queue = requeue;
   map.clear();
 }

@@ -73,7 +73,7 @@ export function CompactTemplateMesh(
     const tool = tools[i];
     if (!tool.mesh!.vertexCount) continue;
 
-    const { vertexArray, indiciesArray } = tool.mesh.create();
+    const { vertexArray, indicesArray } = tool.mesh.create();
 
     const minBounds = tool.mesh.minBounds;
     const maxBounds = tool.mesh.maxBounds;
@@ -81,11 +81,11 @@ export function CompactTemplateMesh(
     data.push([
       tool.id,
       vertexArray,
-      indiciesArray,
+      indicesArray,
       [minBounds.x, minBounds.y, minBounds.z],
       [maxBounds.x, maxBounds.y, maxBounds.z],
     ]);
-    transfers.push(vertexArray.buffer, indiciesArray.buffer);
+    transfers.push(vertexArray.buffer, indicesArray.buffer);
   }
 
   return data;

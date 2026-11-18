@@ -3,7 +3,7 @@ import { TypedEventTarget } from "../../Util/TypedEventTarget";
 import { VoxelBuildSpace } from "../VoxelBuildSpace";
 
 type ToolOptionBase<Data> = {
-  cateogry: string;
+  category: string;
   property: string;
   name: string;
 } & Data;
@@ -43,10 +43,10 @@ export abstract class BuilderToolBase<
     this._categoryMap.clear();
 
     for (const option of data) {
-      let categoryArray = this._categoryMap.get(option.cateogry);
+      let categoryArray = this._categoryMap.get(option.category);
       if (!categoryArray) {
         categoryArray = new Set();
-        this._categoryMap.set(option.cateogry, categoryArray);
+        this._categoryMap.set(option.category, categoryArray);
       }
 
       categoryArray.add(option.property);
@@ -67,8 +67,8 @@ export abstract class BuilderToolBase<
     return this._optionsMap.get(id);
   }
 
-  optionInCategory(option: string, cateogry: string) {
-    return Boolean(this._categoryMap.get(cateogry)?.has(option));
+  optionInCategory(option: string, category: string) {
+    return Boolean(this._categoryMap.get(category)?.has(option));
   }
 
   abstract getCurrentOptions(): ToolOptionsData;

@@ -3,7 +3,7 @@ import { VoxelShaderData } from "./VoxelShaderData";
 import { VoxelModelBuilder } from "../Models/VoxelModelBuilder";
 
 import { Quad } from "../../Geometry/Primitives/Quad";
-import { QuadVerticies } from "../../Geometry/Geometry.types";
+import { QuadVertices } from "../../Geometry/Geometry.types";
 import { VoxelMeshVertexConstants } from "./VoxelMeshVertexStructCursor";
 import { Triangle } from "../../Geometry/Primitives";
 
@@ -29,47 +29,47 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
   const bottomLeftNor = tri.normals.vertices[2];
 
   const topRightVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.TopRight],
-    QuadVerticies.TopRight,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.TopRight],
+    QuadVertices.TopRight,
     vector1ShaderData,
   );
   const topLeftVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.TopLeft],
-    QuadVerticies.TopLeft,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.TopLeft],
+    QuadVertices.TopLeft,
     vector2ShaderData,
   );
   const bottomLeftVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.BottomLeft],
-    QuadVerticies.BottomLeft,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.BottomLeft],
+    QuadVertices.BottomLeft,
     vector3ShaderData,
   );
 
   const indices = builder.mesh!.indices;
-  let indIndex = builder.mesh.indicieCount;
+  let indIndex = builder.mesh.indicesCount;
   let sides = tri.doubleSided ? 2 : 1;
 
   const baseIndex = builder.mesh.vertexCount;
@@ -78,13 +78,13 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
     const baseIndex = builder.mesh.vertexCount;
     builder.mesh.buffer.setIndex(baseIndex);
     addVertex(
-      builder.mesh.buffer.curentIndex,
+      builder.mesh.buffer.currentIndex,
       builder.mesh.buffer.currentFloat32Array,
       builder.mesh.buffer.currentUint32Array,
       origin,
       topRightPos,
       topRightNor,
-      tri.uvs.vertices[QuadVerticies.TopRight],
+      tri.uvs.vertices[QuadVertices.TopRight],
       topRightVoxelData,
       texture,
       overlayTextures,
@@ -92,53 +92,53 @@ export function addVoxelTriangle(builder: VoxelModelBuilder, tri: Triangle) {
 
     builder.mesh.buffer.setIndex(baseIndex + 1);
     addVertex(
-      builder.mesh.buffer.curentIndex,
+      builder.mesh.buffer.currentIndex,
       builder.mesh.buffer.currentFloat32Array,
       builder.mesh.buffer.currentUint32Array,
       origin,
       topLeftPos,
       topLeftNor,
-      tri.uvs.vertices[QuadVerticies.TopLeft],
+      tri.uvs.vertices[QuadVertices.TopLeft],
       topLeftVoxelData,
       texture,
       overlayTextures,
     );
     builder.mesh.buffer.setIndex(baseIndex + 2);
     addVertex(
-      builder.mesh.buffer.curentIndex,
+      builder.mesh.buffer.currentIndex,
       builder.mesh.buffer.currentFloat32Array,
       builder.mesh.buffer.currentUint32Array,
       origin,
       bottomLeftPos,
       bottomLeftNor,
-      tri.uvs.vertices[QuadVerticies.BottomLeft],
+      tri.uvs.vertices[QuadVertices.BottomLeft],
       bottomLeftVoxelData,
       texture,
       overlayTextures,
     );
 
-    builder.mesh.addVerticies(3, 3);
+    builder.mesh.addVertices(3, 3);
   }
   if (!tri.doubleSided) {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
   } else {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
     index += 3;
     indIndex += 3;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index + 3;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index + 3;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 1;
   }
 
@@ -163,70 +163,70 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
   const bottomLeftNor = quad.normals.vertices[2];
   const bottomRightNor = quad.normals.vertices[3];
   const topRightVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.TopRight],
-    QuadVerticies.TopRight,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.TopRight],
+    QuadVertices.TopRight,
     vector1ShaderData,
   );
   const topLeftVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.TopLeft],
-    QuadVerticies.TopLeft,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.TopLeft],
+    QuadVertices.TopLeft,
     vector2ShaderData,
   );
   const bottomLeftVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.BottomLeft],
-    QuadVerticies.BottomLeft,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.BottomLeft],
+    QuadVertices.BottomLeft,
     vector3ShaderData,
   );
   const bottomRightVoxelData = VoxelShaderData.create(
-    worldLight.vertices[QuadVerticies.TopRight],
-    worldLight.vertices[QuadVerticies.TopLeft],
-    worldLight.vertices[QuadVerticies.BottomLeft],
-    worldLight.vertices[QuadVerticies.BottomRight],
-    worldAO.vertices[QuadVerticies.TopRight],
-    worldAO.vertices[QuadVerticies.TopLeft],
-    worldAO.vertices[QuadVerticies.BottomLeft],
-    worldAO.vertices[QuadVerticies.BottomRight],
-    animData.vertices[QuadVerticies.BottomRight],
-    QuadVerticies.BottomRight,
+    worldLight.vertices[QuadVertices.TopRight],
+    worldLight.vertices[QuadVertices.TopLeft],
+    worldLight.vertices[QuadVertices.BottomLeft],
+    worldLight.vertices[QuadVertices.BottomRight],
+    worldAO.vertices[QuadVertices.TopRight],
+    worldAO.vertices[QuadVertices.TopLeft],
+    worldAO.vertices[QuadVertices.BottomLeft],
+    worldAO.vertices[QuadVertices.BottomRight],
+    animData.vertices[QuadVertices.BottomRight],
+    QuadVertices.BottomRight,
     vector4ShaderData,
   );
   const indices = builder.mesh!.indices;
-  let indIndex = builder.mesh.indicieCount;
+  let indIndex = builder.mesh.indicesCount;
 
   const baseIndex = builder.mesh.vertexCount;
   builder.mesh.buffer.setIndex(baseIndex);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     builder.mesh.buffer.currentUint32Array,
     origin,
     topRightPos,
     topRightNor,
-    quad.uvs.vertices[QuadVerticies.TopRight],
+    quad.uvs.vertices[QuadVertices.TopRight],
     topRightVoxelData,
     texture,
     overlayTextures,
@@ -234,39 +234,39 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
 
   builder.mesh.buffer.setIndex(baseIndex + 1);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     builder.mesh.buffer.currentUint32Array,
     origin,
     topLeftPos,
     topLeftNor,
-    quad.uvs.vertices[QuadVerticies.TopLeft],
+    quad.uvs.vertices[QuadVertices.TopLeft],
     topLeftVoxelData,
     texture,
     overlayTextures,
   );
   builder.mesh.buffer.setIndex(baseIndex + 2);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     builder.mesh.buffer.currentUint32Array,
     origin,
     bottomLeftPos,
     bottomLeftNor,
-    quad.uvs.vertices[QuadVerticies.BottomLeft],
+    quad.uvs.vertices[QuadVertices.BottomLeft],
     bottomLeftVoxelData,
     texture,
     overlayTextures,
   );
   builder.mesh.buffer.setIndex(baseIndex + 3);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     builder.mesh.buffer.currentUint32Array,
     origin,
     bottomRightPos,
     bottomRightNor,
-    quad.uvs.vertices[QuadVerticies.BottomRight],
+    quad.uvs.vertices[QuadVertices.BottomRight],
     bottomRightVoxelData,
     texture,
     overlayTextures,
@@ -274,41 +274,41 @@ export function addVoxelQuad(builder: VoxelModelBuilder, quad: Quad) {
 
   if (!quad.doubleSided) {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 3).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 3).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 4).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 4).currentArray[indices.currentIndex] =
       index + 3;
-    indices.setIndex(indIndex + 5).currentArray[indices.curentIndex] = index;
-    builder.mesh.addVerticies(4, 6);
+    indices.setIndex(indIndex + 5).currentArray[indices.currentIndex] = index;
+    builder.mesh.addVertices(4, 6);
   } else {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 3).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 3).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 4).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 4).currentArray[indices.currentIndex] =
       index + 3;
-    indices.setIndex(indIndex + 5).currentArray[indices.curentIndex] = index;
+    indices.setIndex(indIndex + 5).currentArray[indices.currentIndex] = index;
     indIndex += 6;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 3;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 3).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 3).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 4).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 4).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 5).currentArray[indices.curentIndex] = index;
-    builder.mesh.addVerticies(4, 12);
+    indices.setIndex(indIndex + 5).currentArray[indices.currentIndex] = index;
+    builder.mesh.addVertices(4, 12);
   }
 
   builder.vars.reset();

@@ -77,11 +77,11 @@ export interface VoxelProperties extends VoxelBaseProperties {
  * A register entry for a voxel.
  */
 export interface VoxelData {
-  /**The id of the voxel. This should not change and must be unique. Can be used durning runtime to refernce voxels. */
+  /**The id of the voxel. This should not change and must be unique. Can be used durning runtime to reference voxels. */
   id: string;
-  /**The name of the voxel. This can change but must be unique. Can be used durning runtime to refernce voxels. */
+  /**The name of the voxel. This can change but must be unique. Can be used durning runtime to reference voxels. */
   name?: string;
-  /**The title of the voxel. This can change and does not have to be unique. Cannot be used to refernce a voxel.  */
+  /**The title of the voxel. This can change and does not have to be unique. Cannot be used to reference a voxel.  */
   title?: string;
   /**The properties of the voxel. */
   properties: VoxelProperties;

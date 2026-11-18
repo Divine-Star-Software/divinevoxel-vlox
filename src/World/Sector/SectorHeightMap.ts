@@ -32,8 +32,8 @@ export class SectorHeightMap {
     if (!sector) return WorldSpaces.world.bounds.MinY;
     if (sector.sections.length == 0) return WorldSpaces.world.bounds.MinY;
     let maxHeight = WorldSpaces.world.bounds.MinY;
-    const positon: Vec3Array = [x, sy, z];
-    let y = positon[1];
+    const position: Vec3Array = [x, sy, z];
+    let y = position[1];
     for (let i = 0; i < sector.sections.length; i++) {
       const section = sector.sections[i];
       if (!section) continue;

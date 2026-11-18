@@ -8,6 +8,7 @@ import { InitVoxelDataProps } from "../Voxels/InitVoxelData";
 import { MeshManager } from "../Renderer/MeshManager";
 import { WorldRegister } from "../World/WorldRegister";
 import { WorkItemProgress } from "../Util/WorkItemProgress";
+import { PerfLog } from "../Util/PerfLog";
 type StartRendererProps = {
   getProgress?: (progress: WorkItemProgress) => void;
 } & DVERInitData &
@@ -17,6 +18,13 @@ export async function StartRenderer(initData: StartRendererProps) {
   const progress = new WorkItemProgress();
   if (initData.getProgress) initData.getProgress(progress);
   progress.startTask("load");
+  const initStart = PerfLog.now();
+  let phaseStart = initStart;
+  const phase = (name: string) => {
+    const now = PerfLog.now();
+    PerfLog.log(`init ${name}: ${(now - phaseStart).toFixed(0)}ms`);
+    phaseStart = now;
+  };
 
   await Threads.init("render", window, "window");
 
@@ -84,8 +92,9 @@ export async function StartRenderer(initData: StartRendererProps) {
   proms.push(DVER.threads.world.waitTillTaskExist("sync-data"));
 
   progress.setStatus("Generate Data");
-  await progress.wait(100);
+  await progress.nextFrame();
 
+  phase("threads created");
   const syncData = InitDataGenerator({
     threads: {
       nexus: initData.nexusWorker ? true : false,
@@ -95,9 +104,10 @@ export async function StartRenderer(initData: StartRendererProps) {
     materials: initData.materials || [],
   });
 
+  phase("generate voxel data");
   progress.setWorkLoad(5);
   progress.setStatus("Init Threads");
-  await progress.wait(100);
+  await progress.nextFrame();
 
   InitRendererTasks();
   InitWorldDataSync(DVER.threads.world);
@@ -110,9 +120,10 @@ export async function StartRenderer(initData: StartRendererProps) {
   progress.setStatus("Waiting For Threads");
 
   await Promise.all(proms);
+  phase("waiting for workers to start");
   progress.completeWorkItems(1);
   progress.setStatus("Sending Data");
-  await progress.wait(100);
+  await progress.nextFrame();
   proms.length = 0;
 
   for (const thread of DVER.threads._threads) {
@@ -129,13 +140,16 @@ export async function StartRenderer(initData: StartRendererProps) {
 
   proms.push(DVER.threads.world.runTaskAsync("sync-data", syncData));
   await Promise.all(proms);
+  phase("workers processing voxel data");
   progress.completeWorkItems(1);
   progress.setStatus("Init Renderer");
-  await progress.wait(100);
+  await progress.nextFrame();
   await DVER.renderer.init(DVER);
+  phase("renderer init");
+  PerfLog.log(`init StartRenderer total: ${(PerfLog.now() - initStart).toFixed(0)}ms`);
   progress.completeWorkItems(1);
   progress.setStatus("Done");
-  await progress.wait(100);
+  await progress.nextFrame();
   progress.endTask();
 
   return DVER;

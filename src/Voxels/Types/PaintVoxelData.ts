@@ -45,7 +45,7 @@ export class PaintVoxelData {
         VoxelLUT.voxelIdToNameMap.get(paintData.secondaryVoxelId) || "";
     }
     paintData.level = VoxelLevelReader.getLevel(data[2]);
-    paintData.levelState = VoxelLevelReader.getLevel(data[2]);
+    paintData.levelState = VoxelLevelReader.getLevelState(data[2]);
     return paintData;
   }
 
@@ -54,12 +54,12 @@ export class PaintVoxelData {
     let stringId = data.id
       ? data.id
       : data.name
-      ? VoxelLUT.voxelNametoIdMap.get(data.name)!
+      ? VoxelLUT.voxelNameToIdMap.get(data.name)!
       : "dve_air";
-    let secondaryStringId = data.secondaryName
+    let secondaryStringId = data.secondaryVoxelId
       ? data.secondaryVoxelId
       : data.secondaryName
-      ? VoxelLUT.voxelNametoIdMap.get(data.secondaryName)!
+      ? VoxelLUT.voxelNameToIdMap.get(data.secondaryName)!
       : "dve_air";
 
     let state = data.state || 0;
@@ -114,13 +114,13 @@ export class PaintVoxelData {
             )
           : 0
         : 0;
-    let levleData = 0;
+    let levelData = 0;
     if (data.level !== undefined)
-      levleData = VoxelLevelReader.setLevel(levleData, data.level);
+      levelData = VoxelLevelReader.setLevel(levelData, data.level);
     if (data.levelState !== undefined)
-      levleData = VoxelLevelReader.setLevelState(levleData, data.levelState);
+      levelData = VoxelLevelReader.setLevelState(levelData, data.levelState);
 
-    return [id, light, levleData, secondaryId];
+    return [id, light, levelData, secondaryId];
   }
 
   /**Restores the data to the default state of being dve_air */
@@ -177,16 +177,16 @@ export class PaintVoxelData {
     let stringId = data.id
       ? data.id
       : data.name
-      ? VoxelLUT.voxelNametoIdMap.get(data.name)!
+      ? VoxelLUT.voxelNameToIdMap.get(data.name)!
       : "dve_air";
-    let secondaryStringId = data.secondaryName
+    let secondaryStringId = data.secondaryVoxelId
       ? data.secondaryVoxelId
       : data.secondaryName
-      ? VoxelLUT.voxelNametoIdMap.get(data.secondaryName)!
+      ? VoxelLUT.voxelNameToIdMap.get(data.secondaryName)!
       : "dve_air";
 
     if (data.name && !data.id) {
-      data.id = VoxelLUT.voxelNametoIdMap.get(data.name)!;
+      data.id = VoxelLUT.voxelNameToIdMap.get(data.name)!;
     }
     if (!data.name && !data.id) {
       data.id = "dve_air";

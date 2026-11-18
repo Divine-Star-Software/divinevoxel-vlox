@@ -81,7 +81,7 @@ export class BrushTool {
   }
 
   setName(name: string) {
-    this.data.id = VoxelLUT.voxelNametoIdMap.get(name)!;
+    this.data.id = VoxelLUT.voxelNameToIdMap.get(name)!;
     this.data.name = name;
     return this;
   }
@@ -98,7 +98,7 @@ export class BrushTool {
   }
   setSecondaryName(name: string) {
     if (name) {
-      this.data.secondaryVoxelId = VoxelLUT.voxelNametoIdMap.get(name)!;
+      this.data.secondaryVoxelId = VoxelLUT.voxelNameToIdMap.get(name)!;
     } else {
       this.data.secondaryVoxelId = "";
     }

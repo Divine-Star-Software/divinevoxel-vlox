@@ -3,7 +3,7 @@ import { GeometryLUT } from "../../../../../Voxels/Data/GeometryLUT";
 import { VoxelRelativeCubeIndexPositionMap } from "../../../../../Voxels/Geometry/VoxelRelativeCubeIndex";
 import { VoxelModelBuilder } from "../../VoxelModelBuilder";
 
-export function CullRulledFace(
+export function CullRuledFace(
   builder: VoxelModelBuilder,
   trueFaceIndex: number,
 ) {
@@ -39,10 +39,10 @@ export function CullRulledFace(
       let secondary = s == 1 ? true : false;
 
       const voxelId = space.getVoxelId(hashed, secondary);
-      const reltionalVoxelId = space.getRelationalVoxelId(hashed, secondary);
+      const relationalVoxelId = space.getRelationalVoxelId(hashed, secondary);
       const geometryIndex = VoxelLUT.getGeometryIndex(
         voxelId,
-        reltionalVoxelId,
+        relationalVoxelId,
       );
       const offsetBaseGeometry = geometryIndexLUT[geometryIndex];
 

@@ -2,7 +2,7 @@ import { Vector3Like, Vector2Like } from "@amodx/math";
 import { ItemModelBuilder } from "../Models/ItemModelBuilder";
 
 import { Quad } from "../../Geometry/Primitives/Quad";
-import { QuadVerticies } from "../../Geometry/Geometry.types";
+import { QuadVertices } from "../../Geometry/Geometry.types";
 import { ItemMeshVertexConstants } from "./ItemMeshVertexStructCursor";
 import { Triangle } from "../../Geometry/Primitives";
 
@@ -21,7 +21,7 @@ export function addItemTriangle(builder: ItemModelBuilder, tri: Triangle) {
   const bottomLeftNor = tri.normals.vertices[2];
 
   const indices = builder.mesh!.indices;
-  let indIndex = builder.mesh.indicieCount;
+  let indIndex = builder.mesh.indicesCount;
   let sides = tri.doubleSided ? 2 : 1;
 
   const baseIndex = builder.mesh.vertexCount;
@@ -30,61 +30,61 @@ export function addItemTriangle(builder: ItemModelBuilder, tri: Triangle) {
     const baseIndex = builder.mesh.vertexCount;
     builder.mesh.buffer.setIndex(baseIndex);
     addVertex(
-      builder.mesh.buffer.curentIndex,
+      builder.mesh.buffer.currentIndex,
       builder.mesh.buffer.currentFloat32Array,
       origin,
       topRightPos,
       topRightNor,
-      tri.uvs.vertices[QuadVerticies.TopRight],
+      tri.uvs.vertices[QuadVertices.TopRight],
 
       texture
     );
 
     builder.mesh.buffer.setIndex(baseIndex + 1);
     addVertex(
-      builder.mesh.buffer.curentIndex,
+      builder.mesh.buffer.currentIndex,
       builder.mesh.buffer.currentFloat32Array,
       origin,
       topLeftPos,
       topLeftNor,
-      tri.uvs.vertices[QuadVerticies.TopLeft],
+      tri.uvs.vertices[QuadVertices.TopLeft],
 
       texture
     );
     builder.mesh.buffer.setIndex(baseIndex + 2);
     addVertex(
-      builder.mesh.buffer.curentIndex,
+      builder.mesh.buffer.currentIndex,
       builder.mesh.buffer.currentFloat32Array,
       origin,
       bottomLeftPos,
       bottomLeftNor,
-      tri.uvs.vertices[QuadVerticies.BottomLeft],
+      tri.uvs.vertices[QuadVertices.BottomLeft],
 
       texture
     );
 
-    builder.mesh.addVerticies(3, 3);
+    builder.mesh.addVertices(3, 3);
   }
   if (!tri.doubleSided) {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
   } else {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
     index += 3;
     indIndex += 3;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index + 3;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index + 3;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 1;
   }
 
@@ -106,92 +106,92 @@ export function addItemQuad(builder: ItemModelBuilder, quad: Quad) {
   const bottomRightNor = quad.normals.vertices[3];
 
   const indices = builder.mesh!.indices;
-  let indIndex = builder.mesh.indicieCount;
+  let indIndex = builder.mesh.indicesCount;
 
   const baseIndex = builder.mesh.vertexCount;
   builder.mesh.buffer.setIndex(baseIndex);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     origin,
     topRightPos,
     topRightNor,
-    quad.uvs.vertices[QuadVerticies.TopRight],
+    quad.uvs.vertices[QuadVertices.TopRight],
 
     texture
   );
 
   builder.mesh.buffer.setIndex(baseIndex + 1);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     origin,
     topLeftPos,
     topLeftNor,
-    quad.uvs.vertices[QuadVerticies.TopLeft],
+    quad.uvs.vertices[QuadVertices.TopLeft],
 
     texture
   );
   builder.mesh.buffer.setIndex(baseIndex + 2);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     origin,
     bottomLeftPos,
     bottomLeftNor,
-    quad.uvs.vertices[QuadVerticies.BottomLeft],
+    quad.uvs.vertices[QuadVertices.BottomLeft],
 
     texture
   );
   builder.mesh.buffer.setIndex(baseIndex + 3);
   addVertex(
-    builder.mesh.buffer.curentIndex,
+    builder.mesh.buffer.currentIndex,
     builder.mesh.buffer.currentFloat32Array,
     origin,
     bottomRightPos,
     bottomRightNor,
-    quad.uvs.vertices[QuadVerticies.BottomRight],
+    quad.uvs.vertices[QuadVertices.BottomRight],
 
     texture
   );
 
   if (!quad.doubleSided) {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 3).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 3).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 4).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 4).currentArray[indices.currentIndex] =
       index + 3;
-    indices.setIndex(indIndex + 5).currentArray[indices.curentIndex] = index;
-    builder.mesh.addVerticies(4, 6);
+    indices.setIndex(indIndex + 5).currentArray[indices.currentIndex] = index;
+    builder.mesh.addVertices(4, 6);
   } else {
     let index = baseIndex;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 3).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 3).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 4).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 4).currentArray[indices.currentIndex] =
       index + 3;
-    indices.setIndex(indIndex + 5).currentArray[indices.curentIndex] = index;
+    indices.setIndex(indIndex + 5).currentArray[indices.currentIndex] = index;
     indIndex += 6;
-    indices.setIndex(indIndex).currentArray[indices.curentIndex] = index;
-    indices.setIndex(indIndex + 1).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex).currentArray[indices.currentIndex] = index;
+    indices.setIndex(indIndex + 1).currentArray[indices.currentIndex] =
       index + 3;
-    indices.setIndex(indIndex + 2).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 2).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 3).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 3).currentArray[indices.currentIndex] =
       index + 2;
-    indices.setIndex(indIndex + 4).currentArray[indices.curentIndex] =
+    indices.setIndex(indIndex + 4).currentArray[indices.currentIndex] =
       index + 1;
-    indices.setIndex(indIndex + 5).currentArray[indices.curentIndex] = index;
-    builder.mesh.addVerticies(4, 12);
+    indices.setIndex(indIndex + 5).currentArray[indices.currentIndex] = index;
+    builder.mesh.addVertices(4, 12);
   }
 
   builder.vars.reset();

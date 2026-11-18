@@ -10,13 +10,13 @@ export class VoxelModelPlacingStrategy {
     if (typeof data == "string") {
       this._defaultState = data;
     } else {
-      for (const stragety of data) {
-        let faceArray = this._faceMap.get(stragety.face);
+      for (const strategy of data) {
+        let faceArray = this._faceMap.get(strategy.face);
         if (!faceArray) {
           faceArray = [];
-          this._faceMap.set(stragety.face, faceArray);
+          this._faceMap.set(strategy.face, faceArray);
         }
-        faceArray.push(stragety);
+        faceArray.push(strategy);
       }
     }
   }
@@ -26,12 +26,12 @@ export class VoxelModelPlacingStrategy {
     const face = picked.unitNormalFace;
     const delta = picked.delta;
     const direction = picked.unitRayDirection;
-    const stragetegies = this._faceMap.get(
+    const strategies = this._faceMap.get(
       typeof face == "number" ? VoxelFaceNameArray[face] : face
     );
-    if (!stragetegies) return null;
+    if (!strategies) return null;
     let match = true;
-    for (const strat of stragetegies) {
+    for (const strat of strategies) {
       if (alt !== null) {
         if (strat.alt == undefined) {
           match = false;

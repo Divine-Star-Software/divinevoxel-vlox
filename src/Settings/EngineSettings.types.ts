@@ -1,21 +1,34 @@
 import { Vec2Array, Vector3Like } from "@amodx/math";
 export interface MesherSettingsData {}
 export class MesherSettingsData {
-  /**Tell the mesher to shade voxel faces with sun light data. Disable if you are using a custom renderering pipeline. */
+  /**Tell the mesher to shade voxel faces with sun light data. Disable if you are using a custom rendering pipeline. */
   doSunLight = true;
-  /**Tell the mesher to use the built in AO system. Disable if you are using a custom renderering pipeline. */
+  /**Tell the mesher to use the built in AO system. Disable if you are using a custom rendering pipeline. */
   doAO = true;
   doColors = true;
+  /**Send each section's voxel BVH (tree + per voxel index ranges) along with the mesh data.
+   * Needed for ray traced rendering pipelines. Adds ~290KB per meshed section, so leave off unless used. */
+  buildBVH = false;
+  /**Send each meshed section's voxel light (sun + rgb, 8KB) along with the mesh data.
+   * Lets renderers use the light field directly, e.g. volumetric light. */
+  sendLightData = false;
 }
 export interface RenderSettingsData {}
 export class RenderSettingsData {
   /**Set the mode to change how mesh data is generated based on the underlying rendering API. */
   mode: "webgl" | "webgpu" = "webgl";
-  /**Renderer will not dispose of buffers to keep them renderering. */
+  /**Renderer will not dispose of buffers to keep them rendering. */
   cpuBound = false;
-  /* Single buffer mode will store vertex and indicies in single big buffer. While multi will store a buffer for each section mesh.*/
+  /* Single buffer mode will store vertex and indices in single big buffer. While multi will store a buffer for each section mesh.*/
   bufferMode: "single" | "multi" = "multi";
   textureSize: Vec2Array = [16, 16];
+  /**
+   * Milliseconds per frame the main thread may spend applying finished section
+   * meshes. The rest wait for the next frame, so a burst of meshes (e.g. when
+   * the player crosses into new terrain) can't cause one long frame.
+   * 0 applies everything as soon as it arrives.
+   */
+  meshUploadBudgetMs = 4;
 }
 export interface UpdatingSettings {}
 export class UpdatingSettings {

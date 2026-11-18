@@ -14,6 +14,11 @@ export default function PickVoxel(
   rayLength: number,
 ) {
   const rayDir = Vector3Like.Create(...rayDirection);
+  const dirLength = Vector3Like.Length(rayDir);
+  if (!dirLength || !isFinite(dirLength)) return null;
+  rayDir.x /= dirLength;
+  rayDir.y /= dirLength;
+  rayDir.z /= dirLength;
   const rayOrigin = Vector3Like.Create(...rayStart);
   const offset = cursor.volumePosition
     ? cursor.volumePosition
@@ -57,14 +62,23 @@ export default function PickVoxel(
   );
   const normal = Vector3Like.Create();
   const maxDist = rayLength;
+  let entered = false;
   while (true) {
     let cursorX = voxel.x;
     let cursorY = voxel.y;
     let cursorZ = voxel.z;
 
     if (cursor.inBounds(cursorX, cursorY, cursorZ)) {
+      entered = true;
       const voxel = cursor.getVoxel(cursorX, cursorY, cursorZ);
       if (voxel && voxel.isRenderable()) {
+        if (normal.x === 0 && normal.y === 0 && normal.z === 0) {
+          //ray started inside of a voxel use the face pointing back at the ray
+          const back = closestUnitNormal([-rayDir.x, -rayDir.y, -rayDir.z]);
+          normal.x = back[0];
+          normal.y = back[1];
+          normal.z = back[2];
+        }
         const urd = Vector3Like.FromArray(closestUnitNormal(rayDir));
         const n = Vector3Like.Clone(normal);
         const pos = Vector3Like.Create(cursorX, cursorY, cursorZ);
@@ -85,6 +99,9 @@ export default function PickVoxel(
           0,
         );
       }
+    } else if (entered) {
+      //The volume is convex so once the ray leaves it nothing else can be hit.
+      break;
     }
 
     if (tMax.x < tMax.y && tMax.x < tMax.z) {

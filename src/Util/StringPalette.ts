@@ -5,11 +5,11 @@ export class StringPalette {
   _palette: string[] = [];
   _map: Record<string, number> = {};
 
-  constructor(inital?: ArrayLike<string>) {
-    if (inital) {
-      const length = inital.length;
+  constructor(initial?: ArrayLike<string>) {
+    if (initial) {
+      const length = initial.length;
       for (let i = 0; i < length; i++) {
-        this.register(inital[i]);
+        this.register(initial[i]);
       }
     }
   }

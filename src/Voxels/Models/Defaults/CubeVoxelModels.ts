@@ -10,7 +10,7 @@ export const simpleCube: VoxelModelData = {
     },
   },
 
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
     dve_full_block: true,
@@ -57,7 +57,7 @@ export const fullTextureCube: VoxelModelData = {
     },
   },
 
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
     dve_full_block: true,
@@ -93,7 +93,7 @@ export const simpleTransparentCube: VoxelModelData = {
     },
   },
 
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_full_block: true,
     dve_placing_strategy: "*",
@@ -128,7 +128,7 @@ export const simpleNoCulledCube: VoxelModelData = {
     },
   },
 
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_full_block: true,
     dve_placing_strategy: "*",
@@ -211,7 +211,7 @@ export const orientedCube: VoxelModelData = {
       {
         face: "up",
         direction: [-1, 0, 0],
-        state: "placement=down,direction=esat",
+        state: "placement=down,direction=east",
       },
       {
         face: "up",
@@ -234,7 +234,7 @@ export const orientedCube: VoxelModelData = {
       {
         face: "up",
         direction: [-1, 0, 0],
-        state: "placement=east,direction=esat",
+        state: "placement=east,direction=east",
       },
       {
         face: "up",
@@ -268,7 +268,7 @@ export const orientedCube: VoxelModelData = {
     ],
   },
 
-  conditonalNodes: {},
+  conditionalNodes: {},
   stateNodes: {
     "placement=down,rotation=0": [
       {
@@ -745,7 +745,7 @@ export const simpleHalfCube: VoxelModelData = {
       type: "texture",
     },
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
   },
@@ -866,7 +866,7 @@ export const pillarCube: VoxelModelData = {
       type: "texture",
     },
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
   },
@@ -878,7 +878,7 @@ export const pillarCube: VoxelModelData = {
           allTexs: {
             type: "pillar",
             texture: "@sideDisconnectedTex",
-            textureRecrod: {
+            textureRecord: {
               sideConnectedTex: "@sideConnectedTex",
               sideDisconnectedTex: "@sideDisconnectedTex",
               sideUpTex: "@sideUpTex",
@@ -898,7 +898,7 @@ export const pillarCube: VoxelModelData = {
           allTexs: {
             type: "pillar",
             texture: "@sideDisconnectedTex",
-            textureRecrod: {
+            textureRecord: {
               sideConnectedTex: "@sideConnectedTex",
               sideDisconnectedTex: "@sideDisconnectedTex",
               sideUpTex: "@sideUpTex",
@@ -918,7 +918,7 @@ export const pillarCube: VoxelModelData = {
           allTexs: {
             type: "pillar",
             texture: "@sideDisconnectedTex",
-            textureRecrod: {
+            textureRecord: {
               sideConnectedTex: "@sideConnectedTex",
               sideDisconnectedTex: "@sideDisconnectedTex",
               sideUpTex: "@sideUpTex",

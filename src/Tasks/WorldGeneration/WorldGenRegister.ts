@@ -104,7 +104,7 @@ export class WorldGenRegister {
       requests.attempts++;
       if (requests.attempts >= this.MAX_ATTEMPTS) {
         console.error(
-          `World gen requests cancled after max attempts`,
+          `World gen requests canceled after max attempts`,
           requests
         );
         this._requests.delete(registerId);

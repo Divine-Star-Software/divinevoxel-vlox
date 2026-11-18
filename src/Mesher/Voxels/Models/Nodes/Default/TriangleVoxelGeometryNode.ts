@@ -1,23 +1,23 @@
 import { Vec4Array } from "@amodx/math";
 import { VoxelFaces } from "../../../../../Math";
 import { addVoxelTriangle } from "../../../Geometry/VoxelGeometryBuilder";
-import { GeoemtryNode } from "../GeometryNode";
+import { GeometryNode } from "../GeometryNode";
 import { GetTexture } from "../../Common/GetTexture";
 import {
   CompiledTriangleVoxelGeometryNode,
-  TriangleVoxelGometryArgs,
-  TriangleVoxelGometryInputs,
-} from "../Types/TriangleVoxelGometryNodeTypes";
+  TriangleVoxelGeometryArgs,
+  TriangleVoxelGeometryInputs,
+} from "../Types/TriangleVoxelGeometryNodeTypes";
 import { Triangle } from "../../../../Geometry/Primitives/Triangle";
-import { CullRulledFace } from "../../Common/Faces/CullRulledFace";
-import { ShadeRulledFace } from "../../Common/Faces/ShadeRulledFace";
+import { CullRuledFace } from "../../Common/Faces/CullRuledFace";
+import { ShadeRuledFace } from "../../Common/Faces/ShadeRuledFace";
 import { ShadeRulelessFace } from "../../Common/Faces/ShadeRulelessFace";
 
-const ArgIndexes = TriangleVoxelGometryInputs.ArgIndexes;
+const ArgIndexes = TriangleVoxelGeometryInputs.ArgIndexes;
 
-export class TriangleVoxelGeometryNode extends GeoemtryNode<
+export class TriangleVoxelGeometryNode extends GeometryNode<
   CompiledTriangleVoxelGeometryNode,
-  TriangleVoxelGometryArgs
+  TriangleVoxelGeometryArgs
 > {
   triangle: Triangle;
   vertexWeights: Vec4Array[];
@@ -32,18 +32,18 @@ export class TriangleVoxelGeometryNode extends GeoemtryNode<
       this.trueFaceIndex = this.data.trueFaceIndex;
   }
 
-  add(args: TriangleVoxelGometryArgs) {
+  add(args: TriangleVoxelGeometryArgs) {
     if (!args[ArgIndexes.Enabled]) return false;
     if (
       this.trueFaceIndex !== undefined &&
-      !CullRulledFace(this.builder, this.trueFaceIndex)
+      !CullRuledFace(this.builder, this.trueFaceIndex)
     )
       return false;
     const builder = this.builder;
     builder.calculateFaceData(this.closestFace);
 
     this.trueFaceIndex !== undefined
-      ? ShadeRulledFace(
+      ? ShadeRuledFace(
           this.builder,
           this.trueFaceIndex,
           this.builder.lightData[this.closestFace],

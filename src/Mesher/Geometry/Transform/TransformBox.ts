@@ -1,4 +1,4 @@
-import { QuadVerticies, VoxelGeometryTransform } from "../Geometry.types";
+import { QuadVertices, VoxelGeometryTransform } from "../Geometry.types";
 import { AMath, Vector3Like } from "@amodx/math";
 import { Box } from "../Shapes/Box";
 import { VoxelFacesArray } from "../../../Math";
@@ -9,10 +9,10 @@ export function TransformBox(box: Box, transform: VoxelGeometryTransform): Box {
   for (const face of VoxelFacesArray) {
     const quad = box.quads[face];
     const vertices = [
-      quad.positions.vertices[QuadVerticies.TopRight],
-      quad.positions.vertices[QuadVerticies.TopLeft],
-      quad.positions.vertices[QuadVerticies.BottomLeft],
-      quad.positions.vertices[QuadVerticies.BottomRight],
+      quad.positions.vertices[QuadVertices.TopRight],
+      quad.positions.vertices[QuadVertices.TopLeft],
+      quad.positions.vertices[QuadVertices.BottomLeft],
+      quad.positions.vertices[QuadVertices.BottomRight],
     ];
 
     for (const vertex of vertices) {
@@ -145,10 +145,10 @@ export function TransformBox(box: Box, transform: VoxelGeometryTransform): Box {
   for (const face of VoxelFacesArray) {
     const quad = box.quads[face];
     const originalVertices = [
-      quad.positions.vertices[QuadVerticies.TopRight],
-      quad.positions.vertices[QuadVerticies.TopLeft],
-      quad.positions.vertices[QuadVerticies.BottomLeft],
-      quad.positions.vertices[QuadVerticies.BottomRight],
+      quad.positions.vertices[QuadVertices.TopRight],
+      quad.positions.vertices[QuadVertices.TopLeft],
+      quad.positions.vertices[QuadVertices.BottomLeft],
+      quad.positions.vertices[QuadVertices.BottomRight],
     ];
 
     const transformedVertices = originalVertices.map((vertex) => {

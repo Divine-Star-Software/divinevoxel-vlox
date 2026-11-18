@@ -12,7 +12,7 @@ export function MeshSectionSnapShot(
   if (!snapShotCursor) snapShotCursor = new SectionSnapshotCursor();
   const location = snapShot.location;
   snapShotCursor.setSectionSnapShot(snapShot);
-  const sectionCursor = snapShotCursor.getCenteralCursor();
+  const sectionCursor = snapShotCursor.getCentralCursor();
   if (!sectionCursor) return null;
   return MeshSectionBase(snapShotCursor, sectionCursor, location, transfers);
 }

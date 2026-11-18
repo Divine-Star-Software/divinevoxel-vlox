@@ -13,6 +13,7 @@ import { RenderedMaterials } from "../Models/RenderedMaterials";
 import { CompactVoxelSectionMesh } from "./CompactVoxelSectionMesh";
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
 import { BuildVoxel } from "./BuildVoxel";
+import { EngineSettings } from "../../../Settings/EngineSettings";
 
 let space: VoxelGeometryBuilderCacheSpace;
 const bvhTool = new VoxelMeshBVHBuilder();
@@ -20,6 +21,31 @@ const bvhTool = new VoxelMeshBVHBuilder();
 
 
 const padding = Vector3Like.Create(5, 5, 5);
+
+function isFullOpaque(index: number) {
+  return (
+    space.foundHash[index] == 2 &&
+    space.fullBlock[index] == 1 &&
+    space.hasSecondary[index] == 0
+  );
+}
+
+function isEnclosed(
+  worldCursor: DataCursorInterface,
+  x: number,
+  y: number,
+  z: number
+) {
+  return (
+    isFullOpaque(space.getHash(worldCursor, x, y, z)) &&
+    isFullOpaque(space.getHash(worldCursor, x, y + 1, z)) &&
+    isFullOpaque(space.getHash(worldCursor, x, y - 1, z)) &&
+    isFullOpaque(space.getHash(worldCursor, x + 1, y, z)) &&
+    isFullOpaque(space.getHash(worldCursor, x - 1, y, z)) &&
+    isFullOpaque(space.getHash(worldCursor, x, y, z + 1)) &&
+    isFullOpaque(space.getHash(worldCursor, x, y, z - 1))
+  );
+}
 export function MeshSectionBase(
   worldCursor: DataCursorInterface,
   sectionCursor: SectionCursor,
@@ -73,6 +99,11 @@ export function MeshSectionBase(
     const y = cy + sectionCursor._voxelPosition.y;
     const z = cz + sectionCursor._voxelPosition.z;
 
+    if (isEnclosed(worldCursor, x, y, z)) {
+      section.setBuried(i, true);
+      continue;
+    }
+
     let addedVoxel = false;
     if (BuildVoxel(x, y, z, voxel, worldCursor, sectionCursor._voxelPosition)) {
       addedVoxel = true;
@@ -100,7 +131,15 @@ export function MeshSectionBase(
     meshed.push(mesher);
   }
 
-  const compactMesh = CompactVoxelSectionMesh(location, meshed, transfers);
+  const compactMesh = CompactVoxelSectionMesh(
+    location,
+    meshed,
+    transfers,
+    meshed.length && EngineSettings.settings.mesher.buildBVH ? bvhTool : null,
+    meshed.length && EngineSettings.settings.mesher.sendLightData
+      ? section.light
+      : null,
+  );
 
   for (let i = 0; i < meshed.length; i++) {
     meshed[i].clear();

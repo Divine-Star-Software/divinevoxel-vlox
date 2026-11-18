@@ -17,7 +17,7 @@ export class ProtoVertexBuffer {
 
   currentFloat32Array: Float32Array;
   currentUint32Array: Uint32Array;
-  curentIndex = 0;
+  currentIndex = 0;
   _index = 0;
 
   setIndex(index: number) {
@@ -33,7 +33,7 @@ export class ProtoVertexBuffer {
       this._uint32Views[bufferIndex] = new Uint32Array(float32Array.buffer);
     }
 
-    this.curentIndex =
+    this.currentIndex =
       (index * this.vertexFloatSize - bufferIndex * this.sectorSize) /
       this.vertexFloatSize;
     this.currentFloat32Array = this._float32Views[bufferIndex];
@@ -41,7 +41,7 @@ export class ProtoVertexBuffer {
   }
 }
 
-export class ProtoIndiceBuffer {
+export class ProtoIndicesBuffer {
   _buffers: Uint32Array[] = [];
 
   constructor(
@@ -54,7 +54,7 @@ export class ProtoIndiceBuffer {
   }
 
   currentArray: Uint32Array;
-  curentIndex = 0;
+  currentIndex = 0;
   _index = 0;
 
   setIndex(index: number) {
@@ -65,7 +65,7 @@ export class ProtoIndiceBuffer {
     if (!this._buffers[bufferIndex])
       this._buffers[bufferIndex] = new Uint32Array(this.sectorSize);
 
-    this.curentIndex = index - bufferIndex * this.sectorSize;
+    this.currentIndex = index - bufferIndex * this.sectorSize;
     this.currentArray = this._buffers[bufferIndex];
 
     return this;

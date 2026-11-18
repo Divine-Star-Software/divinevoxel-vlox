@@ -1,7 +1,6 @@
 import { DataCursorInterface } from "../../../Voxels/Cursor/DataCursor.interface";
 import { Vec3Array, Vector3Like } from "@amodx/math";
 import { VoxelCursor } from "../../../Voxels/Cursor/VoxelCursor";
-import { GetYXZOrderArrayIndex } from "../../../Math/Indexing";
 import { VoxelSchemas } from "../../../Voxels/State/VoxelSchemas";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 export class VoxelGeometryBuilderCacheSpace {
@@ -11,42 +10,49 @@ export class VoxelGeometryBuilderCacheSpace {
   private voxelCache: Uint16Array;
   //cache of the true voxel ids
   private trueVoxelCache: Uint16Array;
-  //cache of the reltional voxel ids
-  private reltionalVoxelCache: Uint16Array;
-  //cache of the reltional state
-  private reltionalStateCache: Uint16Array;
+  //cache of the relational voxel ids
+  private relationalVoxelCache: Uint16Array;
+  //cache of the relational state
+  private relationalStateCache: Uint16Array;
 
   //cache of the secondary voxel ids
   secondaryVoxelCache: Uint16Array;
   //cache of the true secondary voxel ids
   secondaryTrueVoxelCache: Uint16Array;
-  //cache of the reltional secondary voxel ids
-  secondaryReltionalVoxelCache: Uint16Array;
-  //cache of the secondary reltional state
-  secondaryReltionalStateCache: Uint16Array;
+  //cache of the relational secondary voxel ids
+  secondaryRelationalVoxelCache: Uint16Array;
+  //cache of the secondary relational state
+  secondaryRelationalStateCache: Uint16Array;
 
   hasSecondary: Uint8Array;
   noCastAO: Uint8Array;
   secondaryNoCastAO: Uint8Array;
   fullBlock: Uint8Array;
   offset: Vec3Array = [0, 0, 0];
+  private _offsetX = 0;
+  private _offsetY = 0;
+  private _offsetZ = 0;
+  private _boundsX = 0;
+  private _boundsZ = 0;
 
   voxelCursor = new VoxelCursor();
 
   constructor(public bounds: Vector3Like) {
     const volume = bounds.x * bounds.y * bounds.z;
+    this._boundsX = bounds.x;
+    this._boundsZ = bounds.z;
     this.foundHash = new Uint8Array(volume);
     this.lightCache = new Int32Array(volume);
 
     this.voxelCache = new Uint16Array(volume);
     this.trueVoxelCache = new Uint16Array(volume);
-    this.reltionalVoxelCache = new Uint16Array(volume);
-    this.reltionalStateCache = new Uint16Array(volume);
+    this.relationalVoxelCache = new Uint16Array(volume);
+    this.relationalStateCache = new Uint16Array(volume);
 
     this.secondaryVoxelCache = new Uint16Array(volume);
     this.secondaryTrueVoxelCache = new Uint16Array(volume);
-    this.secondaryReltionalVoxelCache = new Uint16Array(volume);
-    this.secondaryReltionalStateCache = new Uint16Array(volume);
+    this.secondaryRelationalVoxelCache = new Uint16Array(volume);
+    this.secondaryRelationalStateCache = new Uint16Array(volume);
 
     this.fullBlock = new Uint8Array(volume);
     this.hasSecondary = new Uint8Array(volume);
@@ -57,18 +63,21 @@ export class VoxelGeometryBuilderCacheSpace {
     this.offset[0] = x;
     this.offset[1] = y;
     this.offset[2] = z;
+    this._offsetX = x;
+    this._offsetY = y;
+    this._offsetZ = z;
 
     this.fullBlock.fill(0);
     this.lightCache.fill(0);
     this.foundHash.fill(0);
     this.voxelCache.fill(0);
     this.trueVoxelCache.fill(0);
-    this.reltionalVoxelCache.fill(0);
-    this.reltionalStateCache.fill(0);
+    this.relationalVoxelCache.fill(0);
+    this.relationalStateCache.fill(0);
     this.secondaryVoxelCache.fill(0);
     this.secondaryTrueVoxelCache.fill(0);
-    this.secondaryReltionalVoxelCache.fill(0);
-    this.secondaryReltionalStateCache.fill(0);
+    this.secondaryRelationalVoxelCache.fill(0);
+    this.secondaryRelationalStateCache.fill(0);
 
     this.hasSecondary.fill(0);
     this.noCastAO.fill(0);
@@ -76,13 +85,11 @@ export class VoxelGeometryBuilderCacheSpace {
   }
 
   getIndex(x: number, y: number, z: number) {
-    return GetYXZOrderArrayIndex(
-      x - this.offset[0],
-      y - this.offset[1],
-      z - this.offset[2],
-      this.bounds.x,
-      this.bounds.y,
-      this.bounds.z,
+    return Math.floor(
+      z -
+        this._offsetZ +
+        this._boundsZ *
+          (x - this._offsetX + this._boundsX * (y - this._offsetY)),
     );
   }
 
@@ -108,13 +115,13 @@ export class VoxelGeometryBuilderCacheSpace {
   }
   getRelationalState(index: number, secondary = false) {
     return secondary
-      ? this.secondaryReltionalStateCache[index]
-      : this.reltionalStateCache[index];
+      ? this.secondaryRelationalStateCache[index]
+      : this.relationalStateCache[index];
   }
   getRelationalVoxelId(index: number, secondary = false) {
     return secondary
-      ? this.secondaryReltionalVoxelCache[index]
-      : this.reltionalVoxelCache[index];
+      ? this.secondaryRelationalVoxelCache[index]
+      : this.relationalVoxelCache[index];
   }
   getHasSecondary(index: number) {
     return this.hasSecondary[index];
@@ -192,17 +199,17 @@ export class VoxelGeometryBuilderCacheSpace {
     let secondaryRelationalMod = 0;
 
     const relationalBuilder =
-      VoxelSchemas.reltionalStateBuilderMap[VoxelLUT.modelsIndex[trueVoxelId]];
+      VoxelSchemas.relationalStateBuilderMap[VoxelLUT.modelsIndex[trueVoxelId]];
     relationalBuilder.position.x = x;
     relationalBuilder.position.y = y;
     relationalBuilder.position.z = z;
     relationalBuilder.voxel = this.voxelCursor;
     relationalBuilder.dataCursor = dataCursor;
-    const reltionalState = relationalBuilder.buildState();
-    this.reltionalStateCache[index] = reltionalState;
+    const relationalState = relationalBuilder.buildState();
+    this.relationalStateCache[index] = relationalState;
     if (hasSecondary) {
       const relationalBuilder =
-        VoxelSchemas.reltionalStateBuilderMap[
+        VoxelSchemas.relationalStateBuilderMap[
           VoxelLUT.modelsIndex[secondaryTrueVoxelId]
         ];
       relationalBuilder.position.x = x;
@@ -212,26 +219,26 @@ export class VoxelGeometryBuilderCacheSpace {
       relationalBuilder.dataCursor = dataCursor;
       this.voxelCursor.setSecondary(true);
       secondaryRelationalState = relationalBuilder.buildState();
-      this.secondaryReltionalStateCache[index] = secondaryRelationalState;
+      this.secondaryRelationalStateCache[index] = secondaryRelationalState;
       this.voxelCursor.setSecondary(false);
     }
 
     const relationalModBuilder =
-      VoxelSchemas.reltionalModBuilderMap[trueVoxelId];
+      VoxelSchemas.relationalModBuilderMap[trueVoxelId];
 
-    let reltionalMod = 0;
+    let relationalMod = 0;
     if (relationalModBuilder) {
       relationalModBuilder.position.x = x;
       relationalModBuilder.position.y = y;
       relationalModBuilder.position.z = z;
       relationalModBuilder.voxel = this.voxelCursor;
       relationalModBuilder.dataCursor = dataCursor;
-      reltionalMod = relationalModBuilder.buildState();
+      relationalMod = relationalModBuilder.buildState();
     }
 
     if (hasSecondary) {
       const relationalModBuilder =
-        VoxelSchemas.reltionalModBuilderMap[secondaryTrueVoxelId];
+        VoxelSchemas.relationalModBuilderMap[secondaryTrueVoxelId];
       if (relationalModBuilder) {
         relationalModBuilder.position.x = x;
         relationalModBuilder.position.y = y;
@@ -244,14 +251,14 @@ export class VoxelGeometryBuilderCacheSpace {
       }
     }
 
-    this.reltionalVoxelCache[index] = VoxelLUT.getReltionalVoxelId(
+    this.relationalVoxelCache[index] = VoxelLUT.getRelationalVoxelId(
       trueVoxelId,
-      reltionalState,
-      reltionalMod,
+      relationalState,
+      relationalMod,
     );
 
     if (hasSecondary) {
-      this.secondaryReltionalVoxelCache[index] = VoxelLUT.getReltionalVoxelId(
+      this.secondaryRelationalVoxelCache[index] = VoxelLUT.getRelationalVoxelId(
         secondaryTrueVoxelId,
         secondaryRelationalState,
         secondaryRelationalMod,

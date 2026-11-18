@@ -111,6 +111,18 @@ export class DimensionSimulation {
     this.sDataCursor.setFocalPoint(this.dimension.id, x, y, z);
   }
 
+  /**Clears the sectors cached by the tick cursors so they never hold on to unloaded sectors. */
+  refreshTickCursors() {
+    for (const face in this.tickCursor) {
+      this.tickCursor[face as any as VoxelFaces].setFocalPoint(
+        this.dimension.id,
+        0,
+        0,
+        0
+      );
+    }
+  }
+
   getVoxelForUpdate(x: number, y: number, z: number) {
     const voxel = this.cursor.getVoxel(x, y, z);
     if (!voxel)

@@ -21,7 +21,7 @@ export const VisitAll = (
  const gx1 = endPoint.x;
  const gy1 = endPoint.y;
  const gz1 = endPoint.z;
- const positons = [];
+ const positions = [];
  const gx0idx = Math.floor(gx0);
  const gy0idx = Math.floor(gy0);
  const gz0idx = Math.floor(gz0);
@@ -64,7 +64,7 @@ export const VisitAll = (
 
  do {
   if (!visitor(gx, gy, gz)) break;
-  positons.push(gx, gy, gz);
+  positions.push(gx, gy, gz);
   if (gx === gx1idx && gy === gy1idx && gz === gz1idx) break;
   let xr = Math.abs(errx);
   let yr = Math.abs(erry);
@@ -80,5 +80,5 @@ export const VisitAll = (
    errz += derrz;
   }
  } while (true);
- return positons;
+ return positions;
 };

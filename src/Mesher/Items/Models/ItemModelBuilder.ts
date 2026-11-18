@@ -29,7 +29,7 @@ export class ItemModelBuilder {
   constructor(public id: string) {}
 
   startConstruction() {
-    this._indexStart = this.mesh!.indicieCount;
+    this._indexStart = this.mesh!.indicesCount;
     this.bounds.min[0] = Infinity;
     this.bounds.min[1] = Infinity;
     this.bounds.min[2] = Infinity;

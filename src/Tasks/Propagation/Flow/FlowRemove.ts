@@ -38,7 +38,7 @@ export async function FlowRemove(tasks: VoxelUpdateTask) {
   const vox = FM.getVoxel(x, y, z);
   if (!vox) return;
   const voxId = vox.getStringId();
-  const flowRate = vox.getSubstnaceData().getFlowRate();
+  const flowRate = vox.getSubstanceData().getFlowRate();
   RunRemoveCheck(tasks, voxId);
   const noRemoveMap = tasks.flow.remove.noRemoveMap;
   while (tasks.flow.remove.queue.length != 0) {
@@ -137,7 +137,7 @@ function RunRemovePropagation(tasks: VoxelUpdateTask, vox: string) {
 function RunFlowReduce(tasks: VoxelUpdateTask, vox: string) {
 /*   const queue = tasks.flow.remove.queue;
   const map = tasks.flow.remove.map;
-  const reque: number[][] = [];
+  const requeue: number[][] = [];
   while (queue.length != 0) {
     const node = queue.shift();
     if (!node) {
@@ -153,14 +153,14 @@ function RunFlowReduce(tasks: VoxelUpdateTask, vox: string) {
 
     if (l <= 1) {
       FM.removeVoxel(tasks, x, y, z);
-      reque.push([x, y, z]);
+      requeue.push([x, y, z]);
     } else {
       FM.setLevel(l - 1, x, y, z);
-      reque.push([x, y, z]);
+      requeue.push([x, y, z]);
     }
     tasks.bounds.update(x, y, z);
   }
 
-  tasks.flow.remove.queue = reque;
+  tasks.flow.remove.queue = requeue;
   map.clear(); */
 }

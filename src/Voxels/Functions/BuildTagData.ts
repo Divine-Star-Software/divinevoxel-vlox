@@ -3,7 +3,7 @@ import { VoxelData } from "../Types/Voxel.types";
 import { VoxelMaterialData } from "../Types/VoxelMaterial.types";
 import { VoxelSubstanceData } from "../Types/VoxelSubstances.types";
 import { VoxelSubstanceTags, VoxelTags } from "../Data/VoxelTag.types";
-import { CompiledvVxelTags } from "../Types/VoxelModelCompiledData.types";
+import { CompiledVoxelTags } from "../Types/VoxelModelCompiledData.types";
 import { VoxelLogicData } from "../Logic/VoxelLogic.types";
 import { VoxelPropertiesRegister } from "../Data/VoxelPropertiesRegister";
 import { VoxelPlacingStrategyRegister } from "../../Voxels/Interaction/Placing/VoxelPlacingStrategyRegister";
@@ -21,7 +21,7 @@ export type BuildTagDataProps = {
 };
 export function BuildTagAndPaletteData(
   props: BuildTagDataProps
-): CompiledvVxelTags {
+): CompiledVoxelTags {
   const logic: Record<string, VoxelLogicData[]> = {};
   const models = new Map<string, VoxelModelData>(
     props.models.map((_) => [_.id, _])
@@ -73,7 +73,7 @@ export function BuildTagAndPaletteData(
   for (const substance of props.substances) {
     const tags: VoxelSubstanceTags = {} as any;
     const substanceId = VoxelLUT.substance.getNumberId(substance.id);
-    for (const tag of VoxelTagsRegister.IncludedSubstnacesTags) {
+    for (const tag of VoxelTagsRegister.IncludedSubstancesTags) {
       if (substance.properties[tag] === undefined) {
         (tags as any)[tag] =
           VoxelTagsRegister.SubstanceTagDefaults[tag] || false;

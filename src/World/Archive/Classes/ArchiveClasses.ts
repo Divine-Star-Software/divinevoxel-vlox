@@ -1,7 +1,7 @@
 import { NumberPalette } from "../../../Util/NumberPalette";
 import { Section } from "../../../World/Section";
 import { ArchivedLightSegments } from "../Types/Archive.types";
-import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArechive";
+import { VoxelArchivePalette } from "../../../Voxels/Archive/VoxelPaletteArchive";
 
 class ProcessedData<Buffer = any> {
   constructor(public buffer: Buffer) {}

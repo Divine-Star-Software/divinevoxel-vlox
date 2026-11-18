@@ -35,11 +35,25 @@ export class VoxelMeshBVHBuilder {
     };
   }
 
+  /**Total floats in the tree buffer (8191 nodes * 8 floats). */
+  static TreeFloatSize = 8191 * 8;
+  /**Total uint32s in the voxel indices buffer (4096 voxels * 2). */
+  static IndicesSize = 4096 * 2;
+  /**Bits the material index is shifted by when packed into the indices start value. */
+  static MaterialShift = 24;
+  static StartMask = 0xffffff;
+
+  /**
+   * The indices buffer stores two uint32s per voxel:
+   * [indicesStart | (materialIndex << 24), indicesEnd]
+   * indicesStart / indicesEnd are into the index buffer of that material's mesh.
+   * If a voxel has geometry in more than one material the last one wins.
+   */
   updateVoxel(
     voxelX: number,
     voxelY: number,
     voxelZ: number,
-    meshIndex: number,
+    materialIndex: number,
     indicesStart: number,
     indicesEnd: number,
     minX: number,
@@ -51,7 +65,10 @@ export class VoxelMeshBVHBuilder {
   ) {
     const voxelIndex = WorldSpaces.voxel.getIndex(voxelX, voxelY, voxelZ);
     const leafIndex = this.treeIndex.getIndexAtLevel(12, voxelIndex);
-    this.indices[voxelIndex * 2] = indicesStart;
+    this.indices[voxelIndex * 2] =
+      ((indicesStart & VoxelMeshBVHBuilder.StartMask) |
+        (materialIndex << VoxelMeshBVHBuilder.MaterialShift)) >>>
+      0;
     this.indices[voxelIndex * 2 + 1] = indicesEnd;
     this.structCursor.setIndex(leafIndex);
     this.structCursor.updateMin(minX, minY, minZ);

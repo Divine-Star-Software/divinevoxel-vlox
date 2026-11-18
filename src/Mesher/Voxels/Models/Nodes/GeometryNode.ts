@@ -1,14 +1,14 @@
 import { VoxelModelBuilder } from "../VoxelModelBuilder";
 import { VoxelGeometryConstructor } from "./VoxelGeometryConstructor";
-export interface GeoemtryNodeConstructor<Data = any, Args = any> {
+export interface GeometryNodeConstructor<Data = any, Args = any> {
   new (
     geometryPaletteId: number,
     geometry: VoxelGeometryConstructor,
     data: Data
-  ): GeoemtryNode<Data, Args>;
+  ): GeometryNode<Data, Args>;
 }
 
-export abstract class GeoemtryNode<Data = any, Args = any> {
+export abstract class GeometryNode<Data = any, Args = any> {
   builder: VoxelModelBuilder;
   constructor(
     public geometryPaletteId: number,

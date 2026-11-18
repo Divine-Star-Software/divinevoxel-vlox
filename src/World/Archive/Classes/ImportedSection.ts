@@ -9,7 +9,7 @@ import { ImportedSector } from "./ImportedSector";
 import { VoxelLUT } from "../../../Voxels/Data/VoxelLUT";
 import {
   lightSegments,
-  lightSemgnetSet,
+  lightSegmentSet,
 } from "../Functions/Shared/LightSegments";
 import { VoxelTagsRegister } from "../../../Voxels/Data/VoxelTagsRegister";
 import { WorldSpaces } from "../../WorldSpaces";
@@ -25,7 +25,7 @@ class ImportedSectionBuffers {
       ? new BinaryBuffer(section.buffers.id)
       : new BinaryBuffer(
           BinaryBuffer.Create({
-            byteLength: WorldSpaces.section.volumne,
+            byteLength: WorldSpaces.section.volume,
             buffer: 0,
             format: BinaryBufferFormat.Uint16,
           })
@@ -34,7 +34,7 @@ class ImportedSectionBuffers {
       ? new BinaryBuffer(section.buffers.secondary)
       : new BinaryBuffer(
           BinaryBuffer.Create({
-            byteLength: WorldSpaces.section.volumne,
+            byteLength: WorldSpaces.section.volume,
             buffer: 0,
             format: BinaryBufferFormat.Uint16,
           })
@@ -43,7 +43,7 @@ class ImportedSectionBuffers {
       ? new BinaryBuffer(section.buffers.level)
       : new BinaryBuffer(
           BinaryBuffer.Create({
-            byteLength: WorldSpaces.section.volumne,
+            byteLength: WorldSpaces.section.volume,
             buffer: 0,
             format: BinaryBufferFormat.Uint8,
           })
@@ -53,7 +53,7 @@ class ImportedSectionBuffers {
         ? new BinaryBuffer(section.buffers.light.sun)
         : new BinaryBuffer(
             BinaryBuffer.Create({
-              byteLength: WorldSpaces.section.volumne,
+              byteLength: WorldSpaces.section.volume,
               buffer: 0,
               format: BinaryBufferFormat.NibbleArray,
             })
@@ -62,7 +62,7 @@ class ImportedSectionBuffers {
         ? new BinaryBuffer(section.buffers.light.red)
         : new BinaryBuffer(
             BinaryBuffer.Create({
-              byteLength: WorldSpaces.section.volumne,
+              byteLength: WorldSpaces.section.volume,
               buffer: 0,
               format: BinaryBufferFormat.NibbleArray,
             })
@@ -71,7 +71,7 @@ class ImportedSectionBuffers {
         ? new BinaryBuffer(section.buffers.light.green)
         : new BinaryBuffer(
             BinaryBuffer.Create({
-              byteLength: WorldSpaces.section.volumne,
+              byteLength: WorldSpaces.section.volume,
               buffer: 0,
               format: BinaryBufferFormat.NibbleArray,
             })
@@ -80,7 +80,7 @@ class ImportedSectionBuffers {
         ? new BinaryBuffer(section.buffers.light.blue)
         : new BinaryBuffer(
             BinaryBuffer.Create({
-              byteLength: WorldSpaces.section.volumne,
+              byteLength: WorldSpaces.section.volume,
               buffer: 0,
               format: BinaryBufferFormat.NibbleArray,
             })
@@ -184,7 +184,7 @@ export class ImportedSection {
         }
       }
 
-      finalLight = lightSemgnetSet[segment](value, finalLight);
+      finalLight = lightSegmentSet[segment](value, finalLight);
     }
 
     return finalLight;

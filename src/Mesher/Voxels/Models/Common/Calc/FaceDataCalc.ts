@@ -1,5 +1,5 @@
 import type { VoxelModelBuilder } from "../../VoxelModelBuilder.js";
-import { QuadVerticies } from "../../../../Geometry/Geometry.types.js";
+import { QuadVertices } from "../../../../Geometry/Geometry.types.js";
 import { VoxelFaces, VoxelFaceDirections } from "../../../../../Math/index.js";
 import { GradientCheckSets } from "./CalcConstants.js";
 import { VoxelLightData } from "../../../../../Voxels/Cursor/VoxelLightData.js";
@@ -36,7 +36,7 @@ export default function calculateFaceData(
   const startR = lightData.getR(startLight);
   const startG = lightData.getG(startLight);
   const startB = lightData.getB(startLight);
-  for (let vertex: QuadVerticies = <QuadVerticies>0; vertex < 4; vertex++) {
+  for (let vertex: QuadVertices = <QuadVertices>0; vertex < 4; vertex++) {
     vertexData[vertex] = startLight;
     let s = startS;
     let r = startR;

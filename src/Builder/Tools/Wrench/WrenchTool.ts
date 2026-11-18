@@ -15,7 +15,7 @@ interface WrenchToolEvents {
   picked: {};
 }
 
-export type WrenchToolVoxelScehmaNodes =
+export type WrenchToolVoxelSchemaNodes =
   | {
       type: "string";
       values: string[];
@@ -33,8 +33,8 @@ export type WrenchToolVoxelScehmaNodes =
     };
 
 type WrenchToolSchemas = {
-  stateSchema: WrenchToolVoxelScehmaNodes[];
-  modSchema: WrenchToolVoxelScehmaNodes[];
+  stateSchema: WrenchToolVoxelSchemaNodes[];
+  modSchema: WrenchToolVoxelSchemaNodes[];
 };
 
 export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
@@ -67,8 +67,8 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     }
   }
 
-  private processSchema(schema: BinarySchema): WrenchToolVoxelScehmaNodes[] {
-    const nodes: WrenchToolVoxelScehmaNodes[] = [];
+  private processSchema(schema: BinarySchema): WrenchToolVoxelSchemaNodes[] {
+    const nodes: WrenchToolVoxelSchemaNodes[] = [];
     for (const node of schema.nodes) {
       if (node.valuePalette) {
         nodes.push({
@@ -149,7 +149,7 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     };
   }
 
-  /**Get an array of all possible state varations for the current mod of the selected voxel. */
+  /**Get an array of all possible state variations for the current mod of the selected voxel. */
   getStateValues(): PaintVoxelData[] | null {
     if (!this._pickedResult) return null;
     const voxelStates: PaintVoxelData[] = [];
@@ -165,7 +165,7 @@ export class WrenchTool extends BuilderToolBase<WrenchToolEvents> {
     return voxelStates;
   }
 
-  /**Get an array of all possible mod varations for the current state of the selected voxel. */
+  /**Get an array of all possible mod variations for the current state of the selected voxel. */
   getModValues(): PaintVoxelData[] | null {
     if (!this._pickedResult) return null;
     const voxelStates: PaintVoxelData[] = [];

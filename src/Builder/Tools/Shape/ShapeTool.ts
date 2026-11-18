@@ -30,7 +30,7 @@ export class ShapeTool extends BuilderToolBase<BoxToolEvents> {
   }
 
   set distance(distance: number) {
-    if (this.boxSelection) this.pointSelection.distance = distance;
+    this.pointSelection.distance = Math.max(1, distance);
   }
 
   private _started = false;

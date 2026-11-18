@@ -9,7 +9,7 @@ export const lightSegments: ArchivedLightSegments[] = [
   "blue",
 ];
 
-export const lightSemgnetGet: Record<
+export const lightSegmentGet: Record<
   ArchivedLightSegments,
   (value: number) => number
 > = {
@@ -19,7 +19,7 @@ export const lightSemgnetGet: Record<
   blue: (value: number) => lightData.getB(value),
 };
 
-export const lightSemgnetSet: Record<
+export const lightSegmentSet: Record<
   ArchivedLightSegments,
   (value: number, source: number) => number
 > = {

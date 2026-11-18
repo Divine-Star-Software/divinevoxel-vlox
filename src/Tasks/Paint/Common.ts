@@ -246,9 +246,9 @@ export const updateArea = (
   ey: number,
   ez: number
 ) => {
-  for (let x = sx - 1; x < ex + 1; x++) {
-    for (let y = sy - 1; y < ey + 1; y++) {
-      for (let z = sz - 1; z < ez + 1; z++) {
+  for (let x = sx - 1; x <= ex + 1; x++) {
+    for (let y = sy - 1; y <= ey + 1; y++) {
+      for (let z = sz - 1; z <= ez + 1; z++) {
         const voxel = tasks.sDataCursor.getVoxel(x, y, z);
         if (!voxel) continue;
         voxel.updateVoxel(2);

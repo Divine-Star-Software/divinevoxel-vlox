@@ -6,6 +6,7 @@ import {
   CompactedSectionVoxelMesh,
   CompactedMeshData,
 } from "../Geometry/CompactedSectionVoxelMesh";
+import type { VoxelMeshBVHBuilder } from "../Geometry/VoxelMeshBVHBuilder";
 
 const meshData = new CompactedMeshData();
 const compactedMesh = new CompactedSectionVoxelMesh();
@@ -14,10 +15,28 @@ function align4(value: number) {
   return (value + 3) & ~3;
 }
 
+function copyBuffers(
+  target: Float32Array | Uint32Array,
+  buffers: ArrayLike<Float32Array | Uint32Array>,
+  total: number,
+) {
+  let start = 0;
+  for (let b = 0; b < buffers.length && start < total; b++) {
+    const buf = buffers[b];
+    const count = Math.min(buf.length, total - start);
+    target.set(count == buf.length ? buf : buf.subarray(0, count), start);
+    start += count;
+  }
+}
+
 export function CompactVoxelSectionMesh(
   location: LocationData,
   tools: VoxelModelBuilder[],
   transfers: any[] = [],
+  /**If set the section BVH is appended to the end of the buffer. */
+  bvh: VoxelMeshBVHBuilder | null = null,
+  /**If set the section voxel light is appended to the end of the buffer. */
+  light: Uint16Array | null = null,
 ): SetSectionMeshTask {
   let headerSize = CompactedSectionVoxelMesh.GetHeaderByteSize(tools.length);
 
@@ -33,9 +52,21 @@ export function CompactVoxelSectionMesh(
     totalByteCount += vertexByteSize;
     totalByteCount = align4(totalByteCount);
 
-    const indexByteSize = tool.mesh.indicieCount * 4;
+    const indexByteSize = tool.mesh.indicesCount * 4;
 
     totalByteCount += indexByteSize;
+    totalByteCount = align4(totalByteCount);
+  }
+
+  let bvhByteOffset = 0;
+  if (bvh) {
+    bvhByteOffset = totalByteCount;
+    totalByteCount += CompactedSectionVoxelMesh.GetBVHByteSize();
+  }
+  let lightByteOffset = 0;
+  if (light) {
+    lightByteOffset = totalByteCount;
+    totalByteCount += CompactedSectionVoxelMesh.LightSize * 2;
     totalByteCount = align4(totalByteCount);
   }
 
@@ -70,10 +101,10 @@ export function CompactVoxelSectionMesh(
     byteCount += vertexByteCount;
     byteCount = align4(byteCount);
 
-    meshData.indiceIndex[0] = byteCount;
-    meshData.indiceIndex[1] = tool.mesh.indicieCount;
+    meshData.indicesIndex[0] = byteCount;
+    meshData.indicesIndex[1] = tool.mesh.indicesCount;
 
-    const indexByteCount = tool.mesh.indicieCount * 4;
+    const indexByteCount = tool.mesh.indicesCount * 4;
 
     byteCount += indexByteCount;
     byteCount = align4(byteCount);
@@ -86,43 +117,36 @@ export function CompactVoxelSectionMesh(
       totalVertFloats,
     );
 
-    const vertexBuffers = tool.mesh.buffer._float32Views;
-    let start = 0;
-    let done = false;
-    for (let b = 0; b < vertexBuffers.length; b++) {
-      const buf = vertexBuffers[b];
-      for (let j = 0; j < buf.length; j++) {
-        vertexArray[start] = buf[j];
-        start++;
-        if (start >= totalVertFloats) {
-          done = true;
-          break;
-        }
-      }
-      if (done) break;
-    }
+    copyBuffers(vertexArray, tool.mesh.buffer._float32Views, totalVertFloats);
 
     const indicesArray = new Uint32Array(
       buffer,
-      meshData.indiceIndex[0],
-      tool.mesh.indicieCount,
+      meshData.indicesIndex[0],
+      tool.mesh.indicesCount,
     );
 
-    const indiceBuffers = tool.mesh.indices._buffers;
-    start = 0;
-    done = false;
-    for (let b = 0; b < indiceBuffers.length; b++) {
-      const buf = indiceBuffers[b];
-      for (let j = 0; j < buf.length; j++) {
-        indicesArray[start] = buf[j];
-        start++;
-        if (start >= tool.mesh.indicieCount) {
-          done = true;
-          break;
-        }
-      }
-      if (done) break;
-    }
+    copyBuffers(indicesArray, tool.mesh.indices._buffers, tool.mesh.indicesCount);
+  }
+
+  if (bvh) {
+    compactedMesh.setBVHByteOffset(bvhByteOffset);
+    new Float32Array(
+      buffer,
+      bvhByteOffset,
+      CompactedSectionVoxelMesh.BVHTreeFloatSize,
+    ).set(bvh.tree);
+    new Uint32Array(
+      buffer,
+      bvhByteOffset + CompactedSectionVoxelMesh.BVHTreeFloatSize * 4,
+      CompactedSectionVoxelMesh.BVHIndicesSize,
+    ).set(bvh.indices);
+  }
+
+  if (light) {
+    compactedMesh.setLightByteOffset(lightByteOffset);
+    new Uint16Array(buffer, lightByteOffset, CompactedSectionVoxelMesh.LightSize).set(
+      light.subarray(0, CompactedSectionVoxelMesh.LightSize),
+    );
   }
 
   transfers.push(buffer);

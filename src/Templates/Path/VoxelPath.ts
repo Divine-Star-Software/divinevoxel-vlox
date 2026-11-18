@@ -123,16 +123,14 @@ export class VoxelPath extends TypedEventTarget<VoxelPathEvents> {
   }
 
   removeSegment(segment: VoxelPathSegment) {
-    for (let i = this.segments.length - 1; i > -1; i--) {
-      this.segments[i].index--;
-      if (this.segments[i] == segment) {
-        console.log("found segment to remove", i);
-        this.segments.splice(i, 1);
-        break;
-      }
+    const index = this.segments.indexOf(segment);
+    if (index < 0) return false;
+    this.segments.splice(index, 1);
+    for (let i = index; i < this.segments.length; i++) {
+      this.segments[i].index = i;
     }
     this.dispatch("segmentRemoved", segment);
-    return false;
+    return true;
   }
 
   removePoint(segmentIndex: number, pointIndex: 0 | 1) {

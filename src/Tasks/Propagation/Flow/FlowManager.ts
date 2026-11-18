@@ -78,7 +78,7 @@ export class FlowManager {
     /*    if (!this._sDataTool.loadInAt(x, y, z)) return false;
     if (!this._sDataTool.isRenderable()) return false;
 
-    const substance = this._sDataTool.getSubstnaceData();
+    const substance = this._sDataTool.getSubstanceData();
     if (!substance.isLiquid()) return false; */
     return this._sDataTool;
   }

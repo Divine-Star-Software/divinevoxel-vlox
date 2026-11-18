@@ -3,16 +3,16 @@ import {
   BinaryBufferFormat,
 } from "@amodx/binary/Buffer";
 import {
-  ArchivedVoxelTemplateBuffersExportdJSONData,
+  ArchivedVoxelTemplateBuffersExportedJSONData,
   ArchivedVoxelTemplateData,
   ArchivedVoxelTemplateExportedJSONData,
   ArchivedVoxelTemplatePaletteDataExportedJSONData,
 } from "../ArchivedVoxelTemplate.types";
 
-export default async function ExportArchiedTemplateJSON(
+export default async function ExportArchivedTemplateJSON(
   templateData: ArchivedVoxelTemplateData
 ): Promise<ArchivedVoxelTemplateExportedJSONData> {
-  const buffers: ArchivedVoxelTemplateBuffersExportdJSONData = {
+  const buffers: ArchivedVoxelTemplateBuffersExportedJSONData = {
     ids: templateData.buffers.ids
       ? await BinaryBuffer.ToJSON(templateData.buffers.ids, true)
       : undefined,

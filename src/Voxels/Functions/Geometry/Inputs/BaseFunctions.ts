@@ -20,11 +20,11 @@ export function processTexture(
       data.texture
     );
   }
-  if (data.textureRecrod) {
-    for (const key in data.textureRecrod) {
-      const value = data.textureRecrod[key];
+  if (data.textureRecord) {
+    for (const key in data.textureRecord) {
+      const value = data.textureRecord[key];
       if (typeof value == "string") {
-        data.textureRecrod[key] =
+        data.textureRecord[key] =
           TextureManager.getTexture("dve_voxel")!.getTextureIndex(value);
       }
     }

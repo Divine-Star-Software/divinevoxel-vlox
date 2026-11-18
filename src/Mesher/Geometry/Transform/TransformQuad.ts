@@ -1,4 +1,4 @@
-import { QuadVerticies,VoxelGeometryTransform } from "../Geometry.types";
+import { QuadVertices,VoxelGeometryTransform } from "../Geometry.types";
 import { Quad } from "../Primitives";
 import { AMath, Vector3Like } from "@amodx/math";
 
@@ -6,10 +6,10 @@ export function TransformQuad(
   quad: Quad,
   transform: VoxelGeometryTransform
 ): Quad {
-  const p1 = { ...quad.positions.vertices[QuadVerticies.TopRight] };
-  const p2 = { ...quad.positions.vertices[QuadVerticies.TopLeft] };
-  const p3 = { ...quad.positions.vertices[QuadVerticies.BottomLeft] };
-  const p4 = { ...quad.positions.vertices[QuadVerticies.BottomRight] };
+  const p1 = { ...quad.positions.vertices[QuadVertices.TopRight] };
+  const p2 = { ...quad.positions.vertices[QuadVertices.TopLeft] };
+  const p3 = { ...quad.positions.vertices[QuadVertices.BottomLeft] };
+  const p4 = { ...quad.positions.vertices[QuadVertices.BottomRight] };
 
   // Create an array of vertices
   const vertices = [p1, p2, p3, p4];

@@ -20,7 +20,7 @@ export interface VoxelGeometryLinkData {
   //  id: string;
   geometryId: string;
   /**
-   * Overrride the culling procedure for faces
+   * Override the culling procedure for faces
    */
   cullingProcedure?: CullingProcedureData;
   /**Divisor used for transform of this specific node.*/
@@ -52,10 +52,10 @@ export interface VoxelModelData {
   effects?: VoxelEffectData[];
   relationsSchema: VoxelModelRelationsSchemaNodes[];
   stateNodes: Record<string, VoxelGeometryLinkData[]>;
-  conditonalNodes: Record<string, VoxelGeometryLinkData[]>;
+  conditionalNodes: Record<string, VoxelGeometryLinkData[]>;
 }
 
-/**The model data assoicated with the actual voxel. */
+/**The model data associated with the actual voxel. */
 export interface VoxelModelConstructorData {
   id: string;
   modRelationSchema?: VoxelModelRelationsSchemaNodes[];

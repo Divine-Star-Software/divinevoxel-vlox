@@ -39,7 +39,8 @@ export class Generator {
     this._culling = typeof data.culling !== "undefined" ? data.culling : true;
     this._renderCircle.radius = data.renderRadius;
     this._genCircle.radius = data.generationRadius;
-    this._tickCircle.radius = data.generationRadius;
+    this._tickCircle.radius =
+      data.tickRadius !== undefined ? data.tickRadius : data.generationRadius;
     this._maxCircle.radius = data.maxRadius;
   }
 

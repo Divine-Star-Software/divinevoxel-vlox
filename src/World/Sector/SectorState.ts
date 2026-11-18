@@ -15,17 +15,17 @@ export enum SectorStateDefaultTimeStamps {
 }
 
 export class SectorState {
-  /**The default bit flags for secotrs */
+  /**The default bit flags for sectors */
   static Flags = SectorStateDefaultBitFlags;
   /**An array of bit flags tht are preserved when the sector is stored */
   static StoredFlags: Record<string, number> = {
     dve_is_world_gen_done: SectorStateDefaultBitFlags.isWorldGenDone,
     dve_is_world_decoration_done: SectorStateDefaultBitFlags.isWorldDecorDone,
-    dve_is_world_progation_done:
+    dve_is_world_propagation_done:
       SectorStateDefaultBitFlags.isWorldPropagationDone,
     dve_is_world_sun_done: SectorStateDefaultBitFlags.isWorldSunDone,
   };
-  /**The default  timestamps for secotrs */
+  /**The default  timestamps for sectors */
   static TimeStamps = SectorStateDefaultTimeStamps;
   /**An array of bit timestamps tht are preserved when the sector is stored */
   static StoredTimeStamps: Record<string, number> = {};

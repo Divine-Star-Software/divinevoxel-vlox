@@ -5,7 +5,7 @@ import {
   VoxelGeometryData,
 } from "../../../Geometry/VoxelGeometry.types";
 
-import { TriangleVoxelGometryInputs } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
+import { TriangleVoxelGeometryInputs } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGeometryNodeTypes";
 import { cleanArgString, isArgString, processTexture } from "./BaseFunctions";
 import { BaseVoxelGeometryTextureProcedureData } from "../../../../Mesher/Voxels/Models/Procedures/TextureProcedure";
 import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
@@ -18,8 +18,8 @@ export function BuildTriangleInputs(
   model: VoxelModelData,
   geometry: VoxelGeometryData,
 ) {
-  const ArgIndexes = TriangleVoxelGometryInputs.ArgIndexes;
-  const inputs = TriangleVoxelGometryInputs.CreateArgs();
+  const ArgIndexes = TriangleVoxelGeometryInputs.ArgIndexes;
+  const inputs = TriangleVoxelGeometryInputs.CreateArgs();
 
   inputs[ArgIndexes.Enabled] = true;
 
@@ -55,11 +55,11 @@ export function BuildTriangleInputs(
         procedureData.texture =
           data.voxelInputs[cleanArgString(procedureData.texture)];
       }
-      if (procedureData.textureRecrod) {
-        for (const key in procedureData.textureRecrod) {
-          const value = procedureData.textureRecrod[key];
+      if (procedureData.textureRecord) {
+        for (const key in procedureData.textureRecord) {
+          const value = procedureData.textureRecord[key];
           if (typeof value == "string" && isArgString(value)) {
-            procedureData.textureRecrod[key] =
+            procedureData.textureRecord[key] =
               data.voxelInputs[cleanArgString(value)];
           }
         }
@@ -118,7 +118,7 @@ export function BuildTriangleInputs(
   }
 
   inputs[ArgIndexes.UVs] = uvs;
-  /**@TODO updae the tri uvs if it is rotated or transformed */
+  /**@TODO update the tri uvs if it is rotated or transformed */
   if (inputs[ArgIndexes.Rotation]) {
   }
   args.push(inputs);

@@ -1,2 +1,2 @@
-export * from "./Illumanation/RGBUpdate"
-export * from "./Illumanation/SunUpdate"
+export * from "./Illumination/RGBUpdate"
+export * from "./Illumination/SunUpdate"

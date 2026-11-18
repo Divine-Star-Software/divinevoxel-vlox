@@ -40,7 +40,8 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
     const lastMode = this.mode;
     this.mode = mode;
     if (lastMode == PathToolModes.PlacePoints) {
-      for (const segment of this.path.segments) {
+      //copy since removing segments mutates the array
+      for (const segment of [...this.path.segments]) {
         if (segment.transient) {
           this.path.removeSegment(segment);
         }
@@ -120,7 +121,8 @@ export class PathTool extends BuilderToolBase<PathToolEvents> {
     }
 
     if (this.mode == PathToolModes.FillPath) {
-      for (const segment of this.path.segments) {
+      //copy since removing segments mutates the array
+      for (const segment of [...this.path.segments]) {
         segment.voxel = this.voxelData;
       }
       await this.space.paintPath([0, 0, 0], this.path.toJSON());

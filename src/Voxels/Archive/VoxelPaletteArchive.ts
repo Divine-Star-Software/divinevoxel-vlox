@@ -8,7 +8,7 @@ import {
   ArchivedVoxelDataForPalette,
   VoxelArchivePaletteData,
   ArchivedVoxelPaletteDataKey,
-  VoxelPaletteCompents,
+  VoxelPaletteComponents,
 } from "./VoxelArchive.types";
 
 export class VoxelArchivePalette {
@@ -17,15 +17,15 @@ export class VoxelArchivePalette {
       stride: 3,
       components: [
         {
-          type: VoxelPaletteCompents.VoxelId,
+          type: VoxelPaletteComponents.VoxelId,
           index: 0,
         },
         {
-          type: VoxelPaletteCompents.StateValue,
+          type: VoxelPaletteComponents.StateValue,
           index: 1,
         },
         {
-          type: VoxelPaletteCompents.ModValue,
+          type: VoxelPaletteComponents.ModValue,
           index: 2,
         },
       ],
@@ -37,7 +37,7 @@ export class VoxelArchivePalette {
   _voxelsRegistered = new Map<number, number>();
   _ids = new StringPalette();
   _voxels: ArchivedVoxelDataForPalette[] = [];
-  _stateShemas: Record<string, VoxelBinaryStateSchemaNode[]> = {};
+  _stateSchemas: Record<string, VoxelBinaryStateSchemaNode[]> = {};
   _voxelPalette: number[] = [];
   private _voxelCount = 0;
 
@@ -57,15 +57,15 @@ export class VoxelArchivePalette {
       const stateData = VoxelSchemas.getStateSchema(stringId)?.getSchema();
       const modData = VoxelSchemas.mod.get(stringId)?.getSchema();
       if (stateData && stateData?.length) {
-        this._stateShemas[modelId] = stateData;
+        this._stateSchemas[modelId] = stateData;
       }
       const voxelData: ArchivedVoxelDataForPalette = {
         id: stringId,
         ...(modData && modData.length ? { modSchema: modData } : {}),
-        ...(this._stateShemas[modelId] ? { stateSchemaId: modelId } : {}),
+        ...(this._stateSchemas[modelId] ? { stateSchemaId: modelId } : {}),
       };
 
-      const name = VoxelLUT.voxelNametoIdMap.get(stringId);
+      const name = VoxelLUT.voxelNameToIdMap.get(stringId);
       if (name !== undefined && name !== stringId) {
         voxelData.name = name;
       }
@@ -91,7 +91,7 @@ export class VoxelArchivePalette {
         byteLength: this._voxelPalette.length,
         buffer: new Uint16Array(this._voxelPalette).buffer,
       }),
-      stateSchemas: this._stateShemas,
+      stateSchemas: this._stateSchemas,
     };
   }
 }

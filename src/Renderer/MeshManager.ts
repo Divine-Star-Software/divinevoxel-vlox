@@ -54,7 +54,7 @@ export class MeshManager {
   static removeSector(dimensionId: number, x: number, y: number, z: number) {
     const sector = MeshRegister.sectors.remove(dimensionId, x, y, z);
     if (!sector) return false;
-    sector.dipose();
+    sector.dispose();
   }
   static removeSectorAt(data: LocationData) {
     return this.removeSector(...data);

@@ -38,9 +38,11 @@ export const liquidModel: VoxelModelData = {
       type: "texture",
     },
   },
-  conditonalNodes: {},
+  conditionalNodes: {},
   properties: {
     dve_placing_strategy: "*",
+    // Without this liquids use the default behavior and never flow.
+    dve_simulation_behavior: "dve_liquid",
   },
   stateNodes: {
     "*": [

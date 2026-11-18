@@ -2,7 +2,7 @@ type ProgressUpdateFunction = (completed: number, status: string) => void;
 type ProgressTaskFunction = (task: string) => void;
 export class WorkItemProgress {
   private _currentStatus = "";
-  private _compltedWorkItems = 0;
+  private _completedWorkItems = 0;
   private _workItems = 0;
   private _onUpdate: ProgressUpdateFunction[] = [];
   private _startTask: ProgressTaskFunction[] = [];
@@ -11,12 +11,12 @@ export class WorkItemProgress {
   private _currentTask: string = "";
   private _dispatchUpdate() {
     for (const update of this._onUpdate) {
-      update(this._compltedWorkItems / this._workItems, this._currentStatus);
+      update(this._completedWorkItems / this._workItems, this._currentStatus);
     }
   }
 
-  get compltedWorkItems(){
-    return this._compltedWorkItems;
+  get completedWorkItems(){
+    return this._completedWorkItems;
   }
 
   onStartTask(run: ProgressTaskFunction) {
@@ -41,7 +41,7 @@ export class WorkItemProgress {
 
   setWorkLoad(amount: number) {
     this._workItems = amount;
-    this._compltedWorkItems = 0;
+    this._completedWorkItems = 0;
   }
 
   onUpdate(run: ProgressUpdateFunction) {
@@ -49,7 +49,7 @@ export class WorkItemProgress {
   }
 
   completeWorkItems(amount: number) {
-    this._compltedWorkItems += amount;
+    this._completedWorkItems += amount;
     this._dispatchUpdate();
   }
 
@@ -60,5 +60,15 @@ export class WorkItemProgress {
 
   wait(time: number) {
     return new Promise((resolve) => setTimeout(() => resolve(true), time));
+  }
+
+  nextFrame() {
+    return new Promise((resolve) => {
+      if (typeof requestAnimationFrame !== "undefined") {
+        requestAnimationFrame(() => resolve(true));
+      } else {
+        setTimeout(() => resolve(true), 0);
+      }
+    });
   }
 }

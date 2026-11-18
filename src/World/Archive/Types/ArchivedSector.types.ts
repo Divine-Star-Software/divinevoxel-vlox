@@ -18,12 +18,12 @@ export interface ArchivedSectorData
   /** The palette data used within the sector. */
   palettes: ArchivedSectorPaletteData;
   /**Contains duplicate data like duplicate sections. */
-  duplicates: ArchivedSectorDuplicteData;
+  duplicates: ArchivedSectorDuplicateData;
   /** Array of archived section data within the sector. */
   sections: (ArchivedSectionData | string)[];
 }
 
-export interface ArchivedSectorDuplicteData {
+export interface ArchivedSectorDuplicateData {
   sections?: Record<string, ArchivedSectionData>;
 }
 

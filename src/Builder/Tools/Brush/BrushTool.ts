@@ -90,7 +90,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   };
   static BaseToolOptions: ToolOptionsData = [
     {
-      cateogry: "main",
+      category: "main",
       property: "axisXPositionMode",
       name: "X Axis Position Mode",
       type: "string",
@@ -101,7 +101,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       ],
     },
     {
-      cateogry: "main",
+      category: "main",
       property: "axisYPositionMode",
       name: "Y Axis Position Mode",
       type: "string",
@@ -112,7 +112,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
       ],
     },
     {
-      cateogry: "main",
+      category: "main",
       property: "axisZPositionMode",
       name: "Z Axis Position Mode",
       type: "string",
@@ -127,7 +127,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     Sphere() {
       return [
         {
-          cateogry: "shape",
+          category: "shape",
           property: "radius",
           name: "Radius",
           type: "number",
@@ -139,7 +139,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     Box() {
       return [
         {
-          cateogry: "shape",
+          category: "shape",
           property: "width",
           name: "Width",
           type: "number",
@@ -147,7 +147,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           max: 50,
         },
         {
-          cateogry: "shape",
+          category: "shape",
           property: "height",
           name: "Height",
           type: "number",
@@ -155,7 +155,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           max: 50,
         },
         {
-          cateogry: "shape",
+          category: "shape",
           property: "depth",
           name: "Depth",
           type: "number",
@@ -167,7 +167,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     Pyramid() {
       return [
         {
-          cateogry: "shape",
+          category: "shape",
           property: "direction",
           name: "Direction",
           type: "string",
@@ -181,7 +181,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           ],
         },
         {
-          cateogry: "shape",
+          category: "shape",
           property: "height",
           name: "Height",
           type: "number",
@@ -189,7 +189,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           max: 50,
         },
         {
-          cateogry: "shape",
+          category: "shape",
           property: "fallOff",
           name: "Falloff",
           type: "number",
@@ -201,7 +201,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     Ellipsoid() {
       return [
         {
-          cateogry: "shape",
+          category: "shape",
           property: "radiusX",
           name: "Radius X",
           type: "number",
@@ -209,7 +209,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           max: 50,
         },
         {
-          cateogry: "shape",
+          category: "shape",
           property: "radiusY",
           name: "Radius Y",
           type: "number",
@@ -217,7 +217,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           max: 50,
         },
         {
-          cateogry: "shape",
+          category: "shape",
           property: "radiusZ",
           name: "Radius Z",
           type: "number",
@@ -280,10 +280,16 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
           return;
         }
       }
-      place = this.getPlacePosition(this._lastPicked.normalPosition);
+      place = this.getPlacePosition(
+        this.mode == BrushToolModes.Remove
+          ? this._lastPicked.position
+          : this._lastPicked.normalPosition,
+      );
     }
     if (this.positionMode == BrushToolSelectionPositionModes.Free) {
-      this.freeSelection.update();
+      //free mode does not use a pick so clear any stale one from surface mode
+      this._lastPicked = null;
+      if (!this.freeSelection.update()) return;
       place = this.getPlacePosition(this.pointSelection.origin);
     }
     if (!place) return;
@@ -300,8 +306,9 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
   }
 
   async use() {
-    if (!this._lastPicked) return;
-    if (this.usePlacingStrategy) {
+    const freeMode = this.positionMode == BrushToolSelectionPositionModes.Free;
+    if (!freeMode && !this._lastPicked) return;
+    if (this.usePlacingStrategy && this._lastPicked) {
       if (this.voxelData.fill) {
         const newData = this.space.getPlaceState(
           this.voxelData.fill,
@@ -321,6 +328,8 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     }
 
     if (this.mode == BrushToolModes.Extrude) {
+      //extruding needs a surface normal
+      if (!this._lastPicked) return;
       const template = await this.space.getExtrudedSelectionTemplate(
         this.selection.toJSON(),
         this._lastPicked.normal,
@@ -330,13 +339,10 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     }
 
     if (this.mode == BrushToolModes.Remove) {
-      const voxel = this._lastPicked.voxel;
-      if (voxel && !voxel.isAir()) {
-        await this.space.eraseTemplate(
-          [place.x, place.y, place.z],
-          this.template.toJSON(),
-        );
-      }
+      await this.space.eraseTemplate(
+        [place.x, place.y, place.z],
+        this.template.toJSON(),
+      );
       return;
     }
   }
@@ -375,7 +381,7 @@ export class BrushTool extends BuilderToolBase<BrushToolEvents> {
     if (this.axisZPositionMode == BrushPositionModes.Start) {
       this._position.z = position.z;
     }
-    if (this.axisXPositionMode == BrushPositionModes.End) {
+    if (this.axisZPositionMode == BrushPositionModes.End) {
       this._position.z =
         position.z - this.template.shapeSelection.bounds.size.z;
     }

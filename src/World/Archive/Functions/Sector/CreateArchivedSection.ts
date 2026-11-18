@@ -107,26 +107,26 @@ export function CreateArchivedSection(
     });
   }
 
-  for (const semgnet of lightSegments) {
-    if (archiveSection.light[semgnet].allTheSame) {
-      if (archiveSection.light[semgnet].value !== 0) {
+  for (const segment of lightSegments) {
+    if (archiveSection.light[segment].allTheSame) {
+      if (archiveSection.light[segment].value !== 0) {
         buffers.light ??= {};
-        buffers.light[semgnet] = BinaryBuffer.Create({
+        buffers.light[segment] = BinaryBuffer.Create({
           format: BinaryBufferFormat.NibbleArray,
-          buffer: archiveSection.light[semgnet].value,
+          buffer: archiveSection.light[segment].value,
           byteLength: archiveSection.original.light.length,
         });
       }
-    } else if (archiveSection.light[semgnet].isPaletted) {
+    } else if (archiveSection.light[segment].isPaletted) {
       const type = BinaryBuffer.DetermineSubByteArray(
-        archiveSection.light[semgnet].remapped
-          ? archiveSection.palettes.light[semgnet].size
-          : sectorPalettes.light[semgnet].size
+        archiveSection.light[segment].remapped
+          ? archiveSection.palettes.light[segment].size
+          : sectorPalettes.light[segment].size
       )!;
       buffers.light ??= {};
-      buffers.light[semgnet] = BinaryBuffer.Create({
+      buffers.light[segment] = BinaryBuffer.Create({
         buffer: BinaryBuffer.Convert(
-          archiveSection.light[semgnet].buffer,
+          archiveSection.light[segment].buffer,
           BinaryBufferFormat.Uint8,
           type
         ).buffer,
@@ -134,8 +134,8 @@ export function CreateArchivedSection(
       });
     } else {
       buffers.light ??= {};
-      buffers.light[semgnet] = BinaryBuffer.Create({
-        buffer: getLightBuffer(semgnet, archiveSection.original.light).buffer,
+      buffers.light[segment] = BinaryBuffer.Create({
+        buffer: getLightBuffer(segment, archiveSection.original.light).buffer,
         format: BinaryBufferFormat.NibbleArray,
         byteLength: archiveSection.original.light.length,
       });

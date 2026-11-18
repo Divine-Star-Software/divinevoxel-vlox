@@ -9,9 +9,10 @@ import { VoxelLightData } from "../../Voxels/Cursor/VoxelLightData.js";
 
 import { WorldGeneration } from "./WorldGeneration.js";
 import { VoxelUpdateTask } from "../VoxelUpdateTask.js";
-import { RGBRemove, RGBUpdate } from "../Propagation/Illumanation/RGBUpdate.js";
-import { SunRemove, SunUpdate } from "../Propagation/Illumanation/SunUpdate.js";
+import { RGBRemove, RGBUpdate } from "../Propagation/Illumination/RGBUpdate.js";
+import { SunRemove, SunUpdate } from "../Propagation/Illumination/SunUpdate.js";
 import { RawVoxelData } from "Voxels/index.js";
+import { PerfLog } from "../../Util/PerfLog.js";
 
 const lightData = new VoxelLightData();
 export class WorldGenBrush extends BrushTool {
@@ -74,6 +75,7 @@ export class WorldGenBrush extends BrushTool {
     return this;
   }
   paint() {
+    PerfLog.count("brush.paint");
     let voxel = this.dataCursor.getVoxel(this.x, this.y, this.z);
     if (!voxel) {
       if (this.requestsId != "") {

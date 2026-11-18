@@ -1,3 +1,4 @@
+import { SimulationSector } from "./Dimensions/SimulationSector";
 import { Thread, ThreadPool } from "@amodx/threads";
 import { WorldStorageInterface } from "../World/Types/WorldStorage.interface";
 import { TaskTool } from "../Tools/Tasks/TasksTool";
@@ -6,10 +7,12 @@ import { WorldSimulationTasks } from "./Internal/WorldSimulationTasks";
 import { WorldSimulationTools } from "./Internal/WorldSimulationTools";
 import { WorldSimulationDimensions } from "./Internal/WorldSimulationDimensions";
 import { Vector3Like } from "@amodx/math";
-import { InitalLoad } from "./Procedures/InitalLoad";
+import { InitialLoad } from "./Procedures/InitialLoad";
 import SaveAllSectors from "./Procedures/SaveAllSectors";
 import { runActiveSectorUpdate } from "./Internal/runActiveSectorUpdate";
 import { WorldRegister } from "../World/WorldRegister";
+import { PerfLog } from "../Util/PerfLog";
+let lastTickEnd = 0;
 
 interface WorldSimulationInitData {
   parent: Thread;
@@ -17,7 +20,7 @@ interface WorldSimulationInitData {
   meshers: Thread | ThreadPool;
   worldStorage?: WorldStorageInterface;
 }
-let initalized = false;
+let initialized = false;
 /**# Infinite World Generation IWG
  * Object to handle the loading and generating the world around a created generator.
  */
@@ -33,7 +36,7 @@ export class WorldSimulation {
   }
 
   static Procedures = {
-    InitalLoad,
+    InitialLoad,
     SaveAllSectors,
   };
 
@@ -67,7 +70,7 @@ export class WorldSimulation {
   }
 
   static init(data: WorldSimulationInitData) {
-    initalized = true;
+    initialized = true;
 
     WorldSimulationTools.parent = data.parent;
     WorldSimulationTools.taskTool = new TaskTool(data.meshers, data.generators);
@@ -76,8 +79,8 @@ export class WorldSimulation {
   }
 
   static createGenerator(data: Partial<GeneratorData>) {
-    if (!initalized)
-      throw new Error(`IWG must be initalized first before creating generator`);
+    if (!initialized)
+      throw new Error(`IWG must be initialized first before creating generator`);
     return new Generator({
       dimension: data.dimension ? data.dimension : 0,
       position: data.position ? data.position : Vector3Like.Create(),
@@ -139,9 +142,29 @@ export class WorldSimulation {
   }
 
   static tick(generationOnly = false, buildOnly = false) {
+    const perfStart = PerfLog.now();
+    if (lastTickEnd) PerfLog.time("tick.gap", perfStart - lastTickEnd);
+    this._tick(generationOnly, buildOnly);
+    lastTickEnd = PerfLog.now();
+    PerfLog.time("tick", lastTickEnd - perfStart);
+  }
+
+  private static _tick(generationOnly: boolean, buildOnly: boolean) {
     let total = 0;
+    const sectorLoopStart = PerfLog.now();
     for (const [, dimension] of WorldSimulationDimensions._dimensions) {
       dimension.incrementTick();
+      SimulationSector._firstTickScansLeft =
+        SimulationSector.firstTickScansPerTick;
+      dimension.simulation.refreshTickCursors();
+      if (PerfLog.enabled) {
+        PerfLog.gauge("activeSectors", dimension.activeSectors._sectors.length);
+        let genAllDone = 0;
+        for (let i = 0; i < dimension.activeSectors._sectors.length; i++) {
+          if (dimension.activeSectors._sectors[i]._genAllDone) genAllDone++;
+        }
+        PerfLog.gauge("sectorsGenAllDone", genAllDone);
+      }
 
       for (let i = 0; i < dimension.activeSectors._sectors.length; i++) {
         total += dimension.activeSectors._sectors[i].tickQueue.getTotalTicks();
@@ -155,6 +178,8 @@ export class WorldSimulation {
       }
     }
 
+    PerfLog.end("tick.sectorLoop", sectorLoopStart);
+
     let needActiveSectorUpdate = false;
     for (const gen of this._generators) {
       gen.update();
@@ -166,7 +191,9 @@ export class WorldSimulation {
     }
 
     if (needActiveSectorUpdate) {
+      const activeStart = PerfLog.now();
       runActiveSectorUpdate();
+      PerfLog.end("tick.activeSectorUpdate", activeStart);
     }
 
     if (!buildOnly) {
@@ -184,7 +211,9 @@ export class WorldSimulation {
 
     if (!buildOnly) {
       WorldSimulationTasks.saveTasks.runTask(50);
-      WorldSimulationTasks.unloadTasks.runTask(50);
+      // Saving shares the generator threads with loading and world gen; a
+      // lower limit keeps it from starving the terrain ahead of the player.
+      WorldSimulationTasks.unloadTasks.runTask(12);
     }
     WorldSimulationTasks.unbuildTasks.runTask();
   }

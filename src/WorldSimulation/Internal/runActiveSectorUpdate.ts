@@ -11,14 +11,14 @@ const unrender = new Set<SimulationSector>();
 const render = new Set<SimulationSector>();
 const removedSectors: SimulationSector[] = [];
 const queue: number[] = [];
-const vistedMap = new Set<string>();
+const visitedMap = new Set<string>();
 export function runActiveSectorUpdate() {
   sectorSquare.sideLength = WorldSpaces.sector.bounds.x;
   for (const [, dimension] of WorldSimulationDimensions._dimensions) {
     for (let i = dimension.activeSectors._sectors.length - 1; i > -1; i--) {
       const sector = dimension.activeSectors._sectors[i];
       sector.generating = false;
-      sector.renderering = false;
+      sector.rendering = false;
       sector.ticking = false;
 
       const [cx, cy, cz] = sector.position;
@@ -69,8 +69,8 @@ export function runActiveSectorUpdate() {
         const cz = queue.shift()!;
         const key = WorldSpaces.hash.hashXYZ(cx, cy, cz);
 
-        if (vistedMap.has(key)) continue;
-        vistedMap.add(key);
+        if (visitedMap.has(key)) continue;
+        visitedMap.add(key);
 
         sectorSquare.sideLength = WorldSpaces.sector.bounds.x;
         sectorSquare.center.x = cx + WorldSpaces.sector.bounds.x / 2;
@@ -107,7 +107,7 @@ export function runActiveSectorUpdate() {
         ) {
           render.add(sector);
           unrender.delete(sector);
-          sector.renderering = true;
+          sector.rendering = true;
         } else {
           if (!render.has(sector) && sector._rendered) {
             unrender.add(sector);
@@ -134,7 +134,7 @@ export function runActiveSectorUpdate() {
         }
       }
 
-      vistedMap.clear();
+      visitedMap.clear();
     }
 
     for (const sector of unrender) {

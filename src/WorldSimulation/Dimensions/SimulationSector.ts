@@ -9,6 +9,7 @@ import { DimensionSegment } from "./DimensionSegment";
 import { VoxelBehaviorsRegister } from "../Voxels/Behaviors";
 import { MooreNeighborhood2D } from "../../Math/CardinalNeighbors";
 import { Thread } from "@amodx/threads";
+import { LocationData } from "../../Math";
 import { WorldDataSyncIds } from "../../World/Types/WorldDataSyncIds";
 import { EngineSettings } from "../../Settings/EngineSettings";
 import { SectionCursor } from "../../World/Cursor/SectionCursor";
@@ -17,7 +18,7 @@ const tempPosition = Vector3Like.Create();
 export class SimulationSector {
   position: Vec3Array = [0, 0, 0];
 
-  renderering = false;
+  rendering = false;
   generating = false;
   ticking = false;
   state = new SectorState(this);
@@ -26,9 +27,17 @@ export class SimulationSector {
   _rendered = false;
   _genAllDone = false;
   _firstTick = false;
+  /**
+   * The first time a sector ticks it scans every voxel for ones that need an
+   * update. When ticking starts (or the player arrives somewhere new) many
+   * sectors do this at once, which stalled the world thread for over a
+   * second, so only this many sectors scan per tick.
+   */
+  static firstTickScansPerTick = 8;
+  static _firstTickScansLeft = 8;
 
   /**An array of the last tick each section was built at */
-  _displayTicks = new Uint32Array(WorldSpaces.sector.sectionVolumne);
+  _displayTicks = new Uint32Array(WorldSpaces.sector.sectionVolume);
 
   tickQueue: TickQueue;
 
@@ -86,36 +95,23 @@ export class SimulationSector {
   checkOut(thread: Thread) {
     if (EngineSettings.settings.memoryAndCPU.useSharedMemory) return;
     if (!this.sector) return;
+    const dimension = this.dimension.id;
+    const locations: LocationData[] = [];
+    const buffers: ArrayBufferLike[] = [];
     for (const simSector of this.neighbors) {
-      const sector = simSector?.sector!;
+      const sector = simSector.sector!;
       sector.setCheckedOut(true);
-      thread.runTask(
-        WorldDataSyncIds.CheckInSector,
-        [[this.dimension.id, ...simSector.position], sector.buffer],
-        [sector.buffer],
-      );
+      locations.push([dimension, ...simSector.position]);
+      buffers.push(sector.buffer);
     }
     this.sector.setCheckedOut(true);
+    locations.push([dimension, ...this.position]);
+    buffers.push(this.sector.buffer);
     thread.runTask(
-      WorldDataSyncIds.CheckInSector,
-      [[this.dimension.id, ...this.position], this.sector.buffer],
-      [this.sector.buffer],
+      WorldDataSyncIds.CheckInSectors,
+      [[dimension, ...this.position], locations, buffers],
+      buffers,
     );
-  }
-
-  checkIn(thread: Thread) {
-    if (EngineSettings.settings.memoryAndCPU.useSharedMemory) return;
-    if (!this.sector) return;
-    for (const simSector of this.neighbors) {
-      thread.runTask(WorldDataSyncIds.CheckOutSector, [
-        this.dimension.id,
-        ...simSector.position,
-      ]);
-    }
-    thread.runTask(WorldDataSyncIds.CheckOutSector, [
-      this.dimension.id,
-      ...this.position,
-    ]);
   }
 
   tickUpdate(doTickUpdate = true) {
@@ -123,12 +119,12 @@ export class SimulationSector {
     if (this.sector?.isCheckedOut()) {
       return false;
     }
-    if ((!this.renderering && !this.ticking) || !this.sector) return false;
+    if ((!this.rendering && !this.ticking) || !this.sector) return false;
     if (!this._genAllDone) return false;
 
     let renderedSection = false;
     const sector = this.sector;
-    if (this.renderering && WorldSimulation.doBuildUpdate) {
+    if (this.rendering && WorldSimulation.doBuildUpdate) {
       for (const section of sector.sections) {
         if (
           !this._rendered ||
@@ -196,7 +192,13 @@ export class SimulationSector {
           break;
         }
       }
-      if (!this._firstTick && this.renderering && allNeighborsTicking) {
+      if (
+        !this._firstTick &&
+        this.rendering &&
+        allNeighborsTicking &&
+        SimulationSector._firstTickScansLeft > 0
+      ) {
+        SimulationSector._firstTickScansLeft--;
         for (const section of sector.sections) {
           this.sectionCursor.setSection(section);
           const [minY, maxY] = section.getMinMax();
@@ -330,7 +332,7 @@ export class SimulationSector {
     }
 
     if (
-      state.nPropagtionAllDone &&
+      state.nPropagationAllDone &&
       !sector.getBitFlag(Sector.FlagIds.isWorldSunDone)
     ) {
       WorldSimulationTasks.worldSunTasks.add(

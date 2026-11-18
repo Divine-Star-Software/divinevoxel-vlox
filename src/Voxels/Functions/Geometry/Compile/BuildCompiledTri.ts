@@ -3,7 +3,7 @@ import { Triangle } from "../../../../Mesher/Geometry/Primitives/Triangle";
 import { getVertexWeights } from "../CalcFunctions";
 import { TransformTriangle } from "../../../../Mesher/Geometry/Transform/TransformTriangle";
 import { VoxelGeometryTransform } from "../../../../Mesher/Geometry/Geometry.types";
-import { CompiledTriangleVoxelGeometryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGometryNodeTypes";
+import { CompiledTriangleVoxelGeometryNode } from "../../../../Mesher/Voxels/Models/Nodes/Types/TriangleVoxelGeometryNodeTypes";
 import { OcclusionFaceRegister } from "../Rules/OcclusionFaceRegister";
 import { closestVoxelFace } from "../../../../Math/UtilFunctions";
 

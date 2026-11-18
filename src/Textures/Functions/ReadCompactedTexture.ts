@@ -6,7 +6,7 @@ import {
   TextureDataBase,
 } from "../Texture.types";
 
-function findVarationTextureData(id: string, textureData: TextureData) {
+function findVariationTextureData(id: string, textureData: TextureData) {
   if (!textureData.variations) return null;
   for (let i = 0; i < textureData.variations.length; i++) {
     if (
@@ -48,9 +48,9 @@ export async function ReadCompactedTexture(
     textureData.base64 = (await compactedTextureReader.readImage(node)).src;
 
     if (node.variations) {
-      for (const varation of node.variations) {
-        const data = findVarationTextureData(varation.id, textureData)!;
-        data.base64 = (await compactedTextureReader.readImage(varation)).src;
+      for (const variation of node.variations) {
+        const data = findVariationTextureData(variation.id, textureData)!;
+        data.base64 = (await compactedTextureReader.readImage(variation)).src;
       }
     }
   }

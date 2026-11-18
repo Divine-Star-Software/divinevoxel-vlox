@@ -3,6 +3,8 @@ import { VoxelBoundsSelection } from "../../Templates/Selection/VoxelBoundsSelec
 import { Vector3Like } from "@amodx/math";
 import { Axes } from "@amodx/math/Vectors/Axes";
 import { FreePointSelection } from "./FreePointSelection";
+import { GetInclusiveEndPoint } from "./SurfaceBoxSelection";
+const endPoint = Vector3Like.Create();
 export class FreeBoxSelection {
   start: Vector3Like;
   selection: VoxelBoundsSelection;
@@ -23,7 +25,7 @@ export class FreeBoxSelection {
     this.selection.reConstruct(
       this.start,
       Axes.UpReadOnly(),
-      point,
+      GetInclusiveEndPoint(this.start, point, endPoint),
       Axes.UpReadOnly()
     );
   }

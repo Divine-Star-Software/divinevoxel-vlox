@@ -6,8 +6,8 @@ class GeometryStats {
 class PaletteStats {
   /**The final voxel palette id size. */
   paletteSize = 0;
-  /**The final reltional voxel palette id size. */
-  reltionalPaletteSize = 0;
+  /**The final relational voxel palette id size. */
+  relationalPaletteSize = 0;
 }
 
 /**
@@ -28,7 +28,7 @@ export class EngineStats {
 
     //palettes
     output += "Palette\n";
-    output += `Paltte Size: ${this.palette.paletteSize}\n`;
+    output += `Palette Size: ${this.palette.paletteSize}\n`;
 
     return output;
   }

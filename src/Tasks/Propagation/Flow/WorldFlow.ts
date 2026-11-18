@@ -3,8 +3,8 @@ import { VoxelUpdateTask } from "../../VoxelUpdateTask";
 import { WorldRegister } from "../../../World/WorldRegister";
 import { EngineSettings } from "../../../Settings/EngineSettings";
 import { Vec3Array } from "@amodx/math";
-import { SunRemove, SunUpdate } from "../Illumanation/SunUpdate";
-import { RGBRemove, RGBUpdate } from "../Illumanation/RGBUpdate";
+import { SunRemove, SunUpdate } from "../Illumination/SunUpdate";
+import { RGBRemove, RGBUpdate } from "../Illumination/RGBUpdate";
 import { WorldVoxelCursor } from "../../../World/Cursor/WorldVoxelCursor";
 const flowUpdateChecks: Vec3Array[] = [
   [0, -1, 0],

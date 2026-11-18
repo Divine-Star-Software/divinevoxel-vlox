@@ -1,4 +1,7 @@
-import { CardinalNeighbors3D } from "../../../Math/CardinalNeighbors.js";
+import {
+  CardinalNeighbors3D,
+  MooreNeighborhood2D,
+} from "../../../Math/CardinalNeighbors.js";
 import { WorldSpaces } from "../../../World/WorldSpaces.js";
 import { VoxelUpdateTask } from "../../VoxelUpdateTask.js";
 import { SectorHeightMap } from "../../../World/Sector/SectorHeightMap.js";
@@ -9,53 +12,32 @@ import {
   isLessThanForSunAddDown,
   isLessThanForSunAdd,
 } from "./CommonFunctions.js";
+import { PerfLog } from "../../../Util/PerfLog.js";
+import { SectorCursor } from "../../../World/Cursor/SectorCursor.js";
+import { Sector } from "../../../World/Sector/Sector.js";
 
 const queue: number[] = [];
 const lightData = new VoxelLightData();
 
-export function RunWorldSun(tasks: VoxelUpdateTask) {
-  const origin = tasks.origin;
-  const cx = origin[1];
-  const cy = origin[2];
-  const cz = origin[3];
-
+function FillAbove(
+  sectorCursor: SectorCursor,
+  dimension: number,
+  cx: number,
+  cy: number,
+  cz: number
+) {
   const sectorBoundsX = WorldSpaces.sector.bounds.x;
   const sectorBoundsY = WorldSpaces.sector.bounds.y;
   const sectorBoundsZ = WorldSpaces.sector.bounds.z;
   const sectionBoundsY = WorldSpaces.section.bounds.y;
-
-  const RmaxY = SectorHeightMap.getRelative(origin);
-  const AmaxY = SectorHeightMap.getAbsolute(
-    origin[0],
-    origin[1],
-    origin[2],
-    origin[3]
-  );
   const maxX = cx + sectorBoundsX;
   const maxY = cy + sectorBoundsY;
   const maxZ = cz + sectorBoundsZ;
 
-  const sectorCursor = tasks.nDataCursor.getSector(
-    origin[1],
-    origin[2],
-    origin[3]
-  );
-  if (!sectorCursor) {
-    console.warn(
-      "Could not load sector when running world sun at ",
-      origin.toString()
-    );
-    return;
-  }
-
-
+  const AmaxY = SectorHeightMap.getAbsolute(dimension, cx, cy, cz);
   const minY = AmaxY - 1 < 0 ? 0 : AmaxY;
   const section = sectorCursor.getSection(cx, minY, cz)!;
   const sectionY = section.getPosition()[1] + sectionBoundsY;
-
-  const sunFallOff = VoxelLightData.SunFallOffValue;
-  const nDataCursor = tasks.nDataCursor;
-  const sDataCursor = tasks.sDataCursor;
 
   for (let iy = minY; iy < sectionY; iy++) {
     for (let ix = cx; ix < maxX; ix++) {
@@ -77,14 +59,78 @@ export function RunWorldSun(tasks: VoxelUpdateTask) {
       light[i] = lightData.setS(0xf, light[i]);
     }
   }
+  return AmaxY;
+}
 
-  const maxAcculamteY = AmaxY == RmaxY ? RmaxY + 1 : RmaxY;
+export function RunWorldSun(tasks: VoxelUpdateTask) {
+  const origin = tasks.origin;
+  const cx = origin[1];
+  const cy = origin[2];
+  const cz = origin[3];
+
+  const sectorBoundsX = WorldSpaces.sector.bounds.x;
+  const sectorBoundsY = WorldSpaces.sector.bounds.y;
+  const sectorBoundsZ = WorldSpaces.sector.bounds.z;
+  const sectionBoundsY = WorldSpaces.section.bounds.y;
+
+  let phaseStart = PerfLog.now();
+  const RmaxY = SectorHeightMap.getRelative(origin);
+  const maxX = cx + sectorBoundsX;
+  const maxZ = cz + sectorBoundsZ;
+
+  const sectorCursor = tasks.nDataCursor.getSector(
+    origin[1],
+    origin[2],
+    origin[3]
+  );
+  if (!sectorCursor) {
+    console.warn(
+      "Could not load sector when running world sun at ",
+      origin.toString()
+    );
+    return;
+  }
+
+  const sunFallOff = VoxelLightData.SunFallOffValue;
+  const nDataCursor = tasks.nDataCursor;
+  const sDataCursor = tasks.sDataCursor;
+
+  PerfLog.end("sun.heightMap", phaseStart);
+  phaseStart = PerfLog.now();
+  const AmaxY = FillAbove(sectorCursor, origin[0], cx, cy, cz);
+  const minY = AmaxY - 1 < 0 ? 0 : AmaxY;
+
+  for (let i = 1; i < MooreNeighborhood2D.length; i++) {
+    const nx = cx + MooreNeighborhood2D[i][0] * sectorBoundsX;
+    const nz = cz + MooreNeighborhood2D[i][1] * sectorBoundsZ;
+    const neighborCursor = nDataCursor.getSector(nx, cy, nz);
+    if (
+      !neighborCursor ||
+      !neighborCursor._current ||
+      neighborCursor._current.getBitFlag(Sector.FlagIds.isWorldSunDone)
+    )
+      continue;
+    FillAbove(neighborCursor, origin[0], nx, cy, nz);
+  }
+
+  PerfLog.end("sun.fillAbove", phaseStart);
+  phaseStart = PerfLog.now();
+  const maxAccumulateY = AmaxY == RmaxY ? RmaxY + 1 : RmaxY;
+  PerfLog.count("sun.seedLayers", Math.max(0, maxAccumulateY - minY + 1));
   let queueIndex = 0;
   queue.length = 0;
 
-  for (let iy = minY; iy <= maxAcculamteY; iy++) {
+  for (let iy = minY; iy <= maxAccumulateY; iy++) {
     for (let ix = cx; ix < maxX; ix++) {
       for (let iz = cz; iz < maxZ; iz++) {
+        if (
+          iy != minY &&
+          ix != cx &&
+          ix != maxX - 1 &&
+          iz != cz &&
+          iz != maxZ - 1
+        )
+          continue;
         const voxel = sectorCursor.getVoxel(ix, iy, iz);
         if (!voxel) continue;
         const l = voxel.getLight();
@@ -108,6 +154,9 @@ export function RunWorldSun(tasks: VoxelUpdateTask) {
     }
   }
 
+  PerfLog.end("sun.seedScan", phaseStart);
+  PerfLog.count("sun.seeds", queue.length / 3);
+  phaseStart = PerfLog.now();
   while (queueIndex < queue.length) {
     const x = queue[queueIndex++];
     const y = queue[queueIndex++];
@@ -185,6 +234,15 @@ export function RunWorldSun(tasks: VoxelUpdateTask) {
       }
     }
   }
+  PerfLog.end("sun.flood", phaseStart);
+  let outside = 0;
+  for (let i = 0; i < queue.length; i += 3) {
+    const qx = queue[i];
+    const qz = queue[i + 2];
+    if (qx < cx || qx >= maxX || qz < cz || qz >= maxZ) outside++;
+  }
+  PerfLog.count("sun.floodNodesOutsideSector", outside);
+  PerfLog.count("sun.floodNodes", queue.length / 3);
 
   queue.length = 0;
 }

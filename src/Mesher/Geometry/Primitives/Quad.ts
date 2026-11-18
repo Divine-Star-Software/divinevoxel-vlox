@@ -13,7 +13,7 @@ import { QuadVector2VertexData, QuadVector3VertexData } from "./QuadVertexData";
 import {
   QuadUVData,
   QuadVertexVec3Data,
-  QuadVerticies,
+  QuadVertices,
 } from "../Geometry.types";
 import { GetBounds } from "../Functions/GetBounds";
 
@@ -48,9 +48,9 @@ export class Quad {
   }
 
   static RotateVertices90Degrees(
-    vertices: [QuadVerticies, QuadVerticies, QuadVerticies, QuadVerticies],
+    vertices: [QuadVertices, QuadVertices, QuadVertices, QuadVertices],
     times = 1
-  ): [QuadVerticies, QuadVerticies, QuadVerticies, QuadVerticies] {
+  ): [QuadVertices, QuadVertices, QuadVertices, QuadVertices] {
     while (times--) {
       vertices = [vertices[1], vertices[2], vertices[3], vertices[0]];
     }

@@ -1,5 +1,5 @@
 import {
-  VoxelSubstanceTagIdds as VoxelSubstanceTagIds,
+  VoxelSubstanceTagIds as VoxelSubstanceTagIds,
   VoxelSubstanceTags,
   VoxelTagIds,
   VoxelTags,
@@ -26,7 +26,7 @@ export class VoxelTagsRegister {
     VoxelTagIds.fullBlock,
     VoxelTagIds.simulationBehavior,
   ];
-  static IncludedSubstnacesTags: string[] = [
+  static IncludedSubstancesTags: string[] = [
     VoxelSubstanceTagIds.parent,
     VoxelSubstanceTagIds.isSolid,
     VoxelSubstanceTagIds.isTransparent,

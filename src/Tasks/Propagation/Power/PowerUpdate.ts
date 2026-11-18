@@ -1,13 +1,12 @@
 import { VoxelUpdateTask } from "../../VoxelUpdateTask";
 import { CardinalNeighbors3D } from "../../../Math/CardinalNeighbors";
 
-//@todo change array to not use push and shift
 export function PowerUpdate(tasks: VoxelUpdateTask) {
   const queue = tasks.power.update;
-  while (queue.length) {
-    const x = queue.shift()!;
-    const y = queue.shift()!;
-    const z = queue.shift()!;
+  while (queue.next()) {
+    const x = queue.x;
+    const y = queue.y;
+    const z = queue.z;
     const voxel = tasks.sDataCursor.getVoxel(x, y, z);
     if (!voxel) continue;
     const sl = voxel.getPower();
@@ -40,10 +39,10 @@ export function PowerRemove(tasks: VoxelUpdateTask) {
   const update = tasks.power.update;
   const removeMap = tasks.power.removeMap;
   const updateMap = tasks.power.updateMap;
-  while (remove.length) {
-    const x = remove.shift()!;
-    const y = remove.shift()!;
-    const z = remove.shift()!;
+  while (remove.next()) {
+    const x = remove.x;
+    const y = remove.y;
+    const z = remove.z;
     if (removeMap.has(x, y, z)) continue;
     removeMap.add(x, y, z);
     const voxel = tasks.sDataCursor.getVoxel(x, y, z);

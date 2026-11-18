@@ -6,7 +6,7 @@ import { VoxelCursorInterface } from "../../Cursor/VoxelCursor.interface";
 import { DataCursorInterface } from "../../Cursor/DataCursor.interface";
 import { BinarySchema } from "../Schema/BinarySchema";
 
-export class ReltionalStateBuilder {
+export class RelationalStateBuilder {
   name: string;
   position = Vector3Like.Create();
   voxel: VoxelCursorInterface;
@@ -35,7 +35,7 @@ export class ReltionalStateBuilder {
       let value = 1;
       const conditionsLength = conditions.length;
       for (let i = 0; i < conditionsLength; i++) {
-        if (!conditions[i].evulate()) {
+        if (!conditions[i].evaluate()) {
           value = 0;
           break;
         }

@@ -3,16 +3,19 @@ import { WorldSimulation } from "../WorldSimulation";
 import { WorldSimulationDimensions } from "../Internal/WorldSimulationDimensions";
 import { WorldSimulationTools } from "../Internal/WorldSimulationTools";
 import SaveAllSectors from "./SaveAllSectors";
-/**# InitalLoad
+import { PerfLog } from "../../Util/PerfLog";
+/**# InitialLoad
  * ---
  * Load the world without building.
  */
-export async function InitalLoad(props: {
+export async function InitialLoad(props: {
   dimension?: number;
   logTasks?: true;
   genData: Partial<GeneratorData>;
   buildOnly?: boolean;
 }) {
+  const loadStart = PerfLog.now();
+  PerfLog.log("InitialLoad started");
   return new Promise((resolve) => {
     WorldSimulation.doBuildUpdate = props.buildOnly || false;
 
@@ -44,6 +47,7 @@ export async function InitalLoad(props: {
     update();
 
     const maxDoneCount = 5;
+    const checkInterval = 250;
 
     let allDoneCount = 0;
     const check = async () => {
@@ -68,10 +72,13 @@ export async function InitalLoad(props: {
 
       if (!allDone || allDoneCount < maxDoneCount) {
         if (allDone) allDoneCount++;
-        setTimeout(check, 250);
+        setTimeout(check, checkInterval);
         return;
       }
       done = true;
+      PerfLog.log(
+        `InitialLoad finished in ${(PerfLog.now() - loadStart).toFixed(0)}ms (sectors: ${dimension.activeSectors._sectors.length})`
+      );
       clearTimeout(timeOut);
       WorldSimulation.removeGenerator(generator);
 

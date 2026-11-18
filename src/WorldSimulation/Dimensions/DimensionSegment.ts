@@ -116,7 +116,9 @@ export class DimensionSegment {
   }
 
   addTask(id: string, generationTask: boolean) {
-    this.tasks.set(id, new TaskSegment(this, generationTask));
+    const segment = new TaskSegment(this, generationTask);
+    segment.id = id;
+    this.tasks.set(id, segment);
   }
   getTask(id: string) {
     const task = this.tasks.get(id);
